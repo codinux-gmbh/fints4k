@@ -949,12 +949,14 @@ open class BankingPresenter(
             return TransactionsRetrievalState.AccountTypeNotSupported
         }
 
-        if (account.supportsRetrievingAccountTransactions == false) {
-            return TransactionsRetrievalState.AccountDoesNotSupportFetchingTransactions
-        }
-
+        // check first if transactions already have been received and then if retrieving transactions is supported as it already occurred that
+        // transactions have been retrieved but account.supportsRetrievingAccountTransactions was set to false (may retrieving transactions is now not supported anymore)
         if (account.bookedTransactions.isNotEmpty()) {
             return TransactionsRetrievalState.RetrievedTransactions
+        }
+
+        if (account.supportsRetrievingAccountTransactions == false) {
+            return TransactionsRetrievalState.AccountDoesNotSupportFetchingTransactions
         }
 
         if (account.retrievedTransactionsUpTo != null) {
