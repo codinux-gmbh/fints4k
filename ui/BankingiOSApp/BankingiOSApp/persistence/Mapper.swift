@@ -105,7 +105,7 @@ class Mapper {
         
         mapped.haveAllTransactionsBeenRetrieved = account.haveAllTransactionsBeenRetrieved
         mapped.isAccountTypeSupportedByApplication = account.isAccountTypeSupportedByApplication
-        mapped.countDaysForWhichTransactionsAreKept = map(account.countDaysForWhichTransactionsAreKept)!
+        mapped.countDaysForWhichTransactionsAreKept = map(account.countDaysForWhichTransactionsAreKept ?? 0)!
         
         mapped.userSetDisplayName = account.userSetDisplayName
         mapped.displayIndex = account.displayIndex
