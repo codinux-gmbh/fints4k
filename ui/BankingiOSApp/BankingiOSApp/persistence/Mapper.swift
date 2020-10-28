@@ -324,7 +324,8 @@ class Mapper {
             screenshotsAllowed: settings.screenshotsAllowed,
             flickerCodeSettings: map(settings.flickerCodeSettings),
             qrCodeSettings: map(settings.qrCodeSettings),
-            photoTanSettings: map(settings.photoTanSettings))
+            photoTanSettings: map(settings.photoTanSettings),
+            lastSelectedExportFolder: settings.lastSelectedExportFolder)
         
         mapped.technicalId = settings.objectIDAsString
 
@@ -341,6 +342,8 @@ class Mapper {
         mapped.flickerCodeSettings = map(settings.flickerCodeSettings, context)
         mapped.qrCodeSettings = map(settings.qrCodeSettings, context)
         mapped.photoTanSettings = map(settings.photoTanSettings, context)
+        
+        mapped.lastSelectedExportFolder = settings.lastSelectedExportFolder
         
         return mapped
     }
