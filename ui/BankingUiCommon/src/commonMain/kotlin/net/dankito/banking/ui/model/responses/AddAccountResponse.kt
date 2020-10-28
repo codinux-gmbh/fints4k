@@ -6,7 +6,7 @@ import net.dankito.banking.ui.model.*
 open class AddAccountResponse(
     open val bank: TypedBankData,
     retrievedData: List<RetrievedAccountData> = listOf(),
-    errorToShowToUser: String?,
+    errorToShowToUser: String? = null,
     wrongCredentialsEntered: Boolean = false,
     userCancelledAction: Boolean = false
 ) : GetTransactionsResponse(retrievedData, errorToShowToUser, wrongCredentialsEntered, userCancelledAction) {
