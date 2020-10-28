@@ -33,6 +33,7 @@ import net.dankito.banking.util.extraction.ITextExtractorRegistry
 import net.dankito.banking.util.extraction.NoOpInvoiceDataExtractor
 import net.dankito.banking.util.extraction.NoOpTextExtractorRegistry
 import net.codinux.banking.tools.epcqrcode.*
+import net.dankito.banking.service.testaccess.TestAccessBankingClientCreator
 import net.dankito.utils.multiplatform.*
 import net.dankito.utils.multiplatform.log.LoggerFactory
 import kotlin.collections.ArrayList
@@ -72,6 +73,9 @@ open class BankingPresenter(
         protected val MediumDateStyleDateFormatter = DateFormatter(DateFormatStyle.Medium)
 
         protected val MessageLogEntryDateFormatter = DateFormatter("yyyy.MM.dd HH:mm:ss.SSS")
+
+        protected const val TestAccountBankCode = "00000000"
+        protected val TestAccountBankInfo = BankInfo("Testbank", TestAccountBankCode, "RIEKDEMM", "80809", "München", "https://rie.ka/route/to/love", "FinTS V3.0")
 
         private val log = LoggerFactory.getLogger(BankingPresenter::class)
     }
@@ -145,7 +149,7 @@ open class BankingPresenter(
             val deserializedBanks = persister.readPersistedBanks()
 
             deserializedBanks.forEach { bank ->
-                val newClient = bankingClientCreator.createClient(bank, dataFolder, asyncRunner, callback)
+                val newClient = getBankingClientCreatorForBank(bank).createClient(bank, dataFolder, asyncRunner, callback)
 
                 addClientForBank(bank, newClient)
 
@@ -174,7 +178,7 @@ open class BankingPresenter(
         val bank = modelCreator.createBank(bankInfo.bankCode, userName, password, bankInfo.pinTanAddress ?: "", bankInfo.name, bankInfo.bic, "")
         bank.savePassword = savePassword
 
-        val newClient = bankingClientCreator.createClient(bank, dataFolder, asyncRunner, this.callback)
+        val newClient = getBankingClientCreatorForBank(bank).createClient(bank, dataFolder, asyncRunner, this.callback)
 
         val startDate = Date()
 
@@ -182,13 +186,21 @@ open class BankingPresenter(
             if (response.successful) {
                 try {
                     handleSuccessfullyAddedBank(response.bank, newClient, response, startDate)
-                } catch (e: Exception) {
+                } catch (e: Exception) { // TODO: show error to user. Otherwise she has no idea what's going on
                     log.error(e) { "Could not save successfully added bank" }
                 }
             }
 
             callback(response)
         }
+    }
+
+    protected open fun getBankingClientCreatorForBank(bank: TypedBankData): IBankingClientCreator {
+        if (isTestAccount(bank)) {
+            return TestAccessBankingClientCreator(modelCreator)
+        }
+
+        return bankingClientCreator
     }
 
     protected open fun handleSuccessfullyAddedBank(bank: TypedBankData, newClient: IBankingClient, response: AddAccountResponse, startDate: Date) {
@@ -202,7 +214,7 @@ open class BankingPresenter(
 
         findIconForBankAsync(bank)
 
-        persistBankOffUiThread(bank)
+        persistBankOffUiThread(bank) // TODO: if persisting bank throws an exception then () never gets called -> it's data is lost. Due database error maybe forever but also for this session / app run
 
         response.retrievedData.forEach { retrievedData ->
             retrievedAccountTransactions(GetTransactionsResponse(retrievedData), startDate, false)
@@ -210,6 +222,10 @@ open class BankingPresenter(
     }
 
     protected open fun findIconForBankAsync(bank: TypedBankData) {
+        if (isTestAccount(bank)) { // show default icon for test account
+            return
+        }
+
         bankIconFinder.findIconForBankAsync(bank.bankName) { bankIconUrl ->
             bankIconUrl?.let {
                 try {
@@ -700,6 +716,11 @@ open class BankingPresenter(
     }
 
     open fun findBanksByNameBankCodeOrCity(query: String?): List<BankInfo> {
+        // to provide test access as request by Apple
+        if (query == TestAccountBankCode) {
+            return listOf(TestAccountBankInfo)
+        }
+
         return bankFinder.findBankByNameBankCodeOrCity(query)
             .sortedBy { it.name.toLowerCase() }
     }
@@ -1043,6 +1064,15 @@ open class BankingPresenter(
         } catch (e: Exception) {
             log.error(e) { "Could not read AppSettings" }
         }
+    }
+
+
+    protected open fun isTestAccount(bank: TypedBankData): Boolean {
+        return isTestAccount(bank.bankCode)
+    }
+
+    protected open fun isTestAccount(bankCode: String): Boolean {
+        return bankCode == TestAccountBankCode
     }
 
 
