@@ -44,7 +44,7 @@ struct AddAccountDialog: View {
             
             Section(header: Text("Online banking login data")) {
                 LabelledUIKitTextField(label: "Online banking login name", text: $userName, placeholder: "Enter Online banking login name", autocapitalizationType: .none,
-                                       focusNextTextFieldOnReturnKeyPress: true, focusTextField: $focusLoginNameTextField, actionOnReturnKeyPress: handleReturnKeyPress)
+                                       focusNextTextFieldOnReturnKeyPress: true, focusTextField: focusLoginNameTextField, actionOnReturnKeyPress: handleReturnKeyPress)
                 
                 BankCredentialsPasswordView($password, $savePassword, handleReturnKeyPress)
             }
