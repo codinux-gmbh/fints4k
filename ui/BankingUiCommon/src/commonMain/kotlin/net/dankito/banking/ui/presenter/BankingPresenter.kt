@@ -75,7 +75,7 @@ open class BankingPresenter(
         protected val MessageLogEntryDateFormatter = DateFormatter("yyyy.MM.dd HH:mm:ss.SSS")
 
         protected const val TestAccountBankCode = "00000000"
-        protected val TestAccountBankInfo = BankInfo("Testbank", TestAccountBankCode, "RIEKDEMM", "80809", "München", "https://rie.ka/route/to/love", "FinTS V3.0")
+        protected val TestAccountBankInfo = BankInfo("Testbank", TestAccountBankCode, "RIEKDEMMBRV", "80000", "München", "https://rie.ka/route/to/love", "FinTS V3.0")
 
         private val log = LoggerFactory.getLogger(BankingPresenter::class)
     }

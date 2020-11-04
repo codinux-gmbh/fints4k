@@ -35,7 +35,7 @@ open class TestAccessBankingClient(
 
     override fun addAccountAsync(callback: (AddAccountResponse) -> Unit) {
         asyncRunner.runAsync { // for Android it's essential to get off UI thread
-            bank.customerName = "Horst"
+            bank.customerName = "Marieke Musterfrau"
             bank.supportedTanMethods = listOf()
             bank.tanMedia = listOf()
 
@@ -139,21 +139,51 @@ open class TestAccessBankingClient(
     protected open fun createAccountTransaction(account: TypedBankAccount, valueDate: Date): IAccountTransaction {
         val random = defaultRandom
 
-        val amount = createAmount(random)
-        val otherPartyName = getOtherPartyName(random)
-        val otherPartyBankCode = null
-        val otherPartyAccountId = "DEMirHerzlichEgal"
-        val bookingText = "Überweisung"
+        val specialTransaction = random.nextInt(0, 50)
 
-        return modelCreator.createTransaction(account, amount, "EUR", "Reference", valueDate, otherPartyName, otherPartyBankCode, otherPartyAccountId,
+        when {
+            specialTransaction % 49 == 0 -> return createSpecialAccountTransaction01(account, valueDate)
+            specialTransaction % 48 == 0 -> return createSpecialAccountTransaction02(account, valueDate)
+            specialTransaction % 47 == 0 -> return createSpecialAccountTransaction03(account, valueDate)
+            specialTransaction % 46 == 0 -> return createSpecialAccountTransaction04(account, valueDate)
+        }
+
+        val amount = createAmount(random)
+        val otherParty = getOtherParty(random)
+
+        return createAccountTransaction(account, valueDate, otherParty, amount, "Reference", "Überweisung")
+    }
+
+    protected open fun createSpecialAccountTransaction01(account: TypedBankAccount, valueDate: Date): IAccountTransaction {
+        return createAccountTransaction(account, valueDate, Triple("Andreas Scheuer", null, ""), BigDecimal(560_000_000.0), "Ich überweis das jetzt einfach mal irgendwo hin, wird schon wo ankommen", "Überweisung")
+    }
+
+    protected open fun createSpecialAccountTransaction02(account: TypedBankAccount, valueDate: Date): IAccountTransaction {
+        return createAccountTransaction(account, valueDate, Triple("Andreas Scheuer", null, ""), BigDecimal(2_000_000.0), "Bestechung für's Schweigen, dass ich mehrmals einen Meineid geschworen habe", "Überweisung")
+    }
+
+    protected open fun createSpecialAccountTransaction03(account: TypedBankAccount, valueDate: Date): IAccountTransaction {
+        return createAccountTransaction(account, valueDate, Triple("Donald Trump", null, ""), BigDecimal(200_000_000.0), "Thanks for manipulating the U.S. election 2020", "Überweisung")
+    }
+
+    protected open fun createSpecialAccountTransaction04(account: TypedBankAccount, valueDate: Date): IAccountTransaction {
+        return createAccountTransaction(account, valueDate, Triple("Ihre Lottoannahmestelle", null, ""), BigDecimal(1_500_000.0), "Lottogewinn", "Überweisung")
+    }
+
+    protected open fun createAccountTransaction(account: TypedBankAccount, valueDate: Date, otherParty: Triple<String, String?, String?>, amount: BigDecimal, reference: String, bookingText: String): IAccountTransaction {
+        val otherPartyName = otherParty.first
+        val otherPartyBankCode = otherParty.second
+        val otherPartyAccountId = otherParty.third
+
+        return modelCreator.createTransaction(account, amount, "EUR", reference, valueDate, otherPartyName, otherPartyBankCode, otherPartyAccountId,
             bookingText, valueDate)
     }
 
-    protected open fun getOtherPartyName(random: Random): String? {
+    protected open fun getOtherParty(random: Random): Triple<String, String?, String?> {
         val otherPartyNames = listOf("Mahatma Gandhi", "Mutter Theresa", "Nelson Mandela", "Schnappi das Krokodil", "Winnie Puh", "Albert Einstein", "Heinrich VIII.", "Andreas Scheuer")
         val otherPartyNameIndex = random.nextInt(0, otherPartyNames.size)
 
-        return otherPartyNames[otherPartyNameIndex]
+        return Triple(otherPartyNames[otherPartyNameIndex], null, "DE11MirEgal")
     }
 
     protected open fun createAmount(): BigDecimal {
