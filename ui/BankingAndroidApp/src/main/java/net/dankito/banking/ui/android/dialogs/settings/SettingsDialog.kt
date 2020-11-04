@@ -19,6 +19,7 @@ import net.dankito.banking.ui.model.TypedBankData
 import net.dankito.filechooserdialog.FileChooserDialog
 import net.dankito.filechooserdialog.model.FileChooserDialogConfig
 import net.dankito.utils.android.permissions.IPermissionsService
+import net.dankito.utils.multiplatform.toFile
 import java.io.File
 import java.text.SimpleDateFormat
 import javax.inject.Inject
@@ -123,7 +124,7 @@ open class SettingsDialog : SettingsDialogBase() {
 
 
     protected open fun exportAccountTransactions() {
-        val initialDirectory = presenter.appSettings.lastSelectedExportFolder?.let { File(it) }
+        val initialDirectory = presenter.appSettings.lastSelectedExportFolder.toFile()
         val suggestedFilename = getExportCsvSuggestedFilename()
 
 //        val intent = Intent(Intent.ACTION_CREATE_DOCUMENT)

@@ -630,6 +630,9 @@ open class BankingPresenter(
     }
 
     open fun showTransferMoneyDialogWithDataFromPdf(pdf: File): ExtractTransferMoneyDataFromPdfResult {
+        appSettings.lastSelectedOpenPdfFolder = pdf.parent?.getAbsolutePath()
+        appSettingsChanged()
+
         val extractionResult = textExtractorRegistry.extractTextWithBestExtractorForFile(pdf)
 
         if (extractionResult.couldExtractText == false || extractionResult.text == null) {

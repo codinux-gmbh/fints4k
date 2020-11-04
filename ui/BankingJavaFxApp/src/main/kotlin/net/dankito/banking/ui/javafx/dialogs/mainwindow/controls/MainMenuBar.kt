@@ -28,8 +28,6 @@ open class MainMenuBar(protected val presenter: BankingPresenter) : View() {
 
     protected val areAccountsThatCanTransferMoneyAdded = SimpleBooleanProperty()
 
-    protected var lastSelectedFolder: File? = null
-
 
     init {
         presenter.addBanksChangedListener {
@@ -89,12 +87,10 @@ open class MainMenuBar(protected val presenter: BankingPresenter) : View() {
     protected open fun showTransferMoneyDialogWithDataFromPdf() {
         val fileChooser = FileChooser()
 
-        fileChooser.initialDirectory = lastSelectedFolder
+        fileChooser.initialDirectory = presenter.appSettings.lastSelectedOpenPdfFolder.toFile()
         fileChooser.extensionFilters.add(FileChooser.ExtensionFilter("PDFs (*.pdf)", "*.pdf"))
 
         fileChooser.showOpenDialog(currentStage)?.let { pdfFile ->
-            lastSelectedFolder = pdfFile.parentFile
-
             val result = presenter.showTransferMoneyDialogWithDataFromPdf(pdfFile.toFile())
 
             if (result.type != ExtractTransferMoneyDataFromPdfResultType.Success) {

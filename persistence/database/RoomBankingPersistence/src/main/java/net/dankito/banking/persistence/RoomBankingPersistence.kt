@@ -190,7 +190,7 @@ open class RoomBankingPersistence(protected open val applicationContext: Context
 
     override fun saveOrUpdateAppSettings(appSettings: AppSettings) {
         val mapped = net.dankito.banking.persistence.model.AppSettings(appSettings.automaticallyUpdateAccountsAfterMinutes,
-            appSettings.lockAppAfterMinutes, appSettings.screenshotsAllowed, appSettings.lastSelectedExportFolder)
+            appSettings.lockAppAfterMinutes, appSettings.screenshotsAllowed, appSettings.lastSelectedOpenPdfFolder, appSettings.lastSelectedImportFolder, appSettings.lastSelectedExportFolder)
         database.appSettingsDao().saveOrUpdate(mapped)
 
         saveOrUpdateTanMethodSettings(appSettings.flickerCodeSettings, FlickerCodeTanMethodSettingsId)
@@ -215,6 +215,8 @@ open class RoomBankingPersistence(protected open val applicationContext: Context
             settings.automaticallyUpdateAccountsAfterMinutes = persistedSettings.automaticallyUpdateAccountsAfterMinutes
             settings.lockAppAfterMinutes = persistedSettings.lockAppAfterMinutes
             settings.screenshotsAllowed = persistedSettings.screenshotsAllowed
+            settings.lastSelectedOpenPdfFolder = persistedSettings.lastSelectedOpenPdfFolder
+            settings.lastSelectedImportFolder = persistedSettings.lastSelectedImportFolder
             settings.lastSelectedExportFolder = persistedSettings.lastSelectedExportFolder
         }
 

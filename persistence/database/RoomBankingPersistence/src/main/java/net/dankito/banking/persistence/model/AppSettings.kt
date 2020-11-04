@@ -11,6 +11,8 @@ open class AppSettings(
     open var automaticallyUpdateAccountsAfterMinutes: Int? = AppSettings.DefaultAutomaticallyUpdateAccountsAfterMinutes,
     open var lockAppAfterMinutes: Int? = null,
     open var screenshotsAllowed: Boolean = false,
+    open var lastSelectedOpenPdfFolder: String? = null,
+    open var lastSelectedImportFolder: String? = null,
     open var lastSelectedExportFolder: String? = null
 ) {
 

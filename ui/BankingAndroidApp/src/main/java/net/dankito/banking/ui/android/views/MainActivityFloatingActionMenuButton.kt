@@ -33,8 +33,6 @@ open class MainActivityFloatingActionMenuButton(
 
     protected lateinit var fabTransferMoneyFromPdf: FloatingActionButton
 
-    protected var lastSelectedFolder: File? = null
-
 
     init {
         setupButtons(floatingActionMenu)
@@ -98,12 +96,10 @@ open class MainActivityFloatingActionMenuButton(
 
     protected open fun showTransferMoneyDialogWithDataFromPdf() {
         (floatingActionMenu.context.asActivity() as? FragmentActivity)?.let { activity ->
-            val config = FileChooserDialogConfig(listOf("*.pdf"), lastSelectedFolder)
+            val config = FileChooserDialogConfig(listOf("*.pdf"), presenter.appSettings.lastSelectedOpenPdfFolder.toFile())
 
             FileChooserDialog().showOpenSingleFileDialog(activity, permissionsService, config) { _, selectedFile ->
                 selectedFile?.let {
-                    lastSelectedFolder = selectedFile.parentFile
-
                     val result = presenter.showTransferMoneyDialogWithDataFromPdf(selectedFile.toFile())
 
                     if (result.type != ExtractTransferMoneyDataFromPdfResultType.Success) {

@@ -325,6 +325,8 @@ class Mapper {
             flickerCodeSettings: map(settings.flickerCodeSettings),
             qrCodeSettings: map(settings.qrCodeSettings),
             photoTanSettings: map(settings.photoTanSettings),
+            lastSelectedOpenPdfFolder: settings.lastSelectedOpenPdfFolder,
+            lastSelectedImportFolder: settings.lastSelectedImportFolder,
             lastSelectedExportFolder: settings.lastSelectedExportFolder)
         
         mapped.technicalId = settings.objectIDAsString
@@ -343,6 +345,8 @@ class Mapper {
         mapped.qrCodeSettings = map(settings.qrCodeSettings, context)
         mapped.photoTanSettings = map(settings.photoTanSettings, context)
         
+        mapped.lastSelectedOpenPdfFolder = settings.lastSelectedOpenPdfFolder
+        mapped.lastSelectedImportFolder = settings.lastSelectedImportFolder
         mapped.lastSelectedExportFolder = settings.lastSelectedExportFolder
         
         return mapped
