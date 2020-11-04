@@ -176,7 +176,7 @@ class BankingModule(private val applicationContext: Context) {
     @Provides
     @Singleton
     fun provideInvoiceDataExtractor() : IInvoiceDataExtractor {
-        return NoOpInvoiceDataExtractor()
+        return JavaInvoiceDataExtractor()
     }
 
 
