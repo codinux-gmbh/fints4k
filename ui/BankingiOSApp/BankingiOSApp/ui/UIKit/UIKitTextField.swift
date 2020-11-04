@@ -101,6 +101,10 @@ struct UIKitTextField: UIViewRepresentable {
         if focusTextField {
             DispatchQueue.main.async { // in very few cases focusTextField gets called during view update resulting in 'undefined behavior' -> async() fixes this
                 uiView.focus()
+                
+                if isPasswordField { // TODO: currently it works but focusTextField can in general also be set in other ways then by tapping on label
+                    context.coordinator.togglePasswordVisibility()
+                }
 
                 DispatchQueue.main.async {
                     self.focusTextField = false // reset value so that it can be set again (otherwise it may never gets resetted and then updateUIView() requests focus even though already another view got the focus in the meantime)
