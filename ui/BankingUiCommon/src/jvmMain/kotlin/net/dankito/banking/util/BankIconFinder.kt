@@ -3,6 +3,7 @@ package net.dankito.banking.util
 import net.dankito.utils.favicon.FaviconComparator
 import net.dankito.utils.favicon.FaviconFinder
 import net.dankito.utils.favicon.web.UrlConnectionWebClient
+import net.dankito.utils.os.OsHelper
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.slf4j.LoggerFactory
@@ -48,11 +49,13 @@ open class BankIconFinder : IBankIconFinder {
             webClient.get(bankUrl).body?.let { bankHomepageResponse ->
                 val favicons = faviconFinder.extractFavicons(Jsoup.parse(bankHomepageResponse), bankUrl)
 
-                faviconComparator.getBestIcon(favicons, prefSize, prefSize + 32, true)?.let { prefFavicon ->
+                val fileTypesToExclude = if (OsHelper().isRunningOnAndroid) listOf() else listOf(".ico") // JavaFX cannot display .ico files
+
+                faviconComparator.getBestIcon(favicons, prefSize, prefSize + 32, true, fileTypesToExclude)?.let { prefFavicon ->
                     return prefFavicon.url
                 }
 
-                return faviconComparator.getBestIcon(favicons, 16)?.url
+                return faviconComparator.getBestIcon(favicons, 16, null, true, fileTypesToExclude)?.url
             }
         }
 
