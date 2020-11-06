@@ -174,9 +174,8 @@ open class BankingPresenter(
 
 
     // TODO: move BankInfo out of fints4k
-    open fun addAccountAsync(bankInfo: BankInfo, userName: String, password: String, savePassword: Boolean = true, callback: (AddAccountResponse) -> Unit) {
+    open fun addAccountAsync(bankInfo: BankInfo, userName: String, password: String, callback: (AddAccountResponse) -> Unit) {
         val bank = modelCreator.createBank(bankInfo.bankCode, userName, password, bankInfo.pinTanAddress ?: "", bankInfo.name, bankInfo.bic, "")
-        bank.savePassword = savePassword
 
         val newClient = getBankingClientCreatorForBank(bank).createClient(bank, dataFolder, asyncRunner, this.callback)
 
@@ -527,14 +526,13 @@ open class BankingPresenter(
         callBanksChangedListeners()
     }
 
-    open fun bankUpdated(bank: TypedBankData, enteredUsername: String, enteredPassword: String, savePassword: Boolean, selectedTanMethod: TanMethod?) {
-        val didCredentialsChange = bank.userName != enteredUsername || bank.password != enteredPassword || bank.savePassword != savePassword
+    open fun bankUpdated(bank: TypedBankData, enteredUsername: String, enteredPassword: String, selectedTanMethod: TanMethod?) {
+        val didCredentialsChange = bank.userName != enteredUsername || bank.password != enteredPassword
         val didSelectedTanMethodChange = bank.selectedTanMethod != selectedTanMethod
 
         if (didCredentialsChange) {
             bank.userName = enteredUsername
             bank.password = enteredPassword
-            bank.savePassword = savePassword
 
             if (bank.wrongCredentialsEntered) {
                 bank.wrongCredentialsEntered = false // so that on next call its accounts are considered and so it gets checked if credentials are now correct

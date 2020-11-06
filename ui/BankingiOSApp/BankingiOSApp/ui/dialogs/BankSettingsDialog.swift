@@ -16,7 +16,6 @@ struct BankSettingsDialog: View {
     
     @State private var userName: String
     @State private var password: String
-    @State private var savePassword: Bool
     
     @State private var selectedTanMethod: TanMethod?
 
@@ -40,7 +39,6 @@ struct BankSettingsDialog: View {
         
         _userName = State(initialValue: bank.userName)
         _password = State(initialValue: bank.password)
-        _savePassword = State(initialValue: bank.savePassword)
         
         _selectedTanMethod = State(initialValue: bank.selectedTanMethod)
         
@@ -58,7 +56,7 @@ struct BankSettingsDialog: View {
                 LabelledUIKitTextField(label: "Online banking login name", text: $userName, autocapitalizationType: .none)
                 
 
-                BankCredentialsPasswordView($password, $savePassword)
+                BankCredentialsPasswordView($password)
             }
             
             Section {
@@ -133,7 +131,7 @@ struct BankSettingsDialog: View {
         if hasUnsavedData {
             bank.userSetDisplayName = displayName
             
-            presenter.bankUpdated(bank: bank, enteredUsername: userName, enteredPassword: password, savePassword: savePassword, selectedTanMethod: selectedTanMethod)
+            presenter.bankUpdated(bank: bank, enteredUsername: userName, enteredPassword: password, selectedTanMethod: selectedTanMethod)
         }
         
         closeDialog()

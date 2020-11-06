@@ -38,10 +38,4 @@ open class BankCredentialsPasswordView @JvmOverloads constructor(
     open val passwordBox: TextInputEditText
         get() = textInputEditText
 
-    open var savePassword: Boolean
-        get() = swtchSavePassword.isChecked
-        set(value) {
-            swtchSavePassword.isChecked = value
-        }
-
 }

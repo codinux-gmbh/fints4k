@@ -120,7 +120,7 @@ open class AddAccountDialog : DialogFragment() {
             btnAddAccount.isEnabled = false
             pgrbrAddAccount.visibility = View.VISIBLE
 
-            presenter.addAccountAsync(selectedBank, userName, password, bankCredentialsPassword.savePassword) { response ->
+            presenter.addAccountAsync(selectedBank, userName, password) { response ->
                 context?.asActivity()?.runOnUiThread {
                     btnAddAccount.isEnabled = true
                     pgrbrAddAccount.visibility = View.GONE

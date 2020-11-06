@@ -63,7 +63,6 @@ open class BankSettingsDialog : SettingsDialogBase() {
             edtxtBankName.text = bank.displayName
             edtxtUserName.text = bank.userName
             bankCredentialsPassword.password = bank.password
-            bankCredentialsPassword.savePassword = bank.savePassword
 
             val tanMethodItems = createTanMethodItems()
             val tanMethodsAdapter = FastAdapterRecyclerView(rootView.rcyTanMethods, tanMethodItems)
@@ -127,13 +126,12 @@ open class BankSettingsDialog : SettingsDialogBase() {
         get() = didChange(edtxtBankName, bank.displayName)
                 || didChange(edtxtUserName, bank.userName)
                 || bankCredentialsPassword.password != bank.password
-                || bankCredentialsPassword.savePassword != bank.savePassword
                 || bank.selectedTanMethod != selectedTanMethod
 
     override fun saveChanges() {
         bank.userSetDisplayName = edtxtBankName.text
 
-        presenter.bankUpdated(bank, edtxtUserName.text, bankCredentialsPassword.password, bankCredentialsPassword.savePassword, selectedTanMethod)
+        presenter.bankUpdated(bank, edtxtUserName.text, bankCredentialsPassword.password, selectedTanMethod)
     }
 
     protected open fun askUserToDeleteAccount() {
