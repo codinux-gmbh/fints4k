@@ -49,7 +49,7 @@ ext {
 
     fileChooserDialogVersion = "1.3.0-androidx"
 
-    androidUtilsVersion = '1.1.1-SNAPSHOT'
+    androidUtilsVersion = '1.1.2'
 
     fastAdapterVersion = "5.2.4"
 

@@ -39,6 +39,7 @@ import net.dankito.utils.multiplatform.toBigDecimal
 import net.dankito.utils.android.extensions.asActivity
 import net.dankito.utils.android.extensions.getDimension
 import net.dankito.utils.android.extensions.getResourceIdentifier
+import net.dankito.utils.android.extensions.setVisibility
 import java.math.BigDecimal
 import java.text.DecimalFormatSymbols
 import java.util.*
@@ -478,14 +479,18 @@ open class TransferMoneyDialog : DialogFragment() {
             }
         }
 
+        val showHintOrError = validationResult.validationError != null || validationResult.validationHint != null
+
+        val textInputErrorLayout = textInputLayout.getResourceIdentifier("textinput_error", "id")?.let { textInputErrorId -> textInputLayout.findViewById<View>(textInputErrorId)?.parent?.parent as? View }
+        textInputErrorLayout?.setVisibility(showHintOrError)
+
         textInputLayout.error = validationResult.validationError
         if (validationResult.validationError == null) { // don't overwrite error text
             textInputLayout.helperText = validationResult.validationHint
         }
 
         (textInputLayout.layoutParams as? ViewGroup.MarginLayoutParams)?.let { params ->
-            val isShowingHintOrError = validationResult.validationError != null || validationResult.validationHint != null
-            params.bottomMargin = if (isShowingHintOrError == false || textInputLayout == lytReference) 0
+            params.bottomMargin = if (showHintOrError == false || textInputLayout == lytReference) 0
                                     else context!!.getDimension(R.dimen.dialog_transfer_money_input_fields_bottom_margin_when_displaying_validation_label)
         }
     }
