@@ -16,10 +16,10 @@ ext {
 
     javaUtilsVersion = '1.0.16'
 
-    luceneUtilsVersion = "0.5.1-SNAPSHOT"
+    luceneUtilsVersion = "0.6.0"
 
 
-    textExtractorVersion = "0.5.1-SNAPSHOT"
+    textExtractorVersion = "0.6.0"
 
     textInfoExtractorVersion = "1.0.1"
 
@@ -86,7 +86,7 @@ ext {
 
     /*      JavaFX      */
 
-    javaFxUtilsVersion = '1.0.8-SNAPSHOT'
+    javaFxUtilsVersion = '1.0.8'
 
 
     /*      REST APIs   */
