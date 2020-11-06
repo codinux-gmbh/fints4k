@@ -62,7 +62,7 @@ kotlin {
                 api "net.dankito.text.extraction:text-extractor-common:$textExtractorVersion"
                 api "net.dankito.text.extraction:text-info-extractor:$textInfoExtractorVersion"
 
-                implementation "net.dankito.utils:favicon-finder:1.0.0-SNAPSHOT"
+                implementation "net.dankito.utils:favicon-finder:$faviconFinderVersion"
 
                 implementation "org.jsoup:jsoup:1.13.1"
             }

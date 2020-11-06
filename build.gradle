@@ -36,6 +36,11 @@ ext {
 //    embedBitcodeValue = "bitcode" // for release binaries
 
 
+    /*      Java        */
+
+    faviconFinderVersion = "1.0.0"
+
+
     /*      Android     */
 
     androidCompileSdkVersion = 28

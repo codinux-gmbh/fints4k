@@ -2,7 +2,7 @@ package net.dankito.banking.util
 
 import net.dankito.utils.favicon.FaviconComparator
 import net.dankito.utils.favicon.FaviconFinder
-import net.dankito.utils.web.client.OkHttpWebClient
+import net.dankito.utils.favicon.web.UrlConnectionWebClient
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.slf4j.LoggerFactory
@@ -30,7 +30,7 @@ open class BankIconFinder : IBankIconFinder {
     }
 
 
-    protected val webClient = OkHttpWebClient()
+    protected val webClient = UrlConnectionWebClient()
 
     protected val faviconFinder = FaviconFinder(webClient)
 
