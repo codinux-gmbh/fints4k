@@ -12,6 +12,7 @@ import net.dankito.banking.ui.android.authentication.AuthenticationService
 import net.dankito.banking.ui.android.authentication.AuthenticationType
 import net.dankito.banking.ui.android.di.BankingComponent
 import net.dankito.banking.ui.android.extensions.addEnterPressedListener
+import net.dankito.utils.android.extensions.hide
 import javax.inject.Inject
 
 
@@ -37,7 +38,7 @@ open class LoginActivity : BaseActivity() {
         setContentView(R.layout.activity_login)
 
         if (authenticationService.authenticationType == AuthenticationType.Password) {
-            lytBiometricAuthentication.visibility = View.GONE
+            lytBiometricAuthentication.hide()
 
             edtxtLoginPassword.actualEditText.addEnterPressedListener {
                 checkEnteredPasswordAndLogIn()
@@ -47,7 +48,7 @@ open class LoginActivity : BaseActivity() {
             btnLogin.setOnClickListener { checkEnteredPasswordAndLogIn() }
         }
         else {
-            lytPasswordAuthentication.visibility = View.GONE
+            lytPasswordAuthentication.hide()
 
             btnBiometricAuthentication.customButtonClickHandler = {
                 authenticationService.loginUserWithBiometric { result ->

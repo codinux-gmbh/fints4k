@@ -26,6 +26,9 @@ import net.dankito.banking.ui.model.parameters.TransferMoneyData
 import net.dankito.banking.ui.model.responses.GetTransactionsResponse
 import net.dankito.banking.ui.presenter.BankingPresenter
 import net.dankito.utils.android.extensions.asActivity
+import net.dankito.utils.android.extensions.hide
+import net.dankito.utils.android.extensions.isGone
+import net.dankito.utils.android.extensions.setVisibility
 import net.dankito.utils.multiplatform.sum
 import javax.inject.Inject
 
@@ -246,7 +249,7 @@ class HomeFragment : Fragment() {
         mnitmBalance.title = presenter.formatAmount(presenter.balanceOfSelectedAccounts)
         mnitmBalance.isVisible = presenter.doSelectedAccountsSupportRetrievingBalance
 
-        lytTransactionsSummary.visibility = if (presenter.doSelectedAccountsSupportRetrievingBalance) View.VISIBLE else View.GONE
+        lytTransactionsSummary.setVisibility(presenter.doSelectedAccountsSupportRetrievingBalance)
 
         txtCountTransactions.text = context?.getString(R.string.fragment_home_count_transactions, transactionAdapter.items.size)
 
@@ -264,11 +267,11 @@ class HomeFragment : Fragment() {
         val haveTransactionsBeenRetrieved = transactionsRetrievalState == TransactionsRetrievalState.RetrievedTransactions
         val noAccountsAddedYet = presenter.allBanks.isEmpty()
 
-        lytTransactionsTopBar.visibility = if (haveTransactionsBeenRetrieved) View.VISIBLE else View.GONE
-        rcyvwAccountTransactions.visibility = if (haveTransactionsBeenRetrieved) View.VISIBLE else View.GONE
-        lytNoTransactionsFetched.visibility = if (haveTransactionsBeenRetrieved || noAccountsAddedYet) View.GONE else View.VISIBLE
-        btnRetrieveTransactions.visibility = if (TransactionsCannotBeRetrievedStates.contains(transactionsRetrievalState)) View.GONE else View.VISIBLE
-        btnAddAccount.visibility = if (noAccountsAddedYet) View.VISIBLE else View.GONE
+        lytTransactionsTopBar.setVisibility(haveTransactionsBeenRetrieved)
+        rcyvwAccountTransactions.setVisibility(haveTransactionsBeenRetrieved)
+        lytNoTransactionsFetched.isGone = haveTransactionsBeenRetrieved || noAccountsAddedYet
+        btnRetrieveTransactions.isGone = TransactionsCannotBeRetrievedStates.contains(transactionsRetrievalState)
+        btnAddAccount.setVisibility(noAccountsAddedYet)
 
         val messageArgs = mutableListOf<String>()
         val transactionsRetrievalStateMessageId = when (transactionsRetrievalState) {
@@ -291,19 +294,14 @@ class HomeFragment : Fragment() {
         showTopFetchAllTransactionsView = presenter.showStrikingFetchAllTransactionsViewForSelectedAccounts
         val showFetchAllTransactionsView = presenter.showFetchAllTransactionsViewForSelectedAccounts
 
-        if (showFetchAllTransactionsView && showTopFetchAllTransactionsView) {
-            lytTopFetchAllTransactions.visibility = View.VISIBLE
-        }
-        else {
-            lytTopFetchAllTransactions.visibility = View.GONE
-        }
+        lytTopFetchAllTransactions.setVisibility(showFetchAllTransactionsView && showTopFetchAllTransactionsView)
 
         if (showFetchAllTransactionsView && showTopFetchAllTransactionsView == false) {
             // TODO: implement CoordinatorLayout to show lytBottomFetchAllTransactions below rcyvwAccountTransactions
 //            lytBottomFetchAllTransactions.visibility = View.VISIBLE
         }
         else {
-            lytBottomFetchAllTransactions.visibility = View.GONE
+            lytBottomFetchAllTransactions.hide()
         }
     }
 

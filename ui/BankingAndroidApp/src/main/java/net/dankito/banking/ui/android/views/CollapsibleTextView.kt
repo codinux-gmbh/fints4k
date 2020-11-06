@@ -9,6 +9,7 @@ import kotlinx.android.synthetic.main.view_collapsible_text.view.*
 import net.dankito.banking.ui.android.R
 import net.dankito.banking.ui.android.util.StandardTextWatcher
 import net.dankito.utils.android.extensions.asActivity
+import net.dankito.utils.android.extensions.setVisibility
 import java.util.*
 import kotlin.concurrent.schedule
 
@@ -64,7 +65,7 @@ open class CollapsibleTextView @JvmOverloads constructor(
         Timer().schedule(500) { // wait some time till txtvwCollapsibleText is layout and lineCount is set
             context.asActivity()?.runOnUiThread {
                 val showExpandButton = isCollapsed == false || txtvwCollapsibleText.lineCount > CountDisplayedLinesWhenCollapsed
-                btnExpandCollapseTextView.visibility = if (showExpandButton) View.VISIBLE else View.GONE
+                btnExpandCollapseTextView.setVisibility(showExpandButton)
             }
         }
     }

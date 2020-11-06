@@ -35,11 +35,8 @@ import net.dankito.banking.bankfinder.BankInfo
 import net.dankito.banking.ui.android.extensions.isEllipsized
 import net.dankito.banking.ui.android.views.InfoPopupWindow
 import net.dankito.banking.util.ValidationResult
+import net.dankito.utils.android.extensions.*
 import net.dankito.utils.multiplatform.toBigDecimal
-import net.dankito.utils.android.extensions.asActivity
-import net.dankito.utils.android.extensions.getDimension
-import net.dankito.utils.android.extensions.getResourceIdentifier
-import net.dankito.utils.android.extensions.setVisibility
 import java.math.BigDecimal
 import java.text.DecimalFormatSymbols
 import java.util.*
@@ -114,7 +111,7 @@ open class TransferMoneyDialog : DialogFragment() {
         account = preselectedValues?.account ?: accountsSupportingTransferringMoney.first()
 
         if (accountsSupportingTransferringMoney.size > 1) {
-            rootView.lytSelectBankAccount.visibility = View.VISIBLE
+            rootView.lytSelectBankAccount.show()
 
             val adapter = IconedBankAccountsAdapter(accountsSupportingTransferringMoney)
             rootView.spnBankAccounts.adapter = adapter
@@ -185,13 +182,7 @@ open class TransferMoneyDialog : DialogFragment() {
     }
 
     protected open fun setRealTimeTransferControlsVisibility(rootView: View) {
-        rootView.lytRealTimeTransfer.visibility =
-            if (account.supportsRealTimeTransfer) {
-                View.VISIBLE
-            }
-            else {
-                View.GONE
-            }
+        rootView.lytRealTimeTransfer.setVisibility(account.supportsRealTimeTransfer)
     }
 
     protected open fun showRealTimeTransferInfo(btnShowRealTimeTransferInfo: ImageButton) {
@@ -353,16 +344,16 @@ open class TransferMoneyDialog : DialogFragment() {
 
         if (foundBank != null) {
             txtRecipientBankInfo.text = getString(R.string.dialog_transfer_money_bic_detected_from_iban, foundBank.bic, foundBank.name)
-            txtRecipientBankInfo.visibility = View.VISIBLE
+            txtRecipientBankInfo.show()
             setIbanValidationErrorVisibility()
         }
         else if (enteredIban.length >= InputValidator.MinimumLengthToDetermineBicFromIban) {
             txtRecipientBankInfo.text = getString(R.string.dialog_transfer_money_could_not_determine_bic_from_iban, enteredIban.substring(4, InputValidator.MinimumLengthToDetermineBicFromIban))
-            txtRecipientBankInfo.visibility = View.VISIBLE
+            txtRecipientBankInfo.show()
             setIbanValidationErrorVisibility()
         }
         else {
-            txtRecipientBankInfo.visibility = View.GONE
+            txtRecipientBankInfo.hide()
         }
 
         checkIfRequiredDataEnteredOnUiThread()
@@ -371,7 +362,7 @@ open class TransferMoneyDialog : DialogFragment() {
     protected open fun setIbanValidationErrorVisibility() {
         getIbanTextInputErrorView()?.let { textInputError ->
             val displaysErrorOrHint = lytRecipientIban.error != null || lytRecipientIban.helperText != null
-            (textInputError.parent?.parent as? ViewGroup)?.visibility = if (displaysErrorOrHint) View.VISIBLE else View.GONE
+            (textInputError.parent?.parent as? ViewGroup)?.setVisibility(displaysErrorOrHint)
         }
     }
 

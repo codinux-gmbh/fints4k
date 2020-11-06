@@ -15,6 +15,9 @@ import net.dankito.banking.ui.android.di.BankingComponent
 import net.dankito.banking.ui.android.extensions.addEnterPressedListener
 import net.dankito.banking.ui.android.util.StandardTextWatcher
 import net.dankito.utils.android.extensions.hideKeyboardDelayed
+import net.dankito.utils.android.extensions.hide
+import net.dankito.utils.android.extensions.setVisibility
+import net.dankito.utils.android.extensions.show
 import org.slf4j.LoggerFactory
 import javax.inject.Inject
 
@@ -62,7 +65,7 @@ open class ProtectAppSettingsDialog : SettingsDialogBase() {
             val isBiometricAuthenticationSupported = authenticationService.isBiometricAuthenticationSupported
 
             val showAuthenticationMethods = isBiometricAuthenticationSupported || authenticationType != AuthenticationType.None // hide select authentication method if password is the only option to choose
-            segmentedGroup.visibility = if (showAuthenticationMethods) View.VISIBLE else View.GONE
+            segmentedGroup.setVisibility(showAuthenticationMethods)
             segmentedGroup.doOnNextLayout {
                 val segmentedControlButtonWidth = segmentedGroup.measuredWidth / 3
                 btnShowBiometricAuthenticationSection.layoutParams.width = segmentedControlButtonWidth
@@ -70,7 +73,7 @@ open class ProtectAppSettingsDialog : SettingsDialogBase() {
                 btnShowRemoveAppProtectionSection.layoutParams.width = segmentedControlButtonWidth
             }
 
-            btnShowBiometricAuthenticationSection.visibility = if (isBiometricAuthenticationSupported) View.VISIBLE else View.GONE
+            btnShowBiometricAuthenticationSection.setVisibility(isBiometricAuthenticationSupported)
             btnShowBiometricAuthenticationSection.setOnCheckedChangeListener { _, isChecked ->
                 if (isChecked) {
                     showAuthenticationLayout(rootView, lytBiometricAuthentication)
@@ -114,11 +117,11 @@ open class ProtectAppSettingsDialog : SettingsDialogBase() {
     }
 
     protected open fun showAuthenticationLayout(rootView: View, authenticationLayoutToShow: ViewGroup) {
-        lytBiometricAuthentication.visibility = View.GONE
-        lytPasswordAuthentication.visibility = View.GONE
-        lytRemoveAppProtection.visibility = View.GONE
+        lytBiometricAuthentication.hide()
+        lytPasswordAuthentication.hide()
+        lytRemoveAppProtection.hide()
 
-        authenticationLayoutToShow.visibility = View.VISIBLE
+        authenticationLayoutToShow.show()
 
         if (authenticationLayoutToShow == lytRemoveAppProtection) {
             btnSetAuthenticationMethod.setText(R.string.dialog_protect_app_settings_button_remove_app_protection_title)

@@ -9,6 +9,8 @@ import net.dankito.banking.ui.android.extensions.showAmount
 import net.dankito.banking.ui.model.IAccountTransaction
 import net.dankito.banking.ui.presenter.BankingPresenter
 import net.dankito.utils.android.extensions.asActivity
+import net.dankito.utils.android.extensions.hide
+import net.dankito.utils.android.extensions.show
 import net.dankito.utils.android.ui.adapter.ListRecyclerAdapter
 
 
@@ -41,11 +43,11 @@ open class AccountTransactionAdapter(protected val presenter: BankingPresenter)
 
         if (presenter.areAllAccountSelected) {
             viewHolder.imgvwBankIcon.setIcon(item.account.bank)
-            // TODO: if bank icon isn't set: Show default icon? show at least an empty space to that amount and date don't shift up causing an inconsistent view?
-            viewHolder.imgvwBankIcon.visibility = View.VISIBLE
+            viewHolder.imgvwBankIcon.show()
         }
         else {
-            viewHolder.imgvwBankIcon.visibility = View.GONE
+            // TODO: if bank icon isn't set: Show default icon? show at least an empty space to that amount and date don't shift up causing an inconsistent view?
+            viewHolder.imgvwBankIcon.hide()
         }
     }
 

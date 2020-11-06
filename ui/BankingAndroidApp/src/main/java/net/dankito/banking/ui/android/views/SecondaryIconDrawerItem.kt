@@ -16,6 +16,8 @@ import com.mikepenz.materialdrawer.model.BaseDescribeableDrawerItem
 import com.mikepenz.materialdrawer.model.BaseViewHolder
 import net.dankito.banking.ui.android.R
 import net.dankito.utils.android.extensions.createColorStateList
+import net.dankito.utils.android.extensions.hide
+import net.dankito.utils.android.extensions.show
 
 
 open class SecondaryIconDrawerItem<Item : SecondaryIconDrawerItem<Item>> : BaseDescribeableDrawerItem<Item, SecondaryIconDrawerItem.ViewHolder>() {
@@ -41,7 +43,7 @@ open class SecondaryIconDrawerItem<Item : SecondaryIconDrawerItem<Item>> : BaseD
         bindViewHelper(holder)
 
         if (secondaryIcon == null) {
-            holder.btnSecondaryIcon.visibility = View.GONE
+            holder.btnSecondaryIcon.hide()
         }
         else {
             val context = holder.itemView.context
@@ -52,7 +54,7 @@ open class SecondaryIconDrawerItem<Item : SecondaryIconDrawerItem<Item>> : BaseD
 
             holder.btnSecondaryIcon.setOnClickListener { onSecondaryIconClicked?.invoke() }
 
-            holder.btnSecondaryIcon.visibility = View.VISIBLE
+            holder.btnSecondaryIcon.show()
         }
 
         //call the onPostBindView method to trigger post bind view actions (like the listener to modify the item if required)

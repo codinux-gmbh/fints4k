@@ -1,8 +1,9 @@
 package net.dankito.banking.ui.android.extensions
 
-import android.view.View
 import android.widget.ImageView
 import net.dankito.banking.ui.model.IBankData
+import net.dankito.utils.android.extensions.hide
+import net.dankito.utils.android.extensions.show
 
 
 fun ImageView.setIcon(bank: IBankData<*, *>) {
@@ -10,15 +11,15 @@ fun ImageView.setIcon(bank: IBankData<*, *>) {
         val iconData = bank.iconData
 
         if (iconData != null) {
-            this.visibility = View.VISIBLE
+            this.show()
             this.setImageFromBytes(iconData)
         }
         else {
-            this.visibility = View.GONE
+            this.hide()
             this.setImageURI(null)
         }
     } catch (e: Exception) {
-        this.visibility = View.GONE
+        this.hide()
     }
 }
 

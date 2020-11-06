@@ -25,6 +25,8 @@ import net.dankito.banking.ui.model.responses.AddAccountResponse
 import net.dankito.banking.ui.presenter.BankingPresenter
 import net.dankito.banking.bankfinder.BankInfo
 import net.dankito.utils.android.extensions.asActivity
+import net.dankito.utils.android.extensions.hide
+import net.dankito.utils.android.extensions.show
 import net.dankito.utils.android.extensions.showKeyboardDelayed
 import javax.inject.Inject
 
@@ -118,12 +120,12 @@ open class AddAccountDialog : DialogFragment() {
             val password = bankCredentialsPassword.password
 
             btnAddAccount.isEnabled = false
-            pgrbrAddAccount.visibility = View.VISIBLE
+            pgrbrAddAccount.show()
 
             presenter.addAccountAsync(selectedBank, userName, password) { response ->
                 context?.asActivity()?.runOnUiThread {
                     btnAddAccount.isEnabled = true
-                    pgrbrAddAccount.visibility = View.GONE
+                    pgrbrAddAccount.hide()
 
                     handleAccountCheckResponseOnUiThread(response)
                 }

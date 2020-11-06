@@ -6,6 +6,7 @@ import android.widget.TextView
 import com.mikepenz.fastadapter.FastAdapter
 import net.dankito.banking.ui.android.R
 import net.dankito.banking.ui.android.adapter.CheckableValueAdapterItem
+import net.dankito.utils.android.extensions.setVisibleOrInvisible
 
 
 open class CheckableValueViewHolder(view: View) : FastAdapter.ViewHolder<CheckableValueAdapterItem>(view) {
@@ -16,7 +17,7 @@ open class CheckableValueViewHolder(view: View) : FastAdapter.ViewHolder<Checkab
 
 
     override fun bindView(item: CheckableValueAdapterItem, payloads: List<Any>) {
-        imgCheckmark.visibility = if (item.isChecked) View.VISIBLE else View.INVISIBLE
+        imgCheckmark.setVisibleOrInvisible(item.isChecked)
 
         txtValue.text = item.text
     }

@@ -26,6 +26,7 @@ import net.dankito.banking.ui.model.responses.BankingClientResponse
 import net.dankito.banking.ui.model.tan.*
 import net.dankito.banking.ui.presenter.BankingPresenter
 import net.dankito.utils.android.extensions.getSpannedFromHtml
+import net.dankito.utils.android.extensions.show
 import javax.inject.Inject
 
 
@@ -118,7 +119,7 @@ open class EnterTanDialog : DialogFragment() {
         val tanMediaForTanMethod = presenter.getTanMediaForTanMethod(bank, tanChallenge.tanMethod)
 
         if (tanMediaForTanMethod.size > 1) {
-            rootView.lytTanMedium.visibility = View.VISIBLE
+            rootView.lytTanMedium.show()
 
             tanMediumAdapter.setItems(bank.tanMediaSorted)
 
@@ -172,7 +173,7 @@ open class EnterTanDialog : DialogFragment() {
 
     protected open fun setupFlickerCodeTanView(rootView: View) {
         val flickerCodeView = rootView.flickerCodeView
-        flickerCodeView.visibility = View.VISIBLE
+        flickerCodeView.show()
 
         val flickerCode = (tanChallenge as FlickerCodeTanChallenge).flickerCode
         if (flickerCode.decodingSuccessful) {
@@ -184,7 +185,7 @@ open class EnterTanDialog : DialogFragment() {
     }
 
     protected open fun setupImageTanView(rootView: View) {
-        rootView.tanImageView.visibility = View.VISIBLE
+        rootView.tanImageView.show()
 
         val decodedImage = (tanChallenge as ImageTanChallenge).image
         if (decodedImage.decodingSuccessful) {

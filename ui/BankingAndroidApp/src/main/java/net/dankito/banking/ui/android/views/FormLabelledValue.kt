@@ -8,6 +8,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import kotlinx.android.synthetic.main.view_form_labelled_value.view.*
 import net.dankito.banking.ui.android.R
+import net.dankito.utils.android.extensions.setVisibility
 
 
 open class FormLabelledValue @JvmOverloads constructor(
@@ -60,13 +61,8 @@ open class FormLabelledValue @JvmOverloads constructor(
         }
 
     open fun setValueAndVisibilityIfValueIsSet(value: CharSequence?) {
-        if (value != null) {
-            this.value = value
-            this.visibility = View.VISIBLE
-        }
-        else {
-            this.visibility = View.GONE
-        }
+        this.setVisibility(value != null)
+        this.value = value ?: ""
     }
 
 }

@@ -4,6 +4,7 @@ import android.view.View
 import net.dankito.banking.ui.android.R
 import net.dankito.banking.ui.android.adapter.viewholder.RecipientViewHolder
 import net.dankito.banking.search.TransactionParty
+import net.dankito.utils.android.extensions.isGone
 import net.dankito.utils.android.ui.adapter.ListRecyclerAdapter
 
 
@@ -19,7 +20,7 @@ open class RecipientListAdapter(protected val itemClicked: ((TransactionParty) -
         viewHolder.txtvwRecipientName.text = item.name
 
         viewHolder.txtvwRecipientBankName.text = item.bankName
-        viewHolder.txtvwRecipientBankName.visibility = if (item.bankName.isNullOrBlank()) View.GONE else View.VISIBLE
+        viewHolder.txtvwRecipientBankName.isGone = item.bankName.isNullOrBlank()
 
         viewHolder.txtvwRecipientAccountId.text = item.iban
 

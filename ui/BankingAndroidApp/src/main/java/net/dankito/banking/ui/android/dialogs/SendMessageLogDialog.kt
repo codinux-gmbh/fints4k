@@ -13,6 +13,8 @@ import kotlinx.android.synthetic.main.dialog_send_message_log.view.*
 import net.dankito.banking.ui.android.R
 import net.dankito.banking.ui.android.di.BankingComponent
 import net.dankito.banking.ui.presenter.BankingPresenter
+import net.dankito.utils.android.extensions.hide
+import net.dankito.utils.android.extensions.show
 import javax.inject.Inject
 
 
@@ -54,8 +56,8 @@ open class SendMessageLogDialog : DialogFragment() {
         val messageLog = presenter.getMessageLogForAccounts(presenter.allBanksSortedByDisplayIndex).joinToString("\r\n\r\n")
 
         if (messageLog.isBlank()) {
-            rootView.txtvwInfoNoMessageLogEntriesYet.visibility = View.VISIBLE
-            rootView.lytMessageLog.visibility = View.GONE
+            rootView.txtvwInfoNoMessageLogEntriesYet.show()
+            rootView.lytMessageLog.hide()
         }
         else {
             rootView.edtxtMessageLog.setText(context?.getString(R.string.dialog_send_message_courteously_add_error_description, messageLog))
