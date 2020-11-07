@@ -101,7 +101,7 @@ dependencies {
 
 
     implementation "net.dankito.text.extraction:itext2-text-extractor:$textExtractorVersion"
-    implementation "net.dankito.text.extraction:pdfbox-android-text-extractor:$textExtractorVersion"
+    implementation "net.dankito.text.extraction:pdfbox-android-text-extractor:$textExtractorVersion" + "a" // TODO: version 0.6.0a become only necessary due to a misconfigured Maven upload task. Remove 'a' again on next version
 
     implementation "com.github.clans:fab:$clansFloatingActionButtonVersion"
     implementation 'info.hoang8f:android-segmented:1.0.6'
