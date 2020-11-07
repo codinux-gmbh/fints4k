@@ -108,8 +108,10 @@ dependencies {
 
     implementation "com.otaliastudios:autocomplete:$autocompleteVersion"
 
-    implementation("com.journeyapps:zxing-android-embedded:4.1.0") { transitive = false } // transitive to use older Zxing version as ZXing 3.4.0 requires Android > 23
+    implementation("com.journeyapps:zxing-android-embedded:4.1.0") { transitive = false } // transitive to use older ZXing version as ZXing 3.4.0 requires Android > 23
     implementation "com.google.zxing:core:$zxingVersion"
+
+    implementation "com.yakivmospan:scytale:$scytaleVersion"
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$kotlinCoroutinesVersion"

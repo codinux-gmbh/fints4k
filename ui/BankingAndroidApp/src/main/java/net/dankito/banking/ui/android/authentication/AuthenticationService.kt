@@ -1,7 +1,11 @@
 package net.dankito.banking.ui.android.authentication
 
+import android.content.Context
 import android.util.Base64
 import at.favre.lib.crypto.bcrypt.BCrypt
+import com.yakivmospan.scytale.Crypto
+import com.yakivmospan.scytale.Options
+import com.yakivmospan.scytale.Store
 import net.dankito.banking.persistence.IBankingPersistence
 import net.dankito.banking.ui.android.security.CryptographyManager
 import net.dankito.banking.util.ISerializer
@@ -9,9 +13,11 @@ import net.dankito.utils.multiplatform.File
 import net.dankito.utils.multiplatform.asString
 import org.slf4j.LoggerFactory
 import javax.crypto.Cipher
+import javax.crypto.SecretKey
 
 
 open class AuthenticationService(
+    protected open val applicationContext: Context,
     protected open val biometricAuthenticationService: IBiometricAuthenticationService,
     protected open val persistence: IBankingPersistence,
     protected open val dataFolder: File,
@@ -21,6 +27,10 @@ open class AuthenticationService(
 
     companion object {
         private const val AuthenticationSettingsFilename = "a"
+
+        private const val AuthenticationSettingsFileKey = "AuthenticationSettingsFileKey"
+
+        private val AuthenticationSettingsFileKeyPassword = "AuthenticationSettingsFileKeyAuthenticationSettingsFileKeyPassword".toCharArray() // TODO: store in a secure place
 
         private const val EncryptionKeyName = "BankingAndroidKey"
 
@@ -219,7 +229,10 @@ open class AuthenticationService(
             val file = File(dataFolder, AuthenticationSettingsFilename)
 
             if (file.exists()) {
-                val json = file.readText()
+                val (key, crypto) = getAuthenticationSettingsFileKey()
+                val encryptedJson = file.readText()
+
+                val json = crypto.decrypt(encryptedJson, key)
 
                 return serializer.deserializeObject(json, AuthenticationSettings::class)
             }
@@ -233,9 +246,12 @@ open class AuthenticationService(
     protected open fun saveAuthenticationSettings(settings: AuthenticationSettings): Boolean {
         try {
             serializer.serializeObjectToString(settings)?.let { json ->
+                val (key, crypto) = getAuthenticationSettingsFileKey()
+                val encryptedJson = crypto.encrypt(json, key)
+
                 val file = File(dataFolder, AuthenticationSettingsFilename)
 
-                file.writeText(json)
+                file.writeText(encryptedJson)
 
                 return true
             }
@@ -244,6 +260,15 @@ open class AuthenticationService(
         }
 
         return false
+    }
+
+    protected open fun getAuthenticationSettingsFileKey(): Pair<SecretKey, Crypto> {
+        val store = Store(applicationContext)
+
+        val key = if (store.hasKey(AuthenticationSettingsFileKey)) store.getSymmetricKey(AuthenticationSettingsFileKey, AuthenticationSettingsFileKeyPassword)
+                    else store.generateSymmetricKey(AuthenticationSettingsFileKey, AuthenticationSettingsFileKeyPassword)
+
+        return Pair(key, Crypto(Options.TRANSFORMATION_SYMMETRIC))
     }
 
 

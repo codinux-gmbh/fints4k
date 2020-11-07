@@ -66,6 +66,8 @@ ext {
 
     zxingVersion = "3.3.0"
 
+    scytaleVersion = "1.0.1"
+
     multiDexVersion = "2.0.1"
 
     appCompatVersion = "1.1.0"
