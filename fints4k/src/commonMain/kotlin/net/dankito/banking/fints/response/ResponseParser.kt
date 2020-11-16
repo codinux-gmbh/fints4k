@@ -546,40 +546,40 @@ open class ResponseParser(
         }
 
         val status = parseCodeEnum(dataElements[1], TanMediumStatus.values())
+        val mediumName = if (hitabVersion < 2) null else parseStringToNullIfEmpty(dataElements[10])
 
         // TODO: may also parse 'Letzte Benutzung' (second last element) and 'Freigeschaltet am' (last element)
 
         val remainingDataElements = dataElements.subList(2, dataElements.size)
 
         return when (mediumClass) {
-            TanMediumKlasse.TanGenerator -> parseTanGeneratorTanMedium(mediumClass, status, hitabVersion, remainingDataElements)
-            TanMediumKlasse.MobiltelefonMitMobileTan -> parseMobilePhoneTanMedium(mediumClass, status, hitabVersion, remainingDataElements)
-            else -> TanMedium(mediumClass, status, "Unbekannte TAN Medium Klasse")
+            TanMediumKlasse.TanGenerator -> parseTanGeneratorTanMedium(mediumClass, status, mediumName, hitabVersion, remainingDataElements)
+            TanMediumKlasse.MobiltelefonMitMobileTan -> parseMobilePhoneTanMedium(mediumClass, status, mediumName, hitabVersion, remainingDataElements)
+            else -> TanMedium(mediumClass, status, mediumName) // Sparkasse sends for pushTan now class 'AlleMedien' -> set medium name and everything just works fine
         }
     }
 
-    protected open fun parseTanGeneratorTanMedium(mediumClass: TanMediumKlasse, status: TanMediumStatus,
+    protected open fun parseTanGeneratorTanMedium(mediumClass: TanMediumKlasse, status: TanMediumStatus, mediumName: String?,
                                                   hitabVersion: Int, dataElements: List<String>): TanGeneratorTanMedium {
 
         val cardType = if (hitabVersion < 2) null else parseNullableInt(dataElements[2])
         // TODO: may also parse account info
         val validFrom = if (hitabVersion < 2) null else parseNullableDate(dataElements[8])
         val validTo = if (hitabVersion < 2) null else parseNullableDate(dataElements[9])
-        val mediumName = if (hitabVersion < 2) null else parseStringToNullIfEmpty(dataElements[10])
 
         return TanGeneratorTanMedium(mediumClass, status, parseString(dataElements[0]), parseStringToNullIfEmpty(dataElements[1]),
             cardType, validFrom, validTo, mediumName)
     }
 
-    protected open fun parseMobilePhoneTanMedium(mediumClass: TanMediumKlasse, status: TanMediumStatus,
+    protected open fun parseMobilePhoneTanMedium(mediumClass: TanMediumKlasse, status: TanMediumStatus, mediumName: String?,
                                                   hitabVersion: Int, dataElements: List<String>): MobilePhoneTanMedium {
 
-        val mediumName = parseString(dataElements[10])
         val concealedPhoneNumber = if (hitabVersion < 2) null else parseStringToNullIfEmpty(dataElements[11])
         val phoneNumber = if (hitabVersion < 2) null else parseStringToNullIfEmpty(dataElements[12])
         val smsDebitAccount: KontoverbindungInternational? = null // TODO: may parse 13th data element to KontoverbindungInternational
 
-        return MobilePhoneTanMedium(mediumClass, status, mediumName, concealedPhoneNumber, phoneNumber, smsDebitAccount)
+        // mediumName should actually never be unset according to spec
+        return MobilePhoneTanMedium(mediumClass, status, mediumName ?: "", concealedPhoneNumber, phoneNumber, smsDebitAccount)
     }
 
 
