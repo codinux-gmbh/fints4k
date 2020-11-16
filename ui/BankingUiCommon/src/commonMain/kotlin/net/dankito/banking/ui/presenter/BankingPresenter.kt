@@ -782,6 +782,10 @@ open class BankingPresenter(
     }
 
 
+    open fun getFormattedMessageLogForAccounts(banks: List<TypedBankData>, includeFailedAccountAdditions: Boolean = true): String {
+        return getMessageLogForAccounts(banks, includeFailedAccountAdditions).joinToString("\r\n\r\n")
+    }
+
     open fun getMessageLogForAccounts(banks: List<TypedBankData>, includeFailedAccountAdditions: Boolean = true): List<String> {
         val logEntries = mutableListOf<MessageLogEntry>()
 

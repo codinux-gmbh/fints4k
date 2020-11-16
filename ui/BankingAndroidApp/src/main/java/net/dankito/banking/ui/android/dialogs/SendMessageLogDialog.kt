@@ -53,7 +53,7 @@ open class SendMessageLogDialog : DialogFragment() {
     }
 
     protected open fun setupUI(rootView: View) {
-        val messageLog = presenter.getMessageLogForAccounts(presenter.allBanksSortedByDisplayIndex).joinToString("\r\n\r\n")
+        val messageLog = presenter.getFormattedMessageLogForAccounts(presenter.allBanksSortedByDisplayIndex)
 
         if (messageLog.isBlank()) {
             rootView.txtvwInfoNoMessageLogEntriesYet.show()
