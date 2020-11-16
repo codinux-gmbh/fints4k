@@ -87,6 +87,8 @@ open class BankingPresenter(
 
     protected val bankingClientsForBanks = mutableMapOf<TypedBankData, IBankingClient>()
 
+    protected val messageLogsOfFailedAccountAdditions = mutableListOf<MessageLogEntry>()
+
     protected var _selectedAccounts = mutableListOf<TypedBankAccount>()
 
     protected var selectedAccountType = SelectedAccountType.AllAccounts
@@ -188,6 +190,9 @@ open class BankingPresenter(
                 } catch (e: Exception) { // TODO: show error to user. Otherwise she has no idea what's going on
                     log.error(e) { "Could not save successfully added bank" }
                 }
+            }
+            else {
+                messageLogsOfFailedAccountAdditions.addAll(newClient.messageLogWithoutSensitiveData)
             }
 
             callback(response)
@@ -777,10 +782,16 @@ open class BankingPresenter(
     }
 
 
-    open fun getMessageLogForAccounts(banks: List<TypedBankData>): List<String> {
-        val logEntries = banks.flatMap {
-            getBankingClientForBank(it)?.messageLogWithoutSensitiveData ?: listOf()
+    open fun getMessageLogForAccounts(banks: List<TypedBankData>, includeFailedAccountAdditions: Boolean = true): List<String> {
+        val logEntries = mutableListOf<MessageLogEntry>()
+
+        if (includeFailedAccountAdditions) {
+            logEntries.addAll(messageLogsOfFailedAccountAdditions)
         }
+
+        logEntries.addAll(banks.flatMap {
+            getBankingClientForBank(it)?.messageLogWithoutSensitiveData ?: listOf()
+        })
 
         return logEntries.map { entry ->
             MessageLogEntryDateFormatter.format(entry.time) + " " + entry.bank.bankCode + " " + entry.message
