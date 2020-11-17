@@ -1,8 +1,8 @@
 // TODO: move to versions.gradle
 ext {
-    appVersionName = '1.0.0 Alpha 5'
+    appVersionName = '1.0.0 Alpha 6'
 
-    appVersionCode = 5
+    appVersionCode = 6
 
 
     /*      MPP / basic dependencies        */
