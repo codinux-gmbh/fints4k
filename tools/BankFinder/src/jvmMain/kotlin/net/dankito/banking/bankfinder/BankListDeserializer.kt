@@ -9,7 +9,7 @@ actual class BankListDeserializer {
     companion object {
         const val BankListFileName = "BankList.json"
 
-        private val log = LoggerFactory.getLogger(InMemoryBankFinder::class)
+        private val log = LoggerFactory.getLogger(BankListDeserializer::class)
     }
 
 
