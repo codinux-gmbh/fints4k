@@ -20,6 +20,10 @@ open class BankListPrettifier {
             prettifiedList = removeBanksWithSameBankCodeAndCity(prettifiedList)
         }
 
+        if (options.contains(BankListPrettifierOption.MergeAllBranchesOfBankIntoOne)) {
+            prettifiedList = mergeAllBranchesOfBankIntoOne(prettifiedList)
+        }
+
         if (options.contains(BankListPrettifierOption.MapBankNamesToWellKnownNames)) {
             prettifiedList = mapBankNamesToWellKnownNames(prettifiedList)
         }
@@ -103,6 +107,42 @@ open class BankListPrettifier {
         prettifiedList.removeAll(banksToRemove)
 
         return prettifiedList
+    }
+
+    open fun mergeAllBranchesOfBankIntoOne(banks: List<BankInfo>): List<BankInfo> {
+        val groupedByBankCodeAndPinTanAddress = banks.groupBy { it.bankCode + "_" + it.pinTanAddress }
+
+        val banksToRemove = groupedByBankCodeAndPinTanAddress.values.flatMap { banksWithSameBankCodeAndPinTanAddress ->
+            if (banksWithSameBankCodeAndPinTanAddress.size > 1) {
+                val banksToRemove = banksWithSameBankCodeAndPinTanAddress.toMutableList()
+                val mainBranch = findMainBranch(banksWithSameBankCodeAndPinTanAddress)
+
+                banksToRemove.remove(banksWithSameBankCodeAndPinTanAddress.first())
+
+                mainBranch.branchesInOtherCities = banksToRemove.map { it.city }.toSet().toList()
+
+                return@flatMap banksToRemove
+            }
+
+            listOf<BankInfo>()
+        }
+
+        val prettifiedList = banks.toMutableList()
+        prettifiedList.removeAll(banksToRemove)
+
+        return prettifiedList
+    }
+
+    private fun findMainBranch(banksWithSameBankCodeAndPinTanAddress: List<BankInfo>): BankInfo {
+//        banksWithSameBankCodeAndPinTanAddress.forEach { bank ->
+//            if (bank.name.contains(bank.city)) {
+//                println("${bank.name}: Picked ${bank.city} from ${banksWithSameBankCodeAndPinTanAddress.map { it.city }}")
+//                return bank
+//            }
+//        }
+
+        // in most cases this turned out to be the best one
+        return banksWithSameBankCodeAndPinTanAddress.first()
     }
 
 }

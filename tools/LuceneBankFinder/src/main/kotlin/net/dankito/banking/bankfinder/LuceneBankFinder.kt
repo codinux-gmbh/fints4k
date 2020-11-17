@@ -180,7 +180,7 @@ open class LuceneBankFinder(indexFolder: File) : BankFinderBase(), IBankFinder {
     }
 
     protected open fun createDocumentForBank(bank: BankInfo, writer: DocumentsWriter): Document {
-        return writer.createDocumentForNonNullFields(
+        val indexableFields = mutableListOf(
             fields.fullTextSearchField(BankInfoNameFieldName, bank.name, true),
             fields.keywordField(BankInfoBankCodeFieldName, bank.bankCode, true),
             fields.keywordField(BankInfoBicFieldName, bank.bic, true),
@@ -191,6 +191,12 @@ open class LuceneBankFinder(indexFolder: File) : BankFinderBase(), IBankFinder {
             fields.nullableStoredField(BankInfoPinTanServerAddressFieldName, bank.pinTanAddress),
             fields.nullableStoredField(BankInfoPinTanVersionFieldName, bank.pinTanVersion)
         )
+
+        bank.branchesInOtherCities.forEach { branchCity ->
+            indexableFields.add(fields.storedField(BankInfoCityStoredFieldName, branchCity))
+        }
+
+        return writer.createDocumentForNonNullFields(indexableFields)
     }
 
 

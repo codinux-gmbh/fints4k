@@ -59,7 +59,7 @@ struct BankInfoListItem: View {
 struct BankInfoListItem_Previews: PreviewProvider {
     
     static var previews: some View {
-        BankInfoListItem(BankInfo(name: "Abzockbank Berlin", bankCode: "12345678", bic: "ABZODEBBXXX", postalCode: "12345", city: "Berlin", pinTanAddress: nil, pinTanVersion: "FinTS 3.0"))
+        BankInfoListItem(BankInfo(name: "Abzockbank Berlin", bankCode: "12345678", bic: "ABZODEBBXXX", postalCode: "12345", city: "Berlin", pinTanAddress: nil, pinTanVersion: "FinTS 3.0", branchesInOtherCities: []))
     }
     
 }

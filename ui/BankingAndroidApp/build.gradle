@@ -71,11 +71,19 @@ android {
         pickFirst 'META-INF/ktor-http-cio.kotlin_module'
         pickFirst 'META-INF/atomicfu.kotlin_module'
 
+        pickFirst 'META-INF/common.kotlin_module'
+        pickFirst 'META-INF/fints4k.kotlin_module'
+        pickFirst 'META-INF/BankFinder.kotlin_module'
+        pickFirst 'META-INF/BankFinder.kotlin_module'
+
         pickFirst 'META-INF/DEPENDENCIES'
         pickFirst 'META-INF/NOTICE'
         pickFirst 'META-INF/LICENSE'
         pickFirst 'META-INF/LICENSE.txt'
         pickFirst 'META-INF/NOTICE.txt'
+
+        pickFirst 'BankList.json'
+        exclude 'DetailedBankList.json'
     }
 
     lintOptions {

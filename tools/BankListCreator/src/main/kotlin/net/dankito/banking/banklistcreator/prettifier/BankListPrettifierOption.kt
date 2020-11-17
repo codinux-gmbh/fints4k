@@ -19,6 +19,11 @@ enum class BankListPrettifierOption {
     RemoveBanksWithSameBankCodeAndCity,
 
     /**
+     * By default each branch has its own BankInfo. With this option only main branch keeps its BankInfo and all branches get added to branchesInOtherCities.
+     */
+    MergeAllBranchesOfBankIntoOne,
+
+    /**
      * Removes banks like 'Deutsche Bank (Gf intern)' or 'UniCredit Bank - HVB Settlement EAC01' etc.
      */
     RemoveInstitutionInternalBank

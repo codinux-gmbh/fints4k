@@ -35,7 +35,8 @@ actual class BankListDeserializer {
             bankInfoDict.getStringOrEmpty("postalCode"),
             bankInfoDict.getStringOrEmpty("city"),
             bankInfoDict.getString("pinTanAddress"),
-            bankInfoDict.getString("pinTanVersion")
+            bankInfoDict.getString("pinTanVersion"),
+            bankInfoDict.mutableArrayValueForKey("branchesInOtherCities").mapNotNull { it as? String }
         )
     }
 
