@@ -33,9 +33,9 @@ kotlin {
     sourceSets {
         commonMain {
             dependencies {
-                implementation kotlin("stdlib-common")
+                api kotlin("stdlib-common")
 
-                implementation project(":common")
+                api project(":common")
             }
         }
 
