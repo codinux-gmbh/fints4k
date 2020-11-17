@@ -103,11 +103,14 @@
             android:hint="@string/dialog_transfer_money_amount"
         >
 
+            <!-- Yes, i know, it isn't correct allowing dot and comma as decimal separator at the same time, but due to a bug in Android DecimalFormatSymbol's locale is
+            sometimes incorrect and therefore using then the wrong decimal separator so that this solution doesn't work reliable: https://stackoverflow.com/a/34256139 -> better allow both than the wrong one -->
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/edtxtAmount"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/dialog_transfer_money_input_fields_height"
                 android:inputType="numberDecimal"
+                android:digits="0123456789.,"
             />
 
         </com.google.android.material.textfield.TextInputLayout>

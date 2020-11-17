@@ -150,10 +150,6 @@ open class TransferMoneyDialog : DialogFragment() {
         transferMoneyIfEnterPressed(rootView.edtxtAmount)
         transferMoneyIfEnterPressed(rootView.edtxtReference)
 
-        // fix that even in Locales using ',' as decimal separator entering ',' is not allowed (thanks dstibbe! https://stackoverflow.com/a/34256139)
-        val decimalSeparator = DecimalFormatSymbols.getInstance().getDecimalSeparator()
-        rootView.edtxtAmount.keyListener = DigitsKeyListener.getInstance("0123456789$decimalSeparator")
-
         rootView.btnShowRealTimeTransferInfo.setOnClickListener { showRealTimeTransferInfo(rootView.btnShowRealTimeTransferInfo) }
 
         setRealTimeTransferControlsVisibility(rootView)
