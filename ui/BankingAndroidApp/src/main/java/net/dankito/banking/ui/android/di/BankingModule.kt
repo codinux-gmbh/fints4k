@@ -14,6 +14,7 @@ import net.dankito.banking.ui.IBankingClientCreator
 import net.dankito.banking.ui.IRouter
 import net.dankito.banking.ui.presenter.BankingPresenter
 import net.dankito.banking.bankfinder.IBankFinder
+import net.dankito.banking.bankfinder.InMemoryBankFinder
 import net.dankito.banking.bankfinder.LuceneBankFinder
 import net.dankito.banking.persistence.RoomBankingPersistence
 import net.dankito.banking.persistence.model.RoomModelCreator
@@ -124,7 +125,8 @@ class BankingModule(private val applicationContext: Context) {
     @Provides
     @Singleton
     fun provideBankFinder(@Named(IndexFolderKey) indexFolder: File) : IBankFinder {
-        return LuceneBankFinder(indexFolder)
+        //return LuceneBankFinder(indexFolder) // TODO: undo
+        return InMemoryBankFinder()
     }
 
     @Provides
