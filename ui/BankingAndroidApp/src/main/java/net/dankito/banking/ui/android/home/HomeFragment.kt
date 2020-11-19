@@ -9,6 +9,8 @@ import android.widget.EditText
 import android.widget.ImageButton
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
+import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.DrawableCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -25,10 +27,7 @@ import net.dankito.banking.ui.model.TypedBankAccount
 import net.dankito.banking.ui.model.parameters.TransferMoneyData
 import net.dankito.banking.ui.model.responses.GetTransactionsResponse
 import net.dankito.banking.ui.presenter.BankingPresenter
-import net.dankito.utils.android.extensions.asActivity
-import net.dankito.utils.android.extensions.hide
-import net.dankito.utils.android.extensions.isGone
-import net.dankito.utils.android.extensions.setVisibility
+import net.dankito.utils.android.extensions.*
 import net.dankito.utils.multiplatform.sum
 import javax.inject.Inject
 
@@ -188,7 +187,17 @@ class HomeFragment : Fragment() {
     }
 
     private fun updateAccountsTransactions() {
-        presenter.updateSelectedAccountsTransactionsAsync()
+        mnitmUpdateTransactions.isEnabled = false
+
+        val icon = mnitmUpdateTransactions.icon?.let { DrawableCompat.wrap(it) }
+        icon?.let { DrawableCompat.setTint(it, ContextCompat.getColor(context!!, R.color.disabledColor)) }
+
+        presenter.updateSelectedAccountsTransactionsAsync {
+            context?.asActivity()?.runOnUiThread {
+                mnitmUpdateTransactions.isEnabled = true
+                icon?.let { DrawableCompat.setTintList(it, null) }
+            }
+        }
     }
 
     private fun handleGetTransactionsResponseOffUiThread(response: GetTransactionsResponse) {
