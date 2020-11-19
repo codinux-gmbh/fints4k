@@ -546,11 +546,12 @@ open class ResponseParser(
         }
 
         val status = parseCodeEnum(dataElements[1], TanMediumStatus.values())
-        val mediumName = if (hitabVersion < 2) null else parseStringToNullIfEmpty(dataElements[10])
 
         // TODO: may also parse 'Letzte Benutzung' (second last element) and 'Freigeschaltet am' (last element)
 
         val remainingDataElements = dataElements.subList(2, dataElements.size)
+
+        val mediumName = if (hitabVersion < 2) null else parseStringToNullIfEmpty(remainingDataElements[10])
 
         return when (mediumClass) {
             TanMediumKlasse.TanGenerator -> parseTanGeneratorTanMedium(mediumClass, status, mediumName, hitabVersion, remainingDataElements)
