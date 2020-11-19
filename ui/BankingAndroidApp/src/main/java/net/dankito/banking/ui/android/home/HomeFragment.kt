@@ -43,8 +43,6 @@ class HomeFragment : Fragment() {
     }
 
 
-    private lateinit var mnitmBalance: MenuItem
-
     private lateinit var mnitmSearchTransactions: MenuItem
 
     private lateinit var mnitmUpdateTransactions: MenuItem
@@ -111,8 +109,6 @@ class HomeFragment : Fragment() {
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
-
-        mnitmBalance = menu.findItem(R.id.mnitmBalance)
 
         mnitmSearchTransactions = menu.findItem(R.id.mnitmSearchTransactions)
         mnitmUpdateTransactions = menu.findItem(R.id.mnitmUpdateTransactions)
@@ -258,9 +254,6 @@ class HomeFragment : Fragment() {
         setToolbarTitle()
 
         transactionAdapter.items = presenter.searchSelectedAccountTransactions(appliedTransactionsFilter)
-
-        mnitmBalance.title = presenter.formatAmount(presenter.balanceOfSelectedAccounts)
-        mnitmBalance.isVisible = presenter.doSelectedAccountsSupportRetrievingBalance
 
         lytTransactionsSummary.setVisibility(presenter.doSelectedAccountsSupportRetrievingBalance)
 

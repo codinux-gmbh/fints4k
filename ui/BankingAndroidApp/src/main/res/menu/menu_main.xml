@@ -20,11 +20,4 @@
           android:visible="false"
     />
 
-    <item android:id="@+id/mnitmBalance"
-          android:title=""
-          app:showAsAction="always"
-          android:orderInCategory="500"
-          android:visible="false"
-    />
-
 </menu>
