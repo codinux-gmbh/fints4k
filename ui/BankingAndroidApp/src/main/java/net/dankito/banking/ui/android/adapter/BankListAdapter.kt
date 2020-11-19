@@ -27,10 +27,13 @@ open class BankListAdapter(protected val itemClicked: ((BankInfo) -> Unit)? = nu
         }
 
         viewHolder.txtvwBankName.text = item.name
+        viewHolder.txtvwBankName.isEnabled = item.supportsFinTs3_0
 
         viewHolder.txtvwBankCode.text = item.bankCode
+        viewHolder.txtvwBankCode.isEnabled = item.supportsFinTs3_0
 
         viewHolder.txtvwBankAddress.text = item.postalCode + " " + item.city
+        viewHolder.txtvwBankAddress.isEnabled = item.supportsFinTs3_0
 
         viewHolder.itemView.setOnClickListener {
             itemClicked?.invoke(item)
