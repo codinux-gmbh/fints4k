@@ -3,7 +3,7 @@ package net.dankito.banking.bankfinder
 
 abstract class BankFinderBase : IBankFinder {
 
-    protected abstract fun findBankByNameOrCityForNonEmptyQuery(query: String): List<BankInfo>
+    protected abstract fun findBankByNameBankCodeOrCityForNonEmptyQuery(query: String): List<BankInfo>
 
     abstract fun searchBankByBic(bic: String): BankInfo?
 
@@ -20,7 +20,7 @@ abstract class BankFinderBase : IBankFinder {
             return findBankByBankCode(query)
         }
 
-        return findBankByNameOrCityForNonEmptyQuery(query)
+        return findBankByNameBankCodeOrCityForNonEmptyQuery(query)
     }
 
 

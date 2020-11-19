@@ -85,7 +85,7 @@ open class LuceneBankFinder(indexFolder: File) : BankFinderBase(), IBankFinder {
         return getBanksFromQuery(luceneQuery)
     }
 
-    override fun findBankByNameOrCityForNonEmptyQuery(query: String): List<BankInfo> {
+    override fun findBankByNameBankCodeOrCityForNonEmptyQuery(query: String): List<BankInfo> {
         bankFinderWhileUpdatingIndex?.let {
             return it.findBankByNameBankCodeOrCity(query)
         }
@@ -93,7 +93,9 @@ open class LuceneBankFinder(indexFolder: File) : BankFinderBase(), IBankFinder {
         val luceneQuery = queries.createQueriesForSingleTerms(query.toLowerCase()) { singleTerm ->
             listOf(
                 queries.fulltextQuery(BankInfoNameFieldName, singleTerm),
-                queries.startsWith(BankInfoCityIndexedFieldName, singleTerm)
+                queries.startsWith(BankInfoCityIndexedFieldName, singleTerm),
+                queries.startsWith(BankInfoBankCodeFieldName, singleTerm)
+                // TODO: add query for branchesInOtherCities
             )
         }
 
@@ -190,6 +192,8 @@ open class LuceneBankFinder(indexFolder: File) : BankFinderBase(), IBankFinder {
             fields.storedField(BankInfoPostalCodeFieldName, bank.postalCode),
             fields.nullableStoredField(BankInfoPinTanServerAddressFieldName, bank.pinTanAddress),
             fields.nullableStoredField(BankInfoPinTanVersionFieldName, bank.pinTanVersion)
+
+            // TODO: index branchesInOtherCities
         )
 
         bank.branchesInOtherCities.forEach { branchCity ->
