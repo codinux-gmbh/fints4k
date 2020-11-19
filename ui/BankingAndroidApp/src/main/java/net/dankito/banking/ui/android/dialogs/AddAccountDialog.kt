@@ -24,6 +24,7 @@ import net.dankito.banking.ui.android.util.StandardAutocompleteCallback
 import net.dankito.banking.ui.model.responses.AddAccountResponse
 import net.dankito.banking.ui.presenter.BankingPresenter
 import net.dankito.banking.bankfinder.BankInfo
+import net.dankito.banking.ui.android.util.StandardTextWatcher
 import net.dankito.utils.android.extensions.asActivity
 import net.dankito.utils.android.extensions.hide
 import net.dankito.utils.android.extensions.show
@@ -39,6 +40,8 @@ open class AddAccountDialog : DialogFragment() {
 
 
     protected var selectedBank: BankInfo? = null
+
+    protected var justDidSelectBank: Boolean = false
 
 
     @Inject
@@ -87,6 +90,10 @@ open class AddAccountDialog : DialogFragment() {
     }
 
     private fun initBankListAutocompletion(edtxtBank: EditText) {
+        edtxtBank.addTextChangedListener(StandardTextWatcher {
+            mayClearSelectedBank()
+        })
+
         val autocompleteCallback = StandardAutocompleteCallback<BankInfo> { _, item ->
             bankSelected(item)
             true
@@ -163,7 +170,11 @@ open class AddAccountDialog : DialogFragment() {
     protected open fun bankSelected(bank: BankInfo) {
         selectedBank = bank
 
+        justDidSelectBank = true
+
         edtxtBank.text = bank.name
+
+        justDidSelectBank = false
 
         edtxtUserName.requestFocus()
 
@@ -172,6 +183,14 @@ open class AddAccountDialog : DialogFragment() {
         if (bank.supportsFinTs3_0 == false) {
             showBankDoesNotSupportFinTs30ErrorMessage(bank)
         }
+    }
+
+    protected open fun mayClearSelectedBank() {
+        if (justDidSelectBank == false) {
+            selectedBank = null
+        }
+
+        checkIfRequiredDataEnteredOnUiThread()
     }
 
     private fun showBankDoesNotSupportFinTs30ErrorMessage(bank: BankInfo) {
