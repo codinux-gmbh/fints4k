@@ -15,6 +15,8 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_alignParentBottom="true"
+        android:layout_marginRight="@dimen/list_item_bank_info_icon_supports_fints_30_margin_end"
+        android:layout_marginEnd="@dimen/list_item_bank_info_icon_supports_fints_30_margin_end"
         android:layout_centerVertical="true"
         />
 
