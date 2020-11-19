@@ -172,7 +172,7 @@ open class AddAccountDialog : DialogFragment() {
 
         justDidSelectBank = true
 
-        edtxtBank.text = bank.name
+        edtxtBank.text = bank.bankCode + " " + bank.name
 
         justDidSelectBank = false
 

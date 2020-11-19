@@ -29,7 +29,7 @@ struct AddAccountDialog: View {
                 NavigationLink(destination: SelectBankDialog($bank)) {
                     if bank != nil {
                         bank.map { bank in
-                            Text(bank.name)
+                            Text(bank.bankCode + " " + bank.name)
                                 .font(.headline)
                         }
                     }
