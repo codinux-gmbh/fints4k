@@ -7,6 +7,7 @@ import kotlinx.coroutines.*
 import net.dankito.banking.ui.android.adapter.BankListAdapter
 import net.dankito.banking.ui.presenter.BankingPresenter
 import net.dankito.banking.bankfinder.BankInfo
+import net.dankito.banking.ui.android.extensions.addHorizontalItemDivider
 
 
 open class BankInfoPresenter(protected val presenter: BankingPresenter, context: Context) : RecyclerViewPresenter<BankInfo>(context) {
@@ -17,6 +18,8 @@ open class BankInfoPresenter(protected val presenter: BankingPresenter, context:
 
 
     override fun instantiateAdapter(): RecyclerView.Adapter<*> {
+        recyclerView?.addHorizontalItemDivider()
+
         return adapter
     }
 
