@@ -11,6 +11,7 @@ import net.dankito.banking.fints.transactions.mt940.model.StatementLine
 import ch.tutteli.atrium.api.verbs.expect
 import kotlin.test.Test
 import net.dankito.banking.fints.extensions.isFalse
+import net.dankito.banking.fints.extensions.isTrue
 import net.dankito.banking.fints.model.Amount
 import net.dankito.utils.multiplatform.Date
 import net.dankito.utils.multiplatform.DateFormatter
@@ -275,6 +276,40 @@ class Mt940ParserTest : FinTsTestBase() {
                 expect(transaction.information?.customerReference).notToBeNull()
             }
         }
+    }
+
+    @Test
+    fun `Fix that ?, gets detected as field code`() {
+        val transactionsString = """
+            :20:STARTUMS
+            :25:$BankCode/$CustomerId
+            :28C:0
+            :60F:C200511EUR0,00
+            :61:200511D15,00NMSCNONREF
+            :86:105?00BASISLASTSCHRIFT?10931?20EREF+6MKL2OT30QENNLIU
+            ?21MREF+?,3SQNdUbxm9z7dB)+gKYD?22JAKzCM0G?23CRED+DE94ZZZ00000123456
+            ?24SVWZ+306-4991422-2405949 NI?25LE Mktp DE 6MKL2OT30QENNLIU?26
+            EREF: 6MKL2OT30QENNLIU MRE?27F: ?,3SQNdUbxm9z7dB)+gKYDJA?28KzCM0G
+            CRED: DE94ZZZ0000012?293456 IBAN: DE87300308801234?30TUBDDEDD?31DE87300308801234567890?32NILE PAYMENTS EUROPE S.C.?33A.?34992?60567890 BIC: TUBDDEDD 
+            :62F:D200511EUR15,00
+            -
+        """.trimIndent()
+
+
+        // when
+        val result = underTest.parseMt940String(transactionsString)
+
+
+        // then
+        expect(result).hasSize(1)
+        expect(result.first().transactions).hasSize(1)
+
+        expect(result.first().transactions[0].information?.bookingText).toBe("BASISLASTSCHRIFT")
+        expect(result.first().transactions[0].information?.otherPartyBankCode).toBe("TUBDDEDD")
+        expect(result.first().transactions[0].information?.otherPartyAccountId).toBe("DE87300308801234567890")
+        expect(result.first().transactions[0].information?.endToEndReference).toBe("6MKL2OT30QENNLIU")
+        expect(result.first().transactions[0].information?.mandateReference).toBe("?,3SQNdUbxm9z7dB)+gKYDJAKzCM0G")
+        expect(result.first().transactions[0].information?.sepaReference?.contains("IBAN: DE87300308801234567890 BIC: TUBDDEDD") ?: false).isTrue()
     }
 
 

@@ -58,6 +58,8 @@ open class Mt940Parser : IMt940Parser {
 
         val ReferenceTypeRegex = Regex("[A-Z]{4}\\+")
 
+        val InformationToAccountOwnerSubFieldRegex = Regex("\\?\\d\\d")
+
 
         const val EndToEndReferenceKey = "EREF+"
         const val CustomerReferenceKey = "KREF+"
@@ -318,21 +320,21 @@ open class Mt940Parser : IMt940Parser {
         var primaNotaNumber: String? = null
         var textKeySupplement: String? = null
 
-        informationToAccountOwnerString.substring(3).split('?').forEach { subField ->
-            if (subField.isNotEmpty()) {
-                val fieldCode = subField.substring(0, 2).toInt()
-                val fieldValue = subField.substring(2)
+        val subFieldMatches = InformationToAccountOwnerSubFieldRegex.findAll(informationToAccountOwnerString).toList()
+        subFieldMatches.forEachIndexed { index, matchResult ->
+            val fieldCode = matchResult.value.substring(1, 3).toInt()
+            val endIndex = if (index + 1 < subFieldMatches.size) subFieldMatches[index + 1].range.start else informationToAccountOwnerString.length
+            val fieldValue = informationToAccountOwnerString.substring(matchResult.range.last + 1, endIndex)
 
-                when (fieldCode) {
-                    0 -> bookingText = fieldValue
-                    10 -> primaNotaNumber = fieldValue
-                    in 20..29 -> referenceParts.add(fieldValue)
-                    30 -> otherPartyBankCode = fieldValue
-                    31 -> otherPartyAccountId = fieldValue
-                    32, 33 -> otherPartyName.append(fieldValue)
-                    34 -> textKeySupplement = fieldValue
-                    in 60..63 -> referenceParts.add(fieldValue)
-                }
+            when (fieldCode) {
+                0 -> bookingText = fieldValue
+                10 -> primaNotaNumber = fieldValue
+                in 20..29 -> referenceParts.add(fieldValue)
+                30 -> otherPartyBankCode = fieldValue
+                31 -> otherPartyAccountId = fieldValue
+                32, 33 -> otherPartyName.append(fieldValue)
+                34 -> textKeySupplement = fieldValue
+                in 60..63 -> referenceParts.add(fieldValue)
             }
         }
 
