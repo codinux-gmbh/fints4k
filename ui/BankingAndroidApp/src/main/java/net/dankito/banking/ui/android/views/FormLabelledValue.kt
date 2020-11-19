@@ -8,7 +8,10 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import kotlinx.android.synthetic.main.view_form_labelled_value.view.*
 import net.dankito.banking.ui.android.R
+import net.dankito.banking.ui.android.extensions.setTextColorForAmount
 import net.dankito.utils.android.extensions.setVisibility
+import net.dankito.banking.ui.presenter.BankingPresenter
+import net.dankito.utils.multiplatform.BigDecimal
 
 
 open class FormLabelledValue @JvmOverloads constructor(
@@ -63,6 +66,11 @@ open class FormLabelledValue @JvmOverloads constructor(
     open fun setValueAndVisibilityIfValueIsSet(value: CharSequence?) {
         this.setVisibility(value != null)
         this.value = value ?: ""
+    }
+
+    open fun showAmount(presenter: BankingPresenter, amount: BigDecimal, currencyIsoCode: String? = null) {
+        value = presenter.formatAmount(amount, currencyIsoCode)
+        txtValue.setTextColorForAmount(amount)
     }
 
 }

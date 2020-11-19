@@ -25,12 +25,24 @@
     <string name="online_banking_credentials_login_name">Login Name</string>
     <string name="online_banking_credentials_password">Passwort</string>
 
+    <string name="account">Konto</string>
     <string name="accounts">Konten</string>
     <string name="bank_credentials">Bankzugänge</string>
+
+    <string name="name">Name</string>
 
     <string name="bank_code">Bankleitzahl</string>
     <string name="bic">BIC</string>
     <string name="iban">IBAN</string>
+    <string name="amount">Betrag</string>
+    <string name="reference">Verwendungszweck</string>
+
+    <string name="booking_text">Buchungstext</string>
+    <string name="booking_date">Buchungsdatum</string>
+    <string name="value_date">Wertstellungsdatum</string>
+    <string name="day_opening_balance">Taganfangssaldo</string>
+    <string name="day_closing_balance">Tagendsaldo</string>
+
     <string name="customer_name">Kontoinhaber</string>
     <string name="fints_server_address">FinTS Server</string>
 
@@ -67,6 +79,12 @@
 
     <string name="rationale_camera_permission_to_scan_qr_code">Um QR-Codes scannen zu können wird der Zugriff auf die Kamera benötigt.</string>
 
+
+    <string name="dialog_add_account_enter_bank">Bank (Suche mit Name, Bankleitzahl oder Ort):</string>
+    <string name="dialog_add_account_add">Hinzufügen</string>
+    <string name="dialog_add_account_bank_does_not_support_fints_3_error_message">%s untersützt FinTS 3.0 nicht und kann deshalb leider mit dieser App nicht verwendet werden.</string>
+    <string name="dialog_add_account_message_could_not_add_account">Konto konnte nicht hinzugefügt werden.\n\nFehlermeldung Ihrer Bank:\n\n%s</string>
+
     <string name="menu_home">Umsätze</string>
 
     <string name="menu_main_update_transactions">Umsätze aktualisieren</string>
@@ -88,10 +106,10 @@
         \n\nMöchten Sie hingegen den Button für dieses Konto nicht mehr angezeigt bekommen, klicken Sie auf das \'x\' rechts. Der Button wird dann immer noch am Ende der Umsatzlist angezeigt, falls Sie die älteren Umsätze später doch noch abrufen möchten.
     </string>
 
-    <string name="dialog_add_account_enter_bank">Bank (Suche mit Name, Bankleitzahl oder Ort):</string>
-    <string name="dialog_add_account_add">Hinzufügen</string>
-    <string name="dialog_add_account_bank_does_not_support_fints_3_error_message">%s untersützt FinTS 3.0 nicht und kann deshalb leider mit dieser App nicht verwendet werden.</string>
-    <string name="dialog_add_account_message_could_not_add_account">Konto konnte nicht hinzugefügt werden.\n\nFehlermeldung Ihrer Bank:\n\n%s</string>
+    <string name="dialog_account_transaction_details_title">Umsatzdetails</string>
+    <string name="dialog_account_transaction_details_sender">Zahlender</string>
+    <string name="dialog_account_transaction_details_recipient">Empfänger</string>
+
 
     <string name="dialog_transfer_money_account">Konto:</string>
     <string name="dialog_transfer_money_recipient_name">Name:</string>

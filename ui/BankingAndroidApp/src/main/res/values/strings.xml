@@ -25,12 +25,24 @@
     <string name="online_banking_credentials_login_name">Login name</string>
     <string name="online_banking_credentials_password">Password</string>
 
+    <string name="account">Account</string>
     <string name="accounts">Accounts</string>
     <string name="bank_credentials">Bank credentials</string>
+
+    <string name="name">Name</string>
 
     <string name="bank_code">Bank code</string>
     <string name="bic">BIC</string>
     <string name="iban">IBAN</string>
+    <string name="amount">Amount</string>
+    <string name="reference">Reference</string>
+
+    <string name="booking_text">Booking text</string>
+    <string name="booking_date">Booking date</string>
+    <string name="value_date">Value date</string>
+    <string name="day_opening_balance">Day opening balance</string>
+    <string name="day_closing_balance">Day closing balance</string>
+
     <string name="customer_name">Customer name</string>
     <string name="fints_server_address">FinTS server</string>
 
@@ -67,6 +79,13 @@
 
     <string name="rationale_camera_permission_to_scan_qr_code">To scan QR-Codes permission to access camera is required.</string>
 
+
+    <string name="dialog_add_account_enter_bank">Bank (search by name, bank code or city):</string>
+    <string name="dialog_add_account_add">Add</string>
+    <string name="dialog_add_account_bank_does_not_support_fints_3_error_message">%s does not support FinTS 3.0 and can therefore unfortunately not be used with this app.</string>
+    <string name="dialog_add_account_message_could_not_add_account">Could not add account.\n\nError message from your bank:\n\n%s</string>
+
+
     <string name="menu_home">Home</string>
 
     <string name="menu_main_update_transactions">Update transactions</string>
@@ -88,10 +107,10 @@
         \n\nIf you no longer wish to see this button for this account, click on the \'x\' on the right. The button will still be displayed at the end of the list of transactions, in case you want to retrieve the earlier transactions later.
     </string>
 
-    <string name="dialog_add_account_enter_bank">Bank (search by name, bank code or city):</string>
-    <string name="dialog_add_account_add">Add</string>
-    <string name="dialog_add_account_bank_does_not_support_fints_3_error_message">%s does not support FinTS 3.0 and can therefore unfortunately not be used with this app.</string>
-    <string name="dialog_add_account_message_could_not_add_account">Could not add account.\n\nError message from your bank:\n\n%s</string>
+    <string name="dialog_account_transaction_details_title">Transaction details</string>
+    <string name="dialog_account_transaction_details_sender">Sender</string>
+    <string name="dialog_account_transaction_details_recipient">Recipient</string>
+
 
     <string name="dialog_transfer_money_account">Account:</string>
     <string name="dialog_transfer_money_recipient_name">Name:</string>
