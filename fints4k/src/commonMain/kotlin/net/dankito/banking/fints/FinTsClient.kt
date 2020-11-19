@@ -987,7 +987,6 @@ open class FinTsClient(
     protected open fun updateBankData(bank: BankData, response: BankResponse) {
         response.getFirstSegmentById<BankParameters>(InstituteSegmentId.BankParameters)?.let { bankParameters ->
             bank.bpdVersion = bankParameters.bpdVersion
-            bank.bankName = adjustBankName(bankParameters.bankName)
             bank.bankCode = bankParameters.bankCode
             bank.countryCode = bankParameters.bankCountryCode
             bank.countMaxJobsPerMessage = bankParameters.countMaxJobsPerMessage
@@ -1030,10 +1029,6 @@ open class FinTsClient(
         if (response.supportedJobs.isNotEmpty()) {
             bank.supportedJobs = response.supportedJobs
         }
-    }
-
-    protected open fun adjustBankName(bankName: String): String {
-        return bankName.replace("DB24-Filiale", "Deutsche Bank") // set a better name for Deutsche Bank's self title 'DB24-Filiale'
     }
 
     protected open fun updateCustomerData(bank: BankData, response: BankResponse) {
