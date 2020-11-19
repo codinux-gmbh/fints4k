@@ -2,6 +2,7 @@ package net.dankito.banking.ui.android.views
 
 import android.Manifest
 import android.content.Context
+import android.os.Environment
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentActivity
@@ -18,6 +19,7 @@ import net.dankito.filechooserdialog.FileChooserDialog
 import net.dankito.filechooserdialog.model.FileChooserDialogConfig
 import net.dankito.utils.android.extensions.asActivity
 import net.dankito.utils.android.permissions.IPermissionsService
+import org.slf4j.LoggerFactory
 import java.io.File
 
 
@@ -26,6 +28,12 @@ open class MainActivityFloatingActionMenuButton(
     protected val permissionsService: IPermissionsService,
     protected val presenter: BankingPresenter
 ) : FloatingActionMenuButton(floatingActionMenu) {
+
+    companion object {
+        // TODO: remove again as soon as bug that no files are displayed in FileChooserDialog (on Android 10 and higher?) is fixed
+        private val log = LoggerFactory.getLogger(MainActivityFloatingActionMenuButton::class.java)
+    }
+
 
     protected lateinit var fabTransferMoney: FloatingActionButton
 
@@ -96,6 +104,13 @@ open class MainActivityFloatingActionMenuButton(
 
     protected open fun showTransferMoneyDialogWithDataFromPdf() {
         (floatingActionMenu.context.asActivity() as? FragmentActivity)?.let { activity ->
+            // TODO: remove again as soon as bug that no files are displayed in FileChooserDialog (on Android 10 and higher?) is fixed
+            log.info("config.initialDirectory = ${presenter.appSettings.lastSelectedOpenPdfFolder}, Environment.getExternalStorageDirectory() = ${Environment.getExternalStorageDirectory()}, " +
+                    "Downloads dir = ${Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)}")
+            log.info("External storage files: ${Environment.getExternalStorageDirectory()?.listFiles()?.map { it.name }}")
+            log.info("getExternalStorageState() = ${Environment.getExternalStorageState()}, isExternalStorageEmulated() = ${Environment.isExternalStorageEmulated()}, " +
+                    "isExternalStorageRemovable() = ${Environment.isExternalStorageRemovable()}")
+
             val config = FileChooserDialogConfig(listOf("*.pdf"), presenter.appSettings.lastSelectedOpenPdfFolder.toFile())
 
             FileChooserDialog().showOpenSingleFileDialog(activity, permissionsService, config) { _, selectedFile ->
