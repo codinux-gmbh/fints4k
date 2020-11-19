@@ -7,6 +7,7 @@ import android.view.*
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.ImageButton
+import androidx.appcompat.widget.Toolbar
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
@@ -22,6 +23,7 @@ import net.dankito.banking.ui.android.di.BankingComponent
 import net.dankito.banking.ui.android.extensions.addHorizontalItemDivider
 import net.dankito.banking.ui.android.extensions.showAmount
 import net.dankito.banking.ui.android.views.InfoPopupWindow
+import net.dankito.banking.ui.model.SelectedAccountType
 import net.dankito.banking.ui.model.TransactionsRetrievalState
 import net.dankito.banking.ui.model.TypedBankAccount
 import net.dankito.banking.ui.model.parameters.TransferMoneyData
@@ -253,6 +255,8 @@ class HomeFragment : Fragment() {
 
 
     private fun updateTransactionsToDisplayOnUiThread() {
+        setToolbarTitle()
+
         transactionAdapter.items = presenter.searchSelectedAccountTransactions(appliedTransactionsFilter)
 
         mnitmBalance.title = presenter.formatAmount(presenter.balanceOfSelectedAccounts)
@@ -269,6 +273,20 @@ class HomeFragment : Fragment() {
         setRecyclerViewAndNoTransactionsFetchedView()
 
         setFetchAllTransactionsView()
+    }
+
+    private fun setToolbarTitle() {
+        // TODO: also set selected account's icon
+
+        if (presenter.allBanks.isNotEmpty()) {
+            activity?.findViewById<Toolbar>(R.id.toolbar)?.let { toolbar ->
+                toolbar.title = when (presenter.selectedAccountType) {
+                    SelectedAccountType.AllAccounts -> context?.getString(R.string.drawer_menu_all_bank_accounts_title)
+                    SelectedAccountType.SingleBank -> presenter.getSingleSelectedBank()?.displayName
+                    SelectedAccountType.SingleAccount -> presenter.getSingleSelectedAccount()?.displayName
+                }
+            }
+        }
     }
 
     private fun setRecyclerViewAndNoTransactionsFetchedView() {

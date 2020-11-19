@@ -91,7 +91,8 @@ open class BankingPresenter(
 
     protected var _selectedAccounts = mutableListOf<TypedBankAccount>()
 
-    protected var selectedAccountType = SelectedAccountType.AllAccounts
+    open var selectedAccountType = SelectedAccountType.AllAccounts
+        protected set
 
     protected var saveAccountOnNextEnterTanInvocation = false
 
@@ -858,10 +859,31 @@ open class BankingPresenter(
                 && _selectedAccounts.map { it.bank }.toSet().containsExactly(bank)
     }
 
+    open fun getSingleSelectedBank(): TypedBankData? {
+        val selectedBanks = _selectedAccounts.map { it.bank }.toSet()
+
+        if (selectedBanks.size == 1) {
+            return selectedBanks.first() as? TypedBankData
+        }
+
+        return null
+    }
+
     open fun isSingleSelectedAccount(account: TypedBankAccount): Boolean {
         return selectedAccountType == SelectedAccountType.SingleAccount
                 && _selectedAccounts.containsExactly(account)
     }
+
+    open fun getSingleSelectedAccount(): TypedBankAccount? {
+        val selectedAccounts = _selectedAccounts.toSet()
+
+        if (selectedAccounts.size == 1) {
+            return selectedAccounts.first()
+        }
+
+        return null
+    }
+
 
     open fun selectedAllAccounts() {
         selectedAccountType = SelectedAccountType.AllAccounts
