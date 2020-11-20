@@ -168,20 +168,26 @@ open class AddAccountDialog : DialogFragment() {
     }
 
     protected open fun bankSelected(bank: BankInfo) {
-        selectedBank = bank
+        val didSelectSupportedBank = bank.supportsFinTs3_0
+
+        selectedBank = if (didSelectSupportedBank) bank else null
 
         justDidSelectBank = true
 
-        edtxtBank.text = bank.bankCode + " " + bank.name
+        if (didSelectSupportedBank) {
+            edtxtBank.text = bank.bankCode + " " + bank.name
+        }
 
         justDidSelectBank = false
 
-        edtxtUserName.requestFocus()
-
         checkIfRequiredDataEnteredOnUiThread()
 
-        if (bank.supportsFinTs3_0 == false) {
+        if (didSelectSupportedBank) {
+            edtxtUserName.requestFocus()
+        }
+        else {
             showBankDoesNotSupportFinTs30ErrorMessage(bank)
+            edtxtBank.actualEditText.selectAll()
         }
     }
 
