@@ -1,7 +1,16 @@
 package net.dankito.utils.multiplatform.log
 
+import net.dankito.utils.multiplatform.os.OsHelper
 
-open class Slf4jLogger(protected val slf4jLogger: org.slf4j.Logger) : Logger {
+
+open class Slf4jLogger(protected val slf4jLogger: org.slf4j.Logger, protected val osHelper: OsHelper = OsHelper()) : Logger {
+
+    companion object {
+
+        const val MaxLogCatMessageLength = 4 * 1024
+
+    }
+
 
     override val name: String
         get() = slf4jLogger.name
@@ -87,7 +96,16 @@ open class Slf4jLogger(protected val slf4jLogger: org.slf4j.Logger) : Logger {
 
         val args = determineArguments(exception, arguments)
 
-        logOnLevel(message, args)
+        if (osHelper.isRunningOnAndroid && message.length > MaxLogCatMessageLength) {
+            var index = 0
+            // as LogCat only prints at maximum 4076 bytes per message, break up message in multiple strings
+            message.chunked(MaxLogCatMessageLength - 5).forEach { chunk -> // -5 to also log index
+                logOnLevel("[${index++}] $chunk", args)
+            }
+        }
+        else {
+            logOnLevel(message, args)
+        }
     }
 
     protected open fun determineArguments(exception: Throwable?, arguments: Array<out Any>): Array<out Any> {
