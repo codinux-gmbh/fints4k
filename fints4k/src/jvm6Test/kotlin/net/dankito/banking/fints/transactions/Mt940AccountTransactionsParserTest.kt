@@ -2,6 +2,7 @@ package net.dankito.banking.fints.transactions
 
 import net.dankito.banking.fints.FinTsTestBaseJvm
 import net.dankito.banking.fints.model.AccountData
+import net.dankito.banking.fints.model.BankData
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
 
@@ -20,7 +21,7 @@ class Mt940AccountTransactionsParserTest : FinTsTestBaseJvm() {
 
 
         // when
-        val result = underTest.parseTransactions(transactionsString, AccountData())
+        val result = underTest.parseTransactions(transactionsString, BankData(), AccountData())
 
 
         // then

@@ -3,6 +3,7 @@ package net.dankito.banking.fints
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import net.dankito.banking.fints.callback.FinTsClientCallback
+import net.dankito.banking.fints.log.IMessageLogAppender
 import net.dankito.banking.fints.log.MessageLogCollector
 import net.dankito.banking.fints.messages.MessageBuilder
 import net.dankito.banking.fints.messages.MessageBuilderResult
@@ -65,6 +66,12 @@ open class FinTsClient(
             messageLogCollector.logError(message, e, logger, bank)
         }
 
+    }
+
+
+    init {
+        responseParser.logAppender = messageLogAppender
+        mt940Parser.logAppender = messageLogAppender
     }
 
 
@@ -394,7 +401,8 @@ open class FinTsClient(
 
         dialogContext.chunkedResponseHandler = { response ->
             response.getFirstSegmentById<ReceivedAccountTransactions>(InstituteSegmentId.AccountTransactionsMt940)?.let { transactionsSegment ->
-                val (chunkTransaction, remainder) = mt940Parser.parseTransactionsChunk(remainingMt940String + transactionsSegment.bookedTransactionsString, parameter.account)
+                val (chunkTransaction, remainder) = mt940Parser.parseTransactionsChunk(remainingMt940String + transactionsSegment.bookedTransactionsString,
+                    dialogContext.bank, parameter.account)
 
                 bookedTransactions.addAll(chunkTransaction)
                 remainingMt940String = remainder

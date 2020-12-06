@@ -1,5 +1,6 @@
 package net.dankito.banking.fints.response
 
+import net.dankito.banking.fints.log.IMessageLogAppender
 import net.dankito.banking.fints.messages.Separators
 import net.dankito.banking.fints.messages.datenelemente.abgeleiteteformate.Datum
 import net.dankito.banking.fints.messages.datenelemente.abgeleiteteformate.Uhrzeit
@@ -25,7 +26,8 @@ import net.dankito.utils.multiplatform.log.LoggerFactory
 
 
 open class ResponseParser(
-    protected val messageUtils: MessageUtils = MessageUtils()
+    protected open val messageUtils: MessageUtils = MessageUtils(),
+    open var logAppender: IMessageLogAppender? = null
 ) {
 
     companion object {
@@ -52,7 +54,7 @@ open class ResponseParser(
 
             return BankResponse(true, response, parsedSegments)
         } catch (e: Exception) {
-            log.error(e) { "Could not parse response '$response'" }
+            logError("Could not parse response '$response'", e)
 
             return BankResponse(true, response, errorMessage = e.getInnerExceptionMessage())
         }
@@ -84,7 +86,7 @@ open class ResponseParser(
                 return parseSegment(segment, segmentId, dataElementGroups)
             }
         } catch (e: Exception) {
-            log.error(e) { "Could not parse segment '$segment'" } // TODO: what to do here, how to inform user?
+            logError("Could not parse segment '$segment'", e) // TODO: what to do here, how to inform user?
         }
 
         return null
@@ -463,7 +465,7 @@ open class ResponseParser(
             return parseCodeEnum(smsAbbuchungskontoErforderlichString, SmsAbbuchungskontoErforderlich.values())
         } catch (e: Exception) {
             if (isEncodedBooleanValue(smsAbbuchungskontoErforderlichString) == false) {
-                log.error(e) { "Could not parse '$smsAbbuchungskontoErforderlichString' to SmsAbbuchungskontoErforderlich" }
+                logError("Could not parse '$smsAbbuchungskontoErforderlichString' to SmsAbbuchungskontoErforderlich", e)
             }
         }
 
@@ -478,7 +480,7 @@ open class ResponseParser(
             return parseCodeEnum(auftraggeberkontoErforderlichString, AuftraggeberkontoErforderlich.values())
         } catch (e: Exception) {
             if (isEncodedBooleanValue(auftraggeberkontoErforderlichString) == false) {
-                log.error(e) { "Could not parse '$auftraggeberkontoErforderlichString' to AuftraggeberkontoErforderlich" }
+                logError("Could not parse '$auftraggeberkontoErforderlichString' to AuftraggeberkontoErforderlich", e)
             }
         }
 
@@ -708,7 +710,7 @@ open class ResponseParser(
 
             return CreditCardTransaction(amount, transactionDescriptionBase, transactionDescriptionSupplement, bookingDate, valueDate, isCleared)
         } catch (e: Exception) {
-            log.error("Could not parse Credit card transaction '$transactionDataElementGroup'", e)
+            logError("Could not parse Credit card transaction '$transactionDataElementGroup'", e)
         }
 
         return null
@@ -976,6 +978,16 @@ open class ResponseParser(
         }
 
         return binaryData
+    }
+
+
+    protected open fun logError(message: String, e: Exception?) {
+        logAppender?.let { logAppender ->
+            logAppender.logError(message, e, log)
+        }
+        ?: run {
+            log.error(e) { message }
+        }
     }
 
 }

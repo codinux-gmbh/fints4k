@@ -1,9 +1,13 @@
 package net.dankito.banking.fints.transactions.mt940
 
+import net.dankito.banking.fints.log.IMessageLogAppender
 import net.dankito.banking.fints.transactions.mt940.model.AccountStatement
 
 
 interface IMt940Parser {
+
+    var logAppender: IMessageLogAppender?
+
 
     /**
      * Parses a whole MT 940 statements string, that is one that ends with a "-" line.

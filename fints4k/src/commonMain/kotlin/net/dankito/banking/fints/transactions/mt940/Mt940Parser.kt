@@ -1,5 +1,6 @@
 package net.dankito.banking.fints.transactions.mt940
 
+import net.dankito.banking.fints.log.IMessageLogAppender
 import net.dankito.banking.fints.model.Amount
 import net.dankito.banking.fints.transactions.mt940.model.*
 import net.dankito.utils.multiplatform.Date
@@ -77,6 +78,9 @@ open class Mt940Parser : IMt940Parser {
     }
 
 
+    override var logAppender: IMessageLogAppender? = null
+
+
     /**
      * Parses a whole MT 940 statements string, that is one that ends with a "-" line.
      */
@@ -108,7 +112,7 @@ open class Mt940Parser : IMt940Parser {
 
             return Pair(transactions, remainder)
         } catch (e: Exception) {
-            log.error(e) { "Could not parse account statements from MT940 string:\n$mt940Chunk" }
+            logError("Could not parse account statements from MT940 string:\n$mt940Chunk", e)
         }
 
         return Pair(listOf(), "")
@@ -131,7 +135,7 @@ open class Mt940Parser : IMt940Parser {
 
             return parseAccountStatement(fieldsByCode)
         } catch (e: Exception) {
-            log.error(e) { "Could not parse account statement:\n$accountStatementString" }
+            logError("Could not parse account statement:\n$accountStatementString", e)
         }
 
         return null
@@ -301,7 +305,7 @@ open class Mt940Parser : IMt940Parser {
 
             return information
         } catch (e: Exception) {
-            log.error(e) { "Could not parse InformationToAccountOwner from field value '$informationToAccountOwnerString'" }
+            logError("Could not parse InformationToAccountOwner from field value '$informationToAccountOwnerString'", e)
         }
 
         return null
@@ -463,7 +467,7 @@ open class Mt940Parser : IMt940Parser {
 
                 return Date(year + 2000, month, day) // java.util.Date years start at 1900 at month at 0 not at 1
             } catch (e: Exception) {
-                log.error(e) { "Could not parse dateString '$dateString'" }
+                logError("Could not parse dateString '$dateString'", e)
             }
         }
 
@@ -487,6 +491,16 @@ open class Mt940Parser : IMt940Parser {
 
     protected open fun parseAmount(amountString: String): Amount {
         return Amount(amountString)
+    }
+
+
+    protected open fun logError(message: String, e: Exception?) {
+        logAppender?.let { logAppender ->
+            logAppender.logError(message, e, log)
+        }
+        ?: run {
+            log.error(e) { message }
+        }
     }
 
 }

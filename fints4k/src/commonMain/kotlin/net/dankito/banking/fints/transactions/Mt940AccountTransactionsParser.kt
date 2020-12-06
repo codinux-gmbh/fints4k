@@ -1,9 +1,7 @@
 package net.dankito.banking.fints.transactions
 
-import net.dankito.banking.fints.model.AccountData
-import net.dankito.banking.fints.model.AccountTransaction
-import net.dankito.banking.fints.model.Amount
-import net.dankito.banking.fints.model.Money
+import net.dankito.banking.fints.log.IMessageLogAppender
+import net.dankito.banking.fints.model.*
 import net.dankito.banking.fints.transactions.mt940.IMt940Parser
 import net.dankito.banking.fints.transactions.mt940.Mt940Parser
 import net.dankito.banking.fints.transactions.mt940.model.AccountStatement
@@ -11,10 +9,12 @@ import net.dankito.banking.fints.transactions.mt940.model.Balance
 import net.dankito.banking.fints.transactions.mt940.model.Transaction
 import net.dankito.banking.fints.transactions.mt940.model.StatementLine
 import net.dankito.utils.multiplatform.log.LoggerFactory
+import net.dankito.utils.multiplatform.log.Logger
 
 
 open class Mt940AccountTransactionsParser(
-    protected val mt940Parser: IMt940Parser = Mt940Parser()
+    protected val mt940Parser: IMt940Parser = Mt940Parser(),
+    override var logAppender: IMessageLogAppender? = null
 ) : IAccountTransactionsParser {
 
     companion object {
@@ -22,23 +22,25 @@ open class Mt940AccountTransactionsParser(
     }
 
 
-    override fun parseTransactions(transactionsString: String, account: AccountData): List<AccountTransaction> {
+    override fun parseTransactions(transactionsString: String, bank: BankData, account: AccountData): List<AccountTransaction> {
+        setLogAppender(bank)
+
         val accountStatements = mt940Parser.parseMt940String(transactionsString)
 
-        return accountStatements.flatMap { mapToAccountTransactions(it, account) }
+        return accountStatements.flatMap { mapToAccountTransactions(it, bank, account) }
     }
 
-    override fun parseTransactionsChunk(transactionsChunk: String, account: AccountData): Pair<List<AccountTransaction>, String> {
+    override fun parseTransactionsChunk(transactionsChunk: String, bank: BankData, account: AccountData): Pair<List<AccountTransaction>, String> {
         val (accountStatements, remainder) = mt940Parser.parseMt940Chunk(transactionsChunk)
 
-        return Pair(accountStatements.flatMap { mapToAccountTransactions(it, account) }, remainder)
+        return Pair(accountStatements.flatMap { mapToAccountTransactions(it, bank, account) }, remainder)
     }
 
-    protected open fun mapToAccountTransactions(statement: AccountStatement, account: AccountData): List<AccountTransaction> {
+    protected open fun mapToAccountTransactions(statement: AccountStatement, bank: BankData, account: AccountData): List<AccountTransaction> {
         try {
             return statement.transactions.map { mapToAccountTransaction(statement, it, account) }
         } catch (e: Exception) {
-            log.error(e) { "Could not map AccountStatement '$statement' to AccountTransactions" }
+            logError("Could not map AccountStatement '$statement' to AccountTransactions", e, bank)
         }
 
         return listOf()
@@ -111,6 +113,29 @@ open class Mt940AccountTransactionsParser(
         }
 
         return positiveAmount
+    }
+
+
+    protected open fun setLogAppender(bankDataOfCall: BankData) {
+        // TODO: this does not perfectly work as in parallel calls to Mt940AccountTransactionsParser for different account logAppender gets overwritten by the later call
+        mt940Parser.logAppender = logAppender?.let { logAppender ->
+            object : IMessageLogAppender {
+
+                override fun logError(message: String, e: Exception?, logger: Logger?, bank: BankData?) {
+                    logAppender.logError(message, e, logger, bank ?: bankDataOfCall)
+                }
+
+            }
+        }
+    }
+
+    protected open fun logError(message: String, e: Exception?, bank: BankData) {
+        logAppender?.let { logAppender ->
+            logAppender.logError(message, e, log, bank)
+        }
+        ?: run {
+            log.error(e) { message }
+        }
     }
 
 }
