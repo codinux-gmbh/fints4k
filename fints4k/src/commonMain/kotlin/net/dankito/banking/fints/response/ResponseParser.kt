@@ -690,21 +690,27 @@ open class ResponseParser(
 
         return ReceivedCreditCardTransactionsAndBalance(
             balance,
-            transactionsDataElementGroups.map { mapCreditCardTransaction(it) },
+            transactionsDataElementGroups.mapNotNull { mapCreditCardTransaction(it) },
             segment
         )
     }
 
-    protected open fun mapCreditCardTransaction(transactionDataElementGroup: String): CreditCardTransaction {
-        val dataElements = getDataElements(transactionDataElementGroup)
+    protected open fun mapCreditCardTransaction(transactionDataElementGroup: String): CreditCardTransaction? {
+        try {
+            val dataElements = getDataElements(transactionDataElementGroup)
 
-        val bookingDate = parseDate(dataElements[1])
-        val valueDate = parseDate(dataElements[2])
-        val amount = parseCreditCardAmount(dataElements.subList(8, 11))
-        val otherPartyName = parseString(dataElements[11])
-        val isCleared = parseBoolean(dataElements[20])
+            val bookingDate = parseDate(dataElements[1])
+            val valueDate = parseDate(dataElements[2])
+            val amount = parseCreditCardAmount(dataElements.subList(8, 11))
+            val otherPartyName = parseString(dataElements[11])
+            val isCleared = parseBoolean(dataElements[20])
 
-        return CreditCardTransaction(amount, otherPartyName, bookingDate, valueDate, isCleared)
+            return CreditCardTransaction(amount, otherPartyName, bookingDate, valueDate, isCleared)
+        } catch (e: Exception) {
+            log.error("Could not parse Credit card transaction '$transactionDataElementGroup'", e)
+        }
+
+        return null
     }
 
     private fun parseCreditCardAmount(amountDataElements: List<String>): Money {
