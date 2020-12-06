@@ -6,7 +6,8 @@ import net.dankito.banking.fints.model.MessageLogEntryType
 import net.dankito.utils.multiplatform.log.Logger
 import net.dankito.utils.multiplatform.log.LoggerFactory
 import net.dankito.utils.multiplatform.Date
-import net.dankito.utils.multiplatform.getInnerExceptionMessage
+import net.dankito.utils.multiplatform.StackTraceHelper
+import net.dankito.utils.multiplatform.getInnerException
 
 
 open class MessageLogCollector {
@@ -14,6 +15,8 @@ open class MessageLogCollector {
     companion object {
         val FindAccountTransactionsStartRegex = Regex("^HIKAZ:\\d:\\d:\\d\\+@\\d+@", RegexOption.MULTILINE)
         val FindAccountTransactionsEndRegex = Regex("^-'", RegexOption.MULTILINE)
+
+        const val MaxCountStackTraceElements = 15
 
         private val log = LoggerFactory.getLogger(MessageLogCollector::class)
     }
@@ -24,6 +27,9 @@ open class MessageLogCollector {
     // in either case remove sensitive data after response is parsed as otherwise some information like account holder name and accounts may is not set yet on BankData
     open val messageLogWithoutSensitiveData: List<MessageLogEntry>
         get() = messageLog.map { MessageLogEntry(safelyRemoveSensitiveDataFromMessage(it.message, it.bank), it.type, it.time, it.bank) }
+
+
+    protected val stackTraceHelper = StackTraceHelper()
 
 
     open fun addMessageLog(message: String, type: MessageLogEntryType, bank: BankData) {
@@ -51,8 +57,10 @@ open class MessageLogCollector {
             loggerToUse.error(prettyPrintMessage)
         }
 
+        val errorStackTrace = if (e != null) "\r\n" + getStackTrace(e) else ""
+
         // TODO: what to do when bank is not set?
-        messageLog.add(MessageLogEntry(prettyPrintMessage, MessageLogEntryType.Error, Date(), bank))
+        messageLog.add(MessageLogEntry(prettyPrintMessage + errorStackTrace, MessageLogEntryType.Error, Date(), bank))
     }
 
 
@@ -60,7 +68,7 @@ open class MessageLogCollector {
         try {
             return removeSensitiveDataFromMessage(message, bank)
         } catch (e: Exception) {
-            return "! WARNING !\r\nCould not remove sensitive data!\r\n$e\r\n$message"
+            return "! WARNING !\r\nCould not remove sensitive data!\r\n$e\r\n${getStackTrace(e)}\r\n$message"
         }
     }
 
@@ -99,6 +107,13 @@ open class MessageLogCollector {
         }
 
         return message
+    }
+
+
+    protected open fun getStackTrace(e: Exception): String {
+        val innerException = e.getInnerException()
+
+        return stackTraceHelper.getStackTrace(innerException, MaxCountStackTraceElements)
     }
 
 }
