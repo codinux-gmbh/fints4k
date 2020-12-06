@@ -85,19 +85,23 @@ open class Slf4jLogger(protected val slf4jLogger: org.slf4j.Logger) : Logger {
 
         val message = messageCreator()
 
-        if (exception != null) {
+        val args = determineArguments(exception, arguments)
+
+        logOnLevel(message, args)
+    }
+
+    protected open fun determineArguments(exception: Throwable?, arguments: Array<out Any>): Array<out Any> {
+        return if (exception != null) {
             if (arguments.isEmpty()) {
-                logOnLevel(message, arrayOf(exception))
-            }
-            else {
+                arrayOf(exception)
+            } else {
                 val argumentsIncludingException: MutableList<Any> = mutableListOf(exception)
                 argumentsIncludingException.addAll(0, arguments.toList())
 
-                logOnLevel(message, argumentsIncludingException.toTypedArray())
+                argumentsIncludingException.toTypedArray()
             }
-        }
-        else {
-            logOnLevel(message, arguments)
+        } else {
+            arguments
         }
     }
 
