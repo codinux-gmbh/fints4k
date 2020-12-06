@@ -799,12 +799,17 @@ open class BankingPresenter(
         })
 
         return logEntries.map { entry ->
-            MessageLogEntryDateFormatter.format(entry.time) + " " + getMessageLogPrefix(entry) + "\r\n" + entry.bank.bankCode + " " + entry.message
+            MessageLogEntryDateFormatter.format(entry.time) + " " + entry.bank.bankCode + " " + getMessageLogPrefix(entry) + "\r\n" + entry.message
         }
     }
 
     protected open fun getMessageLogPrefix(entry: MessageLogEntry): String {
-        return "${if (entry.type == MessageLogEntryType.Sent) "Sending" else "Received"} message:" // TODO: translate
+        // TODO: translate
+        return when (entry.type) {
+            MessageLogEntryType.Sent -> "Sending message"
+            MessageLogEntryType.Received -> "Received message"
+            MessageLogEntryType.Error -> "Error"
+        }
     }
 
 

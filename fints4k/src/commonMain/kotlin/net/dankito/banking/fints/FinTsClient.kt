@@ -25,6 +25,7 @@ import net.dankito.banking.fints.transactions.IAccountTransactionsParser
 import net.dankito.banking.fints.transactions.Mt940AccountTransactionsParser
 import net.dankito.banking.fints.util.IBase64Service
 import net.dankito.banking.fints.util.PureKotlinBase64Service
+import net.dankito.utils.multiplatform.log.Logger
 import net.dankito.utils.multiplatform.log.LoggerFactory
 import net.dankito.banking.fints.webclient.IWebClient
 import net.dankito.banking.fints.webclient.KtorWebClient
@@ -57,6 +58,14 @@ open class FinTsClient(
 
     open val messageLogWithoutSensitiveData: List<MessageLogEntry>
             get() = messageLogCollector.messageLogWithoutSensitiveData
+
+    protected open val messageLogAppender: IMessageLogAppender = object : IMessageLogAppender {
+
+        override fun logError(message: String, e: Exception?, logger: Logger?, bank: BankData?) {
+            messageLogCollector.logError(message, e, logger, bank)
+        }
+
+    }
 
 
     /**
@@ -756,14 +765,14 @@ open class FinTsClient(
 
                 return responseParser.parse(decodedResponse)
             } catch (e: Exception) {
-                log.error(e) { "Could not decode responseBody:\r\n'$responseBody'" }
+                logError("Could not decode responseBody:\r\n'$responseBody'", dialogContext, e)
 
                 return BankResponse(false, errorMessage = e.getInnerExceptionMessage())
             }
         }
         else {
             val bank = dialogContext.bank
-            log.error(webResponse.error) { "Request to $bank (${bank.finTs3ServerAddress}) failed" }
+            logError("Request to $bank (${bank.finTs3ServerAddress}) failed", dialogContext, webResponse.error)
         }
 
         return BankResponse(false, errorMessage = webResponse.error?.getInnerExceptionMessage())
@@ -786,6 +795,10 @@ open class FinTsClient(
 
     protected open fun addMessageLog(message: String, type: MessageLogEntryType, dialogContext: DialogContext) {
         messageLogCollector.addMessageLog(message, type, dialogContext.bank)
+    }
+
+    protected open fun logError(message: String, dialogContext: DialogContext, e: Exception?) {
+        messageLogAppender.logError(message, e, log, dialogContext.bank)
     }
 
 

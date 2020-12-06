@@ -7,7 +7,7 @@ open class MessageLogEntry(
     open val message: String,
     open val type: MessageLogEntryType,
     open val time: Date,
-    open val bank: BankData
+    open val bank: BankData?
 ) {
 
     override fun toString(): String {

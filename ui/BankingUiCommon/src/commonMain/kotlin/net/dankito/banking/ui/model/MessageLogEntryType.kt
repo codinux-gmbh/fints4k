@@ -5,6 +5,8 @@ enum class MessageLogEntryType {
 
     Sent,
 
-    Received
+    Received,
+
+    Error
 
 }

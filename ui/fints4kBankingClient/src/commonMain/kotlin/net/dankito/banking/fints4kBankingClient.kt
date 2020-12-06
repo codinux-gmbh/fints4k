@@ -61,6 +61,7 @@ open class fints4kBankingClient(
         return when (type) {
             MessageLogEntryType.Sent -> net.dankito.banking.ui.model.MessageLogEntryType.Sent
             MessageLogEntryType.Received -> net.dankito.banking.ui.model.MessageLogEntryType.Received
+            MessageLogEntryType.Error -> net.dankito.banking.ui.model.MessageLogEntryType.Error
         }
     }
 

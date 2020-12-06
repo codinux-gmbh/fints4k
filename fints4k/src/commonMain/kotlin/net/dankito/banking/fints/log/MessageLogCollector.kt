@@ -3,6 +3,7 @@ package net.dankito.banking.fints.log
 import net.dankito.banking.fints.model.BankData
 import net.dankito.banking.fints.model.MessageLogEntry
 import net.dankito.banking.fints.model.MessageLogEntryType
+import net.dankito.utils.multiplatform.log.Logger
 import net.dankito.utils.multiplatform.log.LoggerFactory
 import net.dankito.utils.multiplatform.Date
 import net.dankito.utils.multiplatform.getInnerExceptionMessage
@@ -39,7 +40,27 @@ open class MessageLogCollector {
     }
 
 
-    protected open fun removeSensitiveDataFromMessage(message: String, bank: BankData): String {
+    open fun logError(message: String, e: Exception? = null, logger: Logger? = null, bank: BankData?) {
+        val prettyPrintMessage = prettyPrintHbciMessage(message)
+
+        val loggerToUse = logger ?: log
+        if (e != null) {
+            loggerToUse.error(e) { prettyPrintMessage }
+        }
+        else {
+            loggerToUse.error(prettyPrintMessage)
+        }
+
+        // TODO: what to do when bank is not set?
+        messageLog.add(MessageLogEntry(prettyPrintMessage, MessageLogEntryType.Error, Date(), bank))
+    }
+
+
+    protected open fun removeSensitiveDataFromMessage(message: String, bank: BankData?): String {
+        if (bank == null) {
+            return message
+        }
+
         var prettyPrintMessageWithoutSensitiveData = message
             .replace(bank.customerId, "<customer_id>")
             .replace("+" + bank.pin, "+<pin>")
