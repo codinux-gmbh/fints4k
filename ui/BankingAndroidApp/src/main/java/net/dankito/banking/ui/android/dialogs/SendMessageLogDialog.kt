@@ -34,7 +34,7 @@ open class SendMessageLogDialog : DialogFragment() {
     }
 
 
-    fun show(activity: AppCompatActivity, fullscreen: Boolean = false) {
+    fun show(activity: AppCompatActivity, fullscreen: Boolean = true) {
         val style = if(fullscreen) R.style.FullscreenDialogWithStatusBar else R.style.FloatingDialog
         setStyle(STYLE_NORMAL, style)
 
