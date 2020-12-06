@@ -3,6 +3,7 @@ package net.dankito.banking.fints
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import net.dankito.banking.fints.callback.FinTsClientCallback
+import net.dankito.banking.fints.log.MessageLogCollector
 import net.dankito.banking.fints.messages.MessageBuilder
 import net.dankito.banking.fints.messages.MessageBuilderResult
 import net.dankito.banking.fints.messages.datenelemente.implementierte.Dialogsprache
@@ -39,14 +40,12 @@ open class FinTsClient(
     protected val messageBuilder: MessageBuilder = MessageBuilder(),
     protected val responseParser: ResponseParser = ResponseParser(),
     protected val mt940Parser: IAccountTransactionsParser = Mt940AccountTransactionsParser(),
+    protected val messageLogCollector: MessageLogCollector = MessageLogCollector(),
     protected val product: ProductData = ProductData("15E53C26816138699C7B6A3E8", "1.0.0") // TODO: get version dynamically
 ) {
 
     companion object {
         val SupportedAccountTypes = listOf(AccountType.Girokonto, AccountType.Festgeldkonto, AccountType.Kreditkartenkonto)
-
-        val FindAccountTransactionsStartRegex = Regex("^HIKAZ:\\d:\\d:\\d\\+@\\d+@", RegexOption.MULTILINE)
-        val FindAccountTransactionsEndRegex = Regex("^-'", RegexOption.MULTILINE)
 
         const val OneDayMillis = 24 * 60 * 60 * 1000L
         const val NinetyDaysMillis = 90 * OneDayMillis
@@ -56,11 +55,8 @@ open class FinTsClient(
     }
 
 
-    protected val messageLog = ArrayList<MessageLogEntry>() // TODO: make thread safe like with CopyOnWriteArrayList
-
-    // in either case remove sensitive data after response is parsed as otherwise some information like account holder name and accounts may is not set yet on BankData
     open val messageLogWithoutSensitiveData: List<MessageLogEntry>
-            get() = messageLog.map { MessageLogEntry(removeSensitiveDataFromMessage(it.message, it.bank), it.time, it.bank) }
+            get() = messageLogCollector.messageLogWithoutSensitiveData
 
 
     /**
@@ -789,51 +785,7 @@ open class FinTsClient(
 
 
     protected open fun addMessageLog(message: String, type: MessageLogEntryType, dialogContext: DialogContext) {
-        val timeStamp = Date()
-        val messagePrefix = "${if (type == MessageLogEntryType.Sent) "Sending" else "Received"} message:\r\n" // currently no need to translate
-        val prettyPrintMessage = prettyPrintHbciMessage(message)
-        val prettyPrintMessageWithPrefix = "$messagePrefix$prettyPrintMessage"
-
-        log.debug { prettyPrintMessageWithPrefix }
-
-        messageLog.add(MessageLogEntry(prettyPrintMessageWithPrefix, timeStamp, dialogContext.bank))
-    }
-
-    protected fun prettyPrintHbciMessage(message: String): String {
-        return message.replace("'", "'\r\n")
-    }
-
-    protected open fun removeSensitiveDataFromMessage(message: String, bank: BankData): String {
-        var prettyPrintMessageWithoutSensitiveData = message
-            .replace(bank.customerId, "<customer_id>")
-            .replace("+" + bank.pin, "+<pin>")
-
-        if (bank.customerName.isNotBlank()) {
-            prettyPrintMessageWithoutSensitiveData = prettyPrintMessageWithoutSensitiveData
-                .replace(bank.customerName, "<customer_name>", true)
-        }
-
-        bank.accounts.forEach { account ->
-            prettyPrintMessageWithoutSensitiveData = prettyPrintMessageWithoutSensitiveData
-                .replace(account.accountIdentifier, "<account_identifier>")
-
-            if (account.accountHolderName.isNotBlank()) {
-                prettyPrintMessageWithoutSensitiveData = prettyPrintMessageWithoutSensitiveData
-                    .replace(account.accountHolderName, "<account_holder>", true)
-            }
-        }
-
-        return removeAccountTransactions(prettyPrintMessageWithoutSensitiveData)
-    }
-
-    protected open fun removeAccountTransactions(message: String): String {
-        FindAccountTransactionsStartRegex.find(message)?.let { startMatchResult ->
-            FindAccountTransactionsEndRegex.find(message, startMatchResult.range.endInclusive)?.let { endMatchResult ->
-                return message.replaceRange(IntRange(startMatchResult.range.endInclusive, endMatchResult.range.start), "<account_transactions>")
-            }
-        }
-
-        return message
+        messageLogCollector.addMessageLog(message, type, dialogContext.bank)
     }
 
 

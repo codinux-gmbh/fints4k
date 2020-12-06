@@ -1,6 +1,7 @@
 package net.dankito.banking.fints
 
 import net.dankito.banking.fints.callback.FinTsClientCallback
+import net.dankito.banking.fints.log.MessageLogCollector
 import net.dankito.banking.fints.messages.MessageBuilder
 import net.dankito.banking.fints.model.*
 import net.dankito.banking.fints.response.ResponseParser
@@ -23,10 +24,11 @@ open class FinTsClientForCustomer(
     messageBuilder: MessageBuilder = MessageBuilder(),
     responseParser: ResponseParser = ResponseParser(),
     mt940Parser: IAccountTransactionsParser = Mt940AccountTransactionsParser(),
+    messageLogCollector: MessageLogCollector = MessageLogCollector(),
     product: ProductData = ProductData("15E53C26816138699C7B6A3E8", "1.0.0") // TODO: get version dynamically){}
 ) {
 
-    protected val client = FinTsClient(callback, webClient, base64Service, messageBuilder, responseParser, mt940Parser, product)
+    protected val client = FinTsClient(callback, webClient, base64Service, messageBuilder, responseParser, mt940Parser, messageLogCollector, product)
 
 
     open val messageLogWithoutSensitiveData: List<MessageLogEntry>
