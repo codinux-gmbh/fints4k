@@ -23,7 +23,7 @@ open class MessageLogCollector {
 
     // in either case remove sensitive data after response is parsed as otherwise some information like account holder name and accounts may is not set yet on BankData
     open val messageLogWithoutSensitiveData: List<MessageLogEntry>
-        get() = messageLog.map { MessageLogEntry(removeSensitiveDataFromMessage(it.message, it.bank), it.type, it.time, it.bank) }
+        get() = messageLog.map { MessageLogEntry(safelyRemoveSensitiveDataFromMessage(it.message, it.bank), it.type, it.time, it.bank) }
 
 
     open fun addMessageLog(message: String, type: MessageLogEntryType, bank: BankData) {
@@ -55,6 +55,14 @@ open class MessageLogCollector {
         messageLog.add(MessageLogEntry(prettyPrintMessage, MessageLogEntryType.Error, Date(), bank))
     }
 
+
+    protected open fun safelyRemoveSensitiveDataFromMessage(message: String, bank: BankData?): String {
+        try {
+            return removeSensitiveDataFromMessage(message, bank)
+        } catch (e: Exception) {
+            return "! WARNING !\r\nCould not remove sensitive data!\r\n$e\r\n$message"
+        }
+    }
 
     protected open fun removeSensitiveDataFromMessage(message: String, bank: BankData?): String {
         if (bank == null) {
