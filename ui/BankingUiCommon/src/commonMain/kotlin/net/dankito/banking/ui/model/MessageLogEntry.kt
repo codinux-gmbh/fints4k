@@ -4,9 +4,10 @@ import net.dankito.utils.multiplatform.Date
 
 
 open class MessageLogEntry(
-    val message: String,
-    val time: Date,
-    val bank: TypedBankData
+    open val message: String,
+    open val type: MessageLogEntryType,
+    open val time: Date,
+    open val bank: TypedBankData
 ) {
 
     override fun toString(): String {

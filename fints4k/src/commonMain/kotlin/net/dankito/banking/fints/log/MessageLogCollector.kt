@@ -22,18 +22,16 @@ open class MessageLogCollector {
 
     // in either case remove sensitive data after response is parsed as otherwise some information like account holder name and accounts may is not set yet on BankData
     open val messageLogWithoutSensitiveData: List<MessageLogEntry>
-        get() = messageLog.map { MessageLogEntry(removeSensitiveDataFromMessage(it.message, it.bank), it.time, it.bank) }
+        get() = messageLog.map { MessageLogEntry(removeSensitiveDataFromMessage(it.message, it.bank), it.type, it.time, it.bank) }
 
 
     open fun addMessageLog(message: String, type: MessageLogEntryType, bank: BankData) {
         val timeStamp = Date()
-        val messagePrefix = "${if (type == MessageLogEntryType.Sent) "Sending" else "Received"} message:\r\n" // currently no need to translate
         val prettyPrintMessage = prettyPrintHbciMessage(message)
-        val prettyPrintMessageWithPrefix = "$messagePrefix$prettyPrintMessage"
 
-        log.debug { prettyPrintMessageWithPrefix }
+        log.debug { "${if (type == MessageLogEntryType.Sent) "Sending" else "Received"} message:\r\n" + prettyPrintMessage }
 
-        messageLog.add(MessageLogEntry(prettyPrintMessageWithPrefix, timeStamp, bank))
+        messageLog.add(MessageLogEntry(prettyPrintMessage, type, timeStamp, bank))
     }
 
     protected open fun prettyPrintHbciMessage(message: String): String {

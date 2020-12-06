@@ -17,6 +17,7 @@ import net.dankito.banking.fints.webclient.IWebClient
 import net.dankito.banking.fints.webclient.KtorWebClient
 import net.dankito.banking.extensions.toMoney
 import net.dankito.banking.fints.model.BankData
+import net.dankito.banking.fints.model.MessageLogEntryType
 import net.dankito.banking.fints.response.client.FinTsClientResponse
 import net.dankito.banking.ui.model.*
 import net.dankito.banking.ui.model.MessageLogEntry
@@ -54,7 +55,14 @@ open class fints4kBankingClient(
 
 
     override val messageLogWithoutSensitiveData: List<MessageLogEntry>
-        get() = client.messageLogWithoutSensitiveData.map { MessageLogEntry(it.message, it.time, bank) }
+        get() = client.messageLogWithoutSensitiveData.map { MessageLogEntry(it.message, map(it.type), it.time, bank) }
+
+    protected open fun map(type: MessageLogEntryType): net.dankito.banking.ui.model.MessageLogEntryType {
+        return when (type) {
+            MessageLogEntryType.Sent -> net.dankito.banking.ui.model.MessageLogEntryType.Sent
+            MessageLogEntryType.Received -> net.dankito.banking.ui.model.MessageLogEntryType.Received
+        }
+    }
 
 
     override fun addAccountAsync(callback: (AddAccountResponse) -> Unit) {
