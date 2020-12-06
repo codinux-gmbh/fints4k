@@ -399,7 +399,7 @@ open class FinTsClient(
 
             response.getFirstSegmentById<ReceivedCreditCardTransactionsAndBalance>(InstituteSegmentId.CreditCardTransactions)?.let { transactionsSegment ->
                 balance = Money(transactionsSegment.balance.amount, transactionsSegment.balance.currency ?: "EUR")
-                bookedTransactions.addAll(transactionsSegment.transactions.map { AccountTransaction(parameter.account, it.amount, it.otherPartyName, it.bookingDate, it.otherPartyName, null, null, "", it.valueDate) })
+                bookedTransactions.addAll(transactionsSegment.transactions.map { AccountTransaction(parameter.account, it.amount, it.description, it.bookingDate, it.transactionDescriptionBase ?: "", null, null, "", it.valueDate) })
             }
         }
 

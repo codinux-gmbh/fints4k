@@ -5,15 +5,31 @@ import net.dankito.utils.multiplatform.format
 
 
 open class CreditCardTransaction(
-    val amount: Money,
-    val otherPartyName: String,
-    val bookingDate: Date,
-    val valueDate: Date,
-    val isCleared: Boolean
+    open val amount: Money,
+    open val transactionDescriptionBase: String?,
+    open val transactionDescriptionSupplement: String?,
+    open val bookingDate: Date,
+    open val valueDate: Date,
+    open val isCleared: Boolean
 ) {
 
+
+    open val description: String
+        get() {
+            transactionDescriptionBase?.let { transactionDescriptionBase ->
+                if (transactionDescriptionSupplement != null) {
+                    return transactionDescriptionBase + " " + transactionDescriptionSupplement
+                }
+
+                return transactionDescriptionBase
+            }
+
+            return ""
+        }
+
+
     override fun toString(): String {
-        return "${valueDate.format("dd.MM.yy")} $amount $otherPartyName"
+        return "${valueDate.format("dd.MM.yy")} $amount $description"
     }
 
 }

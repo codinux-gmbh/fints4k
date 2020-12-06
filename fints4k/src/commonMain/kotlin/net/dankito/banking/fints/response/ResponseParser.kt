@@ -702,10 +702,11 @@ open class ResponseParser(
             val bookingDate = parseDate(dataElements[1])
             val valueDate = parseDate(dataElements[2])
             val amount = parseCreditCardAmount(dataElements.subList(8, 11))
-            val otherPartyName = parseString(dataElements[11])
+            val transactionDescriptionBase = parseStringToNullIfEmpty(dataElements[11])
+            val transactionDescriptionSupplement = parseStringToNullIfEmpty(dataElements[12])
             val isCleared = parseBoolean(dataElements[20])
 
-            return CreditCardTransaction(amount, otherPartyName, bookingDate, valueDate, isCleared)
+            return CreditCardTransaction(amount, transactionDescriptionBase, transactionDescriptionSupplement, bookingDate, valueDate, isCleared)
         } catch (e: Exception) {
             log.error("Could not parse Credit card transaction '$transactionDataElementGroup'", e)
         }
