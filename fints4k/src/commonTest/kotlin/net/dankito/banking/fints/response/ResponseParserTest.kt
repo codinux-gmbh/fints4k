@@ -1234,7 +1234,7 @@ class ResponseParserTest : FinTsTestBase() {
             expect(segment.transactions.size).toBe(2)
 
             segment.transactions.forEach { transaction ->
-                expect(transaction.otherPartyName).toBe(otherPartyName)
+                expect(transaction.transactionDescriptionBase).toBe(otherPartyName)
                 expect(transaction.bookingDate).toBe(Date(2020, 8, 19))
                 expect(transaction.valueDate).toBe(Date(2020, 8, 20))
                 expect(transaction.amount.amount.string).toBe("-" + amount)
