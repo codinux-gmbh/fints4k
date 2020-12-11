@@ -23,12 +23,16 @@ actual class Date(val date: NSDate) { // cannot subclass NSDate as it's a class 
 
         val DiffBetweenEpochTimeAndReferenceDate = (NSDate.timeIntervalSinceReferenceDate - NSTimeIntervalSince1970).toMillis()
 
-        fun from(year: Int, month: Int, day: Int): NSDate {
+        fun from(year: Int, month: Int, day: Int, hour: Int = 0, minute: Int = 0, second: Int = 0): NSDate {
             val dateComponents = NSDateComponents()
 
             dateComponents.year = year.toLong()
             dateComponents.month = month.toLong()
             dateComponents.day = day.toLong()
+
+            dateComponents.hour = hour.toLong()
+            dateComponents.minute = minute.toLong()
+            dateComponents.second = second.toLong()
 
             val calendar = NSCalendar.currentCalendar
             val todayInUtc = calendar.dateFromComponents(dateComponents) !!
@@ -54,9 +58,9 @@ actual class Date(val date: NSDate) { // cannot subclass NSDate as it's a class 
 
     actual constructor() : this(NSDate())
 
-    actual constructor(year: Int, month: Int, day: Int) : this(from(year, month, day))
+    actual constructor(year: Int, month: Int, day: Int, hour: Int, minute: Int, second: Int) : this(from(year, month, day, hour, minute, second))
 
-    actual constructor(year: Int, month: Month, day: Int) : this(year, month.month, day)
+    actual constructor(year: Int, month: Month, day: Int, hour: Int, minute: Int, second: Int) : this(year, month.month, day, hour, minute, second)
 
 
     actual val millisSinceEpoch: Long

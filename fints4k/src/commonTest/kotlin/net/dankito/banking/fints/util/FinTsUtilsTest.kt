@@ -41,7 +41,7 @@ class FinTsUtilsTest {
     fun formatTime_AM() {
 
         // given
-        val time = Date(8, 2, 1)
+        val time = Date(0, 0, 0, 8, 2, 1)
 
         // when
         val result = underTest.formatTime(time)
@@ -54,7 +54,7 @@ class FinTsUtilsTest {
     fun formatTime_PM() {
 
         // given
-        val time = Date(18, 22, 51)
+        val time = Date(0, 0, 0, 18, 22, 51)
 
         // when
         val result = underTest.formatTime(time)
@@ -67,7 +67,7 @@ class FinTsUtilsTest {
     fun formatTimeAsInt_AM() {
 
         // given
-        val time = Date(8, 2, 1)
+        val time = Date(0, 0, 0, 8, 2, 1)
 
         // when
         val result = underTest.formatTimeAsInt(time)
@@ -80,7 +80,7 @@ class FinTsUtilsTest {
     fun formatTimeAsInt_PM() {
 
         // given
-        val time = Date(18, 22, 51)
+        val time = Date(0, 0, 0, 18, 22, 51)
 
         // when
         val result = underTest.formatTimeAsInt(time)

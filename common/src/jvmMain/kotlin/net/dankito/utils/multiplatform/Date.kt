@@ -31,9 +31,9 @@ actual class Date actual constructor(millisSinceEpoch: Long) : java.util.Date(mi
 
     actual constructor() : this(System.currentTimeMillis())
 
-    actual constructor(year: Int, month: Int, day: Int) : this(java.util.Date(year - 1900, month - 1, day).time)
+    actual constructor(year: Int, month: Int, day: Int, hour: Int, minute: Int, second: Int) : this(java.util.Date(year - 1900, month - 1, day, hour, minute, second).time)
 
-    actual constructor(year: Int, month: Month, day: Int) : this(year, month.month, day)
+    actual constructor(year: Int, month: Month, day: Int, hour: Int, minute: Int, second: Int) : this(year, month.month, day, hour, minute, second)
 
 
     actual val millisSinceEpoch: Long
