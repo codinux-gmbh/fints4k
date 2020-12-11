@@ -710,7 +710,7 @@ class ResponseParserTest : FinTsTestBase() {
 
 
     @Test
-    fun parseTanInfo() {
+    fun parseTanInfo_1() {
 
         // when
         val result = underTest.parse("HITANS:171:6:4+1+1+1+J:N:0:910:2:HHD1.3.0:::chipTAN manuell:6:1:TAN-Nummer:3:J:2:N:0:0:N:N:00:0:N:1:911:2:HHD1.3.2OPT:HHDOPT1:1.3.2:chipTAN optisch:6:1:TAN-Nummer:3:J:2:N:0:0:N:N:00:0:N:1:912:2:HHD1.3.2USB:HHDUSB1:1.3.2:chipTAN-USB:6:1:TAN-Nummer:3:J:2:N:0:0:N:N:00:0:N:1:913:2:Q1S:Secoder_UC:1.2.0:chipTAN-QR:6:1:TAN-Nummer:3:J:2:N:0:0:N:N:00:0:N:1:920:2:smsTAN:::smsTAN:6:1:TAN-Nummer:3:J:2:N:0:0:N:N:00:2:N:5:921:2:pushTAN:::pushTAN:6:1:TAN-Nummer:3:J:2:N:0:0:N:N:00:2:N:2:900:2:iTAN:::iTAN:6:1:TAN-Nummer:3:J:2:N:0:0:N:N:00:0:N:0'")
@@ -732,6 +732,84 @@ class ResponseParserTest : FinTsTestBase() {
                     "smsTAN", "pushTAN", "iTAN")
         }
         ?: run { fail("No segment of type TanInfo found in ${result.receivedSegments}") }
+    }
+
+    @Test
+    fun parseTanInfo6_2() {
+
+        // when
+        val result = underTest.parse("HITANS:77:6:3+1+1+1+J:N:0:942:2:MTAN2:mobileTAN::mobile TAN:6:1:SMS:2048:J:1:N:0:2:N:J:00:0:N:1:944:2:SECUREGO:mobileTAN::SecureGo:6:1:TAN:2048:J:1:N:0:2:N:J:00:0:N:1:962:2:HHD1.4:HHD:1.4:Smart-TAN plus manuell:6:1:Challenge:2048:J:1:N:0:2:N:J:00:0:N:1:972:2:HHD1.4OPT:HHDOPT1:1.4:Smart-TAN plus optisch / USB:6:1:Challenge:2048:J:1:N:0:2:N:J:00:0:N:1:982:2:MS1.0.0:::Smart-TAN photo:6:1:Challenge:2048:J:1:N:0:2:N:J:00:0:N:1'")
+
+        // then
+        assertSuccessfullyParsedSegment(result, InstituteSegmentId.TanInfo, 77, 6, 3)
+
+        result.getFirstSegmentById<TanInfo>(InstituteSegmentId.TanInfo)?.let { segment ->
+            val tanMethodParameters = segment.tanProcedureParameters.methodParameters
+            expect(tanMethodParameters).hasSize(5)
+
+            assertTanMethodParameter(tanMethodParameters, 0, Sicherheitsfunktion.PIN_TAN_942, DkTanMethod.mobileTAN, "mobile TAN")
+            assertTanMethodParameter(tanMethodParameters, 1, Sicherheitsfunktion.PIN_TAN_944, DkTanMethod.mobileTAN, "SecureGo")
+            assertTanMethodParameter(tanMethodParameters, 2, Sicherheitsfunktion.PIN_TAN_962, DkTanMethod.HHD, "Smart-TAN plus manuell")
+            assertTanMethodParameter(tanMethodParameters, 3, Sicherheitsfunktion.PIN_TAN_972, DkTanMethod.HHDOPT1, "Smart-TAN plus optisch / USB")
+            assertTanMethodParameter(tanMethodParameters, 4, Sicherheitsfunktion.PIN_TAN_982, null, "Smart-TAN photo")
+        }
+        ?: run { fail("No segment of type TanInfo found in ${result.receivedSegments}") }
+    }
+
+    @Test
+    fun parseTanInfo6_3() {
+
+        // when
+        val result = underTest.parse("HITANS:169:6:3+1+1+1+J:N:0:910:2:HHD1.3.0:::chipTAN manuell:6:1:TAN-Nummer:3:J:2:N:0:0:N:N:00:0:N:1:911:2:HHD1.3.2OPT:HHDOPT1:1.3.2:chipTAN optisch:6:1:TAN-Nummer:3:J:2:N:0:0:N:N:00:0:N:1:912:2:HHD1.3.2USB:HHDUSB1:1.3.2:chipTAN-USB:6:1:TAN-Nummer:3:J:2:N:0:0:N:N:00:0:N:1:913:2:Q1S:Secoder_UC:1.2.0:chipTAN-QR:6:1:TAN-Nummer:3:J:2:N:0:0:N:N:00:0:N:1:920:2:smsTAN:::smsTAN:6:1:TAN-Nummer:3:J:2:N:0:0:N:N:00:2:N:5:921:2:pushTAN:::pushTAN:6:1:TAN-Nummer:3:J:2:N:0:0:N:N:00:2:N:2:900:2:iTAN:::iTAN:6:1:TAN-Nummer:3:J:2:N:0:0:N:N:00:0:N:0'")
+
+        // then
+        assertSuccessfullyParsedSegment(result, InstituteSegmentId.TanInfo, 169, 6, 3)
+
+        result.getFirstSegmentById<TanInfo>(InstituteSegmentId.TanInfo)?.let { segment ->
+            val tanMethodParameters = segment.tanProcedureParameters.methodParameters
+            expect(tanMethodParameters).hasSize(7)
+
+            assertTanMethodParameter(tanMethodParameters, 0, Sicherheitsfunktion.PIN_TAN_910, null, "chipTAN manuell")
+            assertTanMethodParameter(tanMethodParameters, 1, Sicherheitsfunktion.PIN_TAN_911, DkTanMethod.HHDOPT1, "chipTAN optisch")
+            assertTanMethodParameter(tanMethodParameters, 2, Sicherheitsfunktion.PIN_TAN_912, null, "chipTAN-USB") // TODO: parse not specified 'HHDUSB1' to DkTanMethod?
+            assertTanMethodParameter(tanMethodParameters, 3, Sicherheitsfunktion.PIN_TAN_913, null, "chipTAN-QR") // TODO: parse not specified 'Secoder_UC' to DkTanMethod?
+            assertTanMethodParameter(tanMethodParameters, 4, Sicherheitsfunktion.PIN_TAN_920, null, "smsTAN")
+            assertTanMethodParameter(tanMethodParameters, 5, Sicherheitsfunktion.PIN_TAN_921, null, "pushTAN")
+            assertTanMethodParameter(tanMethodParameters, 6, Sicherheitsfunktion.PIN_TAN_900, null, "iTAN")
+        }
+        ?: run { fail("No segment of type TanInfo found in ${result.receivedSegments}") }
+    }
+
+    @Test
+    fun parseTanInfo6_4() {
+
+        // when
+        val result = underTest.parse("HITANS:54:6:3+1+1+1+N:N:0:901:2:CR#1:::SMS-TAN:6:1:SMS-TAN:256:J:2:J:0:0:N:N:01:0:N:1:904:2:CR#5 - 1.4:HHDOPT1:1.4:chipTAN comfort:6:1:chipTAN comfort:2048:N:1:N:0:0:N:N:01:0:N:1:905:2:CR#6 - 1.4:HHD:1.4:chipTAN comfort manuell:6:1:chipTAN comfort manuell:2048:N:1:N:0:0:N:N:01:0:N:0:906:2:CR#8 - MS1.0:::BV AppTAN:6:1:BV AppTAN:2048:N:1:N:0:0:N:N:01:0:N:0:907:2:MS1.0.0:::PhotoTAN:7:1:PhotoTAN:2048:N:1:N:0:0:N:J:01:0:N:0'")
+
+        // then
+        assertSuccessfullyParsedSegment(result, InstituteSegmentId.TanInfo, 54, 6, 3)
+
+        result.getFirstSegmentById<TanInfo>(InstituteSegmentId.TanInfo)?.let { segment ->
+            val tanMethodParameters = segment.tanProcedureParameters.methodParameters
+            expect(tanMethodParameters).hasSize(5)
+
+            assertTanMethodParameter(tanMethodParameters, 0, Sicherheitsfunktion.PIN_TAN_901, null, "SMS-TAN")
+            assertTanMethodParameter(tanMethodParameters, 1, Sicherheitsfunktion.PIN_TAN_904, DkTanMethod.HHDOPT1, "chipTAN comfort")
+            assertTanMethodParameter(tanMethodParameters, 2, Sicherheitsfunktion.PIN_TAN_905, DkTanMethod.HHD, "chipTAN comfort manuell")
+            assertTanMethodParameter(tanMethodParameters, 3, Sicherheitsfunktion.PIN_TAN_906, null, "BV AppTAN")
+            assertTanMethodParameter(tanMethodParameters, 4, Sicherheitsfunktion.PIN_TAN_907, null, "PhotoTAN")
+        }
+        ?: run { fail("No segment of type TanInfo found in ${result.receivedSegments}") }
+    }
+
+    private fun assertTanMethodParameter(parsedTanMethodParameters: List<TanMethodParameters>, index: Int, securityFunction: Sicherheitsfunktion,
+                                         tanMethod: DkTanMethod?, methodName: String) {
+
+        val tanMethodParameters = parsedTanMethodParameters[index]
+
+        expect(tanMethodParameters.securityFunction).toBe(securityFunction)
+        expect(tanMethodParameters.dkTanMethod).toBe(tanMethod)
+        expect(tanMethodParameters.methodName).toBe(methodName)
     }
 
     @Test
@@ -803,6 +881,54 @@ class ResponseParserTest : FinTsTestBase() {
             expect(segment.tanProcedureParameters.methodParameters.map { it.methodName })
                 .containsExactly("iTAN", "mobile TAN", "App-basiertes Verfahren", "chipTAN 1.4",
                     "chipTAN 1.4 manuell", "Vorlagen und Informationen")
+        }
+        ?: run { fail("No segment of type TanInfo found in ${result.receivedSegments}") }
+    }
+
+    @Test
+    fun parseTanInfo7_DecoupledpushTan() {
+
+        // when
+        val result = underTest.parse("HITANS:177:7:4+1+1+1+N:N:0:922:2:pushTAN-dec:Decoupled::pushTAN 2.0:::Aufforderung:2048:J:2:N:0:0:N:N:00:2:N:2:180:1:1:J:J'")
+
+        // then
+        assertSuccessfullyParsedSegment(result, InstituteSegmentId.TanInfo, 177, 7, 4)
+
+        result.getFirstSegmentById<TanInfo>(InstituteSegmentId.TanInfo)?.let { segment ->
+            expect(segment.maxCountJobs).toBe(1)
+            expect(segment.minimumCountSignatures).toBe(1)
+            expect(segment.securityClass).toBe(1)
+            expect(segment.tanProcedureParameters.oneStepProcedureAllowed).isFalse()
+            expect(segment.tanProcedureParameters.moreThanOneTanDependentJobPerMessageAllowed).isFalse()
+            expect(segment.tanProcedureParameters.jobHashValue).toBe("0")
+
+            expect(segment.tanProcedureParameters.methodParameters).hasSize(1)
+
+            val decoupledPushTanMethod = segment.tanProcedureParameters.methodParameters.first()
+
+            expect(decoupledPushTanMethod.securityFunction).toBe(Sicherheitsfunktion.PIN_TAN_922)
+            expect(decoupledPushTanMethod.tanProcess).toBe(TanProcess.TanProcess2)
+            expect(decoupledPushTanMethod.technicalTanMethodIdentification).toBe("pushTAN-dec")
+            expect(decoupledPushTanMethod.dkTanMethod).toBe(DkTanMethod.Decoupled)
+            expect(decoupledPushTanMethod.versionDkTanMethod).toBe(null)
+            expect(decoupledPushTanMethod.methodName).toBe("pushTAN 2.0")
+            expect(decoupledPushTanMethod.maxTanInputLength).toBe(null)
+            expect(decoupledPushTanMethod.allowedTanFormat).toBe(null)
+
+            expect(decoupledPushTanMethod.descriptionToShowToUser).toBe("Aufforderung")
+            expect(decoupledPushTanMethod.maxReturnValueLength).toBe(2048)
+            expect(decoupledPushTanMethod.multipleTansAllowed).toBe(true)
+            expect(decoupledPushTanMethod.timeAndDialogRelation).toBe(TanZeitUndDialogbezug.TanZeitversetztDialoguebergreifendErlaubt)
+            expect(decoupledPushTanMethod.cancellationAllowed).toBe(false)
+
+            expect(decoupledPushTanMethod.nameOfTanMediumRequired).toBe(BezeichnungDesTanMediumsErforderlich.BezeichnungDesTanMediumsMussAngegebenWerden)
+            expect(decoupledPushTanMethod.countSupportedActiveTanMedia).toBe(2)
+
+            expect(decoupledPushTanMethod.maxNumberOfStateRequestsForDecoupled).toBe(180)
+            expect(decoupledPushTanMethod.initialDelayInSecondsForStateRequestsForDecoupled).toBe(1)
+            expect(decoupledPushTanMethod.delayInSecondsForNextStateRequestsForDecoupled).toBe(1)
+            expect(decoupledPushTanMethod.manualConfirmationAllowedForDecoupled).toBe(true)
+            expect(decoupledPushTanMethod.periodicStateRequestsAllowedForDecoupled).toBe(true)
         }
         ?: run { fail("No segment of type TanInfo found in ${result.receivedSegments}") }
     }

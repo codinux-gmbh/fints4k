@@ -390,33 +390,57 @@ open class ResponseParser(
         var remainingDataElements = methodsDataElements
 
         while (remainingDataElements.size >= 20) { // parameters have at least 20 data elements, the last element is optional
-            val dataElementForNextMethod = if (remainingDataElements.size >= 21) remainingDataElements.subList(0, 21)
-                                            else remainingDataElements.subList(0, 20)
-
-            val methodParameters = mapToSingleTanMethodParameters(dataElementForNextMethod)
+            val methodParameters = mapToSingleTanMethodParameters(remainingDataElements)
             parsedMethodsParameters.add(methodParameters)
 
-            val has21ElementsParsed = methodParameters.countSupportedActiveTanMedia != null ||
-                    (dataElementForNextMethod.size >= 21 && dataElementForNextMethod[20].isBlank())
-
-            if (has21ElementsParsed) remainingDataElements = remainingDataElements.subList(21, remainingDataElements.size)
-            else remainingDataElements = remainingDataElements.subList(20, remainingDataElements.size)
+            val countParsedDataElements = determineCountParsedTanMethodParametersDataElements(remainingDataElements, methodParameters)
+            remainingDataElements = remainingDataElements.subList(countParsedDataElements, remainingDataElements.size)
         }
 
         return parsedMethodsParameters
     }
 
+    protected open fun determineCountParsedTanMethodParametersDataElements(remainingDataElements: List<String>, parsedMethodParameters: TanMethodParameters): Int {
+        // last TanMethodParameters data elements
+        if (remainingDataElements.size == 20) {
+            return 20
+        }
+        else if (remainingDataElements.size == 21) {
+            return 21
+        }
+
+        if (parsedMethodParameters.dkTanMethod == DkTanMethod.Decoupled) {
+            if (parsedMethodParameters.periodicStateRequestsAllowedForDecoupled != null) {
+                return 26
+            }
+            else if (parsedMethodParameters.manualConfirmationAllowedForDecoupled != null) {
+                return 26
+            }
+            else {
+                return 24
+            }
+        }
+
+        if (parsedMethodParameters.countSupportedActiveTanMedia != null || remainingDataElements[20].isBlank()) {
+            return 21
+        }
+
+        return 20
+    }
+
     protected open fun mapToSingleTanMethodParameters(methodDataElements: List<String>): TanMethodParameters {
+        val dkTanMethod = tryToParseDkTanMethod(methodDataElements[3])
+        val isDecoupledTanMethod = dkTanMethod == DkTanMethod.Decoupled || dkTanMethod == DkTanMethod.DecoupledPush
 
         return TanMethodParameters(
             parseCodeEnum(methodDataElements[0], Sicherheitsfunktion.values()),
             parseCodeEnum(methodDataElements[1], TanProcess.values()),
             parseString(methodDataElements[2]),
-            tryToParseZkaTanMethod(methodDataElements[3]),
+            dkTanMethod,
             parseStringToNullIfEmpty(methodDataElements[4]),
             parseString(methodDataElements[5]),
-            parseInt(methodDataElements[6]),
-            parseCodeEnum(methodDataElements[7], AllowedTanFormat.values()),
+            if (isDecoupledTanMethod) null else parseNullableInt(methodDataElements[6]),
+            if (isDecoupledTanMethod) null else parseCodeEnum(methodDataElements[7], AllowedTanFormat.values()),
             parseString(methodDataElements[8]),
             parseInt(methodDataElements[9]),
             // for HITANS 4 and 5 here is another "Anzahl unterstützter aktiver TAN-Listen" Integer element
@@ -431,30 +455,35 @@ open class ResponseParser(
             parseCodeEnum(methodDataElements[17], Initialisierungsmodus.values()),
             parseCodeEnum(methodDataElements[18], BezeichnungDesTanMediumsErforderlich.values()),
             parseBoolean(methodDataElements[19]),
-            if (methodDataElements.size > 20) parseNullableInt(methodDataElements[20]) else null
+            if (methodDataElements.size > 20) parseNullableInt(methodDataElements[20]) else null,
+            if (isDecoupledTanMethod && methodDataElements.size > 21) parseNullableInt(methodDataElements[21]) else null,
+            if (isDecoupledTanMethod && methodDataElements.size > 22) parseNullableInt(methodDataElements[22]) else null,
+            if (isDecoupledTanMethod && methodDataElements.size > 23) parseNullableInt(methodDataElements[23]) else null,
+            if (isDecoupledTanMethod && methodDataElements.size > 24) parseNullableBoolean(methodDataElements[24]) else null,
+            if (isDecoupledTanMethod && methodDataElements.size > 25) parseNullableBoolean(methodDataElements[25]) else null
         )
     }
 
-    protected open fun tryToParseZkaTanMethod(mayZkaTanMethod: String): ZkaTanMethod? {
-        if (mayZkaTanMethod.isBlank()) {
+    protected open fun tryToParseDkTanMethod(mayDkTanMethod: String): DkTanMethod? {
+        if (mayDkTanMethod.isBlank()) {
             return null
         }
 
         try {
-            val lowerCaseMayZkaTanMethod = mayZkaTanMethod.toLowerCase()
+            val lowerCaseMayDkTanMethod = mayDkTanMethod.toLowerCase()
 
-            if (lowerCaseMayZkaTanMethod == "mobiletan" || lowerCaseMayZkaTanMethod == "mtan") {
-                return ZkaTanMethod.mobileTAN
+            if (lowerCaseMayDkTanMethod == "mobiletan" || lowerCaseMayDkTanMethod == "mtan") {
+                return DkTanMethod.mobileTAN
             }
 
-            if (lowerCaseMayZkaTanMethod == "apptan" || lowerCaseMayZkaTanMethod == "phototan") {
-                return ZkaTanMethod.appTAN
+            if (lowerCaseMayDkTanMethod == "apptan" || lowerCaseMayDkTanMethod == "phototan") {
+                return DkTanMethod.App
             }
 
             // TODO: what about these values, all returned by banks in anonymous dialog initialization:
             //  BestSign, HHDUSB1, Secoder_UC, ZkaTANMode, photoTAN, QRTAN, 1822TAN+
 
-            return ZkaTanMethod.valueOf(mayZkaTanMethod)
+            return DkTanMethod.valueOf(mayDkTanMethod)
         } catch (ignored: Exception) { }
 
         return null
@@ -890,6 +919,14 @@ open class ResponseParser(
             .replace(Separators.MaskingCharacter + Separators.DataElementsSeparator, Separators.DataElementsSeparator)
             // masking character '?' is also masked, in his case with '??'
             .replace(Separators.MaskingCharacter + Separators.MaskingCharacter, Separators.MaskingCharacter)
+    }
+
+    protected open fun parseNullableBoolean(mayBoolean: String): Boolean? {
+        try {
+            return parseBoolean(mayBoolean)
+        } catch (ignored: Exception) { }
+
+        return null
     }
 
     protected open fun parseBoolean(dataElement: String): Boolean {

@@ -8,11 +8,11 @@ open class TanMethodParameters(
     val securityFunction: Sicherheitsfunktion,
     val tanProcess: TanProcess,
     val technicalTanMethodIdentification: String,
-    val zkaTanMethod: ZkaTanMethod?,
-    val versionZkaTanMethod: String?,
+    val dkTanMethod: DkTanMethod?,
+    val versionDkTanMethod: String?,
     val methodName: String,
-    val maxTanInputLength: Int,
-    val allowedTanFormat: AllowedTanFormat,
+    val maxTanInputLength: Int?,
+    val allowedTanFormat: AllowedTanFormat?,
     val descriptionToShowToUser: String,
     val maxReturnValueLength: Int,
     val multipleTansAllowed: Boolean,
@@ -25,7 +25,12 @@ open class TanMethodParameters(
     val initializingMode: Initialisierungsmodus,
     val nameOfTanMediumRequired: BezeichnungDesTanMediumsErforderlich,
     val hhdUcResponseRequired: Boolean, // TODO: wird hierueber gesteuert ob eine TAN eingegeben werden muss (z. B. beim EasyTAN Verfahren muss ja keine eingegeben werden)
-    val countSupportedActiveTanMedia: Int?
+    val countSupportedActiveTanMedia: Int?,
+    val maxNumberOfStateRequestsForDecoupled: Int? = null,
+    val initialDelayInSecondsForStateRequestsForDecoupled: Int? = null,
+    val delayInSecondsForNextStateRequestsForDecoupled: Int? = null,
+    val manualConfirmationAllowedForDecoupled: Boolean? = null,
+    val periodicStateRequestsAllowedForDecoupled: Boolean? = null
 ) {
 
 

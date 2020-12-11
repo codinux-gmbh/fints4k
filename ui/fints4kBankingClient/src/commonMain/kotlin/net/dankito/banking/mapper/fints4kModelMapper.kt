@@ -283,10 +283,11 @@ open class fints4kModelMapper(protected val modelCreator: IModelCreator) {
         }
     }
 
-    open fun mapAllowedTanFormat(allowedTanFormat: net.dankito.banking.fints.messages.datenelemente.implementierte.tan.AllowedTanFormat): AllowedTanFormat {
+    open fun mapAllowedTanFormat(allowedTanFormat: net.dankito.banking.fints.messages.datenelemente.implementierte.tan.AllowedTanFormat?): AllowedTanFormat {
         return when (allowedTanFormat) {
             net.dankito.banking.fints.messages.datenelemente.implementierte.tan.AllowedTanFormat.Alphanumeric -> AllowedTanFormat.Alphanumeric
             net.dankito.banking.fints.messages.datenelemente.implementierte.tan.AllowedTanFormat.Numeric -> AllowedTanFormat.Numeric
+            null -> AllowedTanFormat.TanIsEnteredOnOtherDevice
         }
     }
 
@@ -420,10 +421,11 @@ open class fints4kModelMapper(protected val modelCreator: IModelCreator) {
         }
     }
 
-    open fun mapAllowedTanFormat(allowedTanFormat: AllowedTanFormat): net.dankito.banking.fints.messages.datenelemente.implementierte.tan.AllowedTanFormat {
+    open fun mapAllowedTanFormat(allowedTanFormat: AllowedTanFormat): net.dankito.banking.fints.messages.datenelemente.implementierte.tan.AllowedTanFormat? {
         return when (allowedTanFormat) {
             AllowedTanFormat.Alphanumeric -> net.dankito.banking.fints.messages.datenelemente.implementierte.tan.AllowedTanFormat.Alphanumeric
             AllowedTanFormat.Numeric -> net.dankito.banking.fints.messages.datenelemente.implementierte.tan.AllowedTanFormat.Numeric
+            AllowedTanFormat.TanIsEnteredOnOtherDevice -> null
         }
     }
 

@@ -71,7 +71,7 @@ class BanksFinTsDetailsRetriever {
     private val tanMethodTypes = mutableMapOf<TanMethodType?, MutableSet<TanMethodParameters>>()
 
     private val tanMethodParameterTechnicalIdentification = mutableSetOf<String>()
-    private val tanMethodParameterVersionZkaTanMethod = mutableSetOf<String?>()
+    private val tanMethodParameterVersionDkTanMethod = mutableSetOf<String?>()
 
     private val requiresSmsAbbuchungskonto = mutableListOf<BankInfo>()
     private val requiresAuftraggeberkonto = mutableListOf<BankInfo>()
@@ -220,7 +220,7 @@ class BanksFinTsDetailsRetriever {
             }
 
             tanMethodParameterTechnicalIdentification.add(methodParameter.technicalTanMethodIdentification)
-            tanMethodParameterVersionZkaTanMethod.add(methodParameter.versionZkaTanMethod)
+            tanMethodParameterVersionDkTanMethod.add(methodParameter.versionDkTanMethod)
 
             if (methodParameter.smsDebitAccountRequired == SmsAbbuchungskontoErforderlich.SmsAbbuchungskontoMussAngegebenWerden) {
                 requiresSmsAbbuchungskonto.add(bankInfo)
@@ -283,11 +283,11 @@ class BanksFinTsDetailsRetriever {
     private fun printStatistics() {
         log.info("Did not receive response from Banks ${printBanks(requestNotSuccessful)}")
 
-        log.info("Mapped tanMethodTypes: ${tanMethodTypes.map { System.lineSeparator() + it.key + ": " + it.value.map { it.methodName + " " + it.zkaTanMethod + " " + it.technicalTanMethodIdentification + " (" + it.descriptionToShowToUser + ")" }.toSet().joinToString(", ") }}\n\n")
-        log.info("TanMethodParameters:${tanMethodParameter.map { System.lineSeparator() + it.key + ": " + it.value.map { it.securityFunction.code + " " + it.zkaTanMethod + " " + it.technicalTanMethodIdentification + " (" + it.descriptionToShowToUser + ")" }.toSet().joinToString(", ") } }\n\n")
+        log.info("Mapped tanMethodTypes: ${tanMethodTypes.map { System.lineSeparator() + it.key + ": " + it.value.map { it.methodName + " " + it.dkTanMethod + " " + it.technicalTanMethodIdentification + " (" + it.descriptionToShowToUser + ")" }.toSet().joinToString(", ") }}\n\n")
+        log.info("TanMethodParameters:${tanMethodParameter.map { System.lineSeparator() + it.key + ": " + it.value.map { it.securityFunction.code + " " + it.dkTanMethod + " " + it.technicalTanMethodIdentification + " (" + it.descriptionToShowToUser + ")" }.toSet().joinToString(", ") } }\n\n")
 
         log.info("TanMethodParameters TechnicalIdentification:${tanMethodParameterTechnicalIdentification.joinToString(", ") } \n\n")
-        log.info("TanMethodParameters VersionZkaTanMethod:${tanMethodParameterVersionZkaTanMethod.joinToString(", ") } \n\n")
+        log.info("TanMethodParameters VersionDkTanMethod:${tanMethodParameterVersionDkTanMethod.joinToString(", ") } \n\n")
 
         log.info("Requires SmsAbbuchungskonto ${printBanks(requiresSmsAbbuchungskonto)}") // no (only 2)
         log.info("Requires Auftraggeberkonto ${printBanks(requiresAuftraggeberkonto)}") // yes, a lot of (12631)

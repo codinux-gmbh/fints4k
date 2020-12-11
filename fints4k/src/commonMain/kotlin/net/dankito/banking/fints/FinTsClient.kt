@@ -1141,13 +1141,13 @@ open class FinTsClient(
         return when {
             // names are like 'chipTAN (comfort) manuell', 'Smart(-)TAN plus (manuell)' and
             // technical identification is 'HHD'. Exception:  there's one that states itself as 'chipTAN (Manuell)'
-            // but its ZkaTanMethod is set to 'HHDOPT1' -> handle ChipTanManuell before ChipTanFlickercode
-            parameters.zkaTanMethod == ZkaTanMethod.HHD || name.contains("manuell") ->
+            // but its DkTanMethod is set to 'HHDOPT1' -> handle ChipTanManuell before ChipTanFlickercode
+            parameters.dkTanMethod == DkTanMethod.HHD || name.contains("manuell") ->
                 TanMethodType.ChipTanManuell
 
             // names are like 'chipTAN optisch/comfort', 'SmartTAN (plus) optic/USB', 'chipTAN (Flicker)' and
             // technical identification is 'HHDOPT1'
-            parameters.zkaTanMethod == ZkaTanMethod.HHDOPT1 ||
+            parameters.dkTanMethod == DkTanMethod.HHDOPT1 ||
                     tanMethodNameContains(name, "optisch", "optic", "comfort", "flicker") ->
                 TanMethodType.ChipTanFlickercode
 
@@ -1172,7 +1172,8 @@ open class FinTsClient(
 
             // 'flateXSecure' identifies itself as 'PPTAN' instead of 'AppTAN'
             // 'activeTAN-Verfahren' can actually be used either with an app or a reader; it's like chipTAN QR but without a chip card
-            tanMethodNameContains(name, "push", "app", "BestSign", "SecureGo", "TAN2go", "activeTAN", "easyTAN", "SecurePlus", "TAN+")
+            parameters.dkTanMethod == DkTanMethod.App
+                    || tanMethodNameContains(name, "push", "app", "BestSign", "SecureGo", "TAN2go", "activeTAN", "easyTAN", "SecurePlus", "TAN+")
                     || technicalTanMethodIdentificationContains(parameters, "SECURESIGN", "PPTAN") ->
                 TanMethodType.AppTan
 
@@ -1185,8 +1186,8 @@ open class FinTsClient(
         return when {
             technicalTanMethodIdentificationContains(parameters, "HHD1.4") -> HHDVersion.HHD_1_4
             technicalTanMethodIdentificationContains(parameters, "HHD1.3") -> HHDVersion.HHD_1_3
-            parameters.versionZkaTanMethod?.contains("1.4") == true -> HHDVersion.HHD_1_4
-            parameters.versionZkaTanMethod?.contains("1.3") == true -> HHDVersion.HHD_1_4
+            parameters.versionDkTanMethod?.contains("1.4") == true -> HHDVersion.HHD_1_4
+            parameters.versionDkTanMethod?.contains("1.3") == true -> HHDVersion.HHD_1_4
             else -> null
         }
     }

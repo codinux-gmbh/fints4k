@@ -10,7 +10,7 @@ open class TanMethod(
     open val type: TanMethodType,
     open val hhdVersion: HHDVersion? = null,
     open val maxTanInputLength: Int? = null,
-    open val allowedTanFormat: AllowedTanFormat = AllowedTanFormat.Alphanumeric,
+    open val allowedTanFormat: AllowedTanFormat? = null,
     open val nameOfTanMediumRequired: Boolean = false
 ) {
 

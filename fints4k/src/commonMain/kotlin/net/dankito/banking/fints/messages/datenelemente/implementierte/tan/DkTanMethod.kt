@@ -1,7 +1,7 @@
 package net.dankito.banking.fints.messages.datenelemente.implementierte.tan
 
 
-enum class ZkaTanMethod {
+enum class DkTanMethod {
 
     HHD,
 
@@ -11,8 +11,10 @@ enum class ZkaTanMethod {
 
     mobileTAN,
 
-    // values not specified by standard but found out there in the wild
+    App,
 
-    appTAN
+    Decoupled,
+
+    DecoupledPush
 
 }

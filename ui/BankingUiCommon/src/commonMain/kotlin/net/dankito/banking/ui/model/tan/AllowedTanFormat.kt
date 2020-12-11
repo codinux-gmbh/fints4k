@@ -5,6 +5,8 @@ enum class AllowedTanFormat {
 
     Numeric,
 
-    Alphanumeric
+    Alphanumeric,
+
+    TanIsEnteredOnOtherDevice
 
 }
