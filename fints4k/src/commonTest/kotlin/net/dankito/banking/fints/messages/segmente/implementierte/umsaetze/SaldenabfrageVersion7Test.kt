@@ -18,7 +18,7 @@ class SaldenabfrageVersion7Test : FinTsTestBase() {
         val result = underTest.format()
 
         // then
-        expect(result).toBe("HKSAL:3:7+$Iban::$CustomerId::280:$BankCode+N")
+        expect(result).toBe("HKSAL:3:7+$Iban:$Bic:$CustomerId::280:$BankCode+N")
     }
 
     @Test
@@ -31,7 +31,7 @@ class SaldenabfrageVersion7Test : FinTsTestBase() {
         val result = underTest.format()
 
         // then
-        expect(result).toBe("HKSAL:3:7+$Iban::$CustomerId::280:$BankCode+J")
+        expect(result).toBe("HKSAL:3:7+$Iban:$Bic:$CustomerId::280:$BankCode+J")
     }
 
 }
