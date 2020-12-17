@@ -35,8 +35,8 @@ open class MessageBuilder(protected val generator: ISegmentNumberGenerator = Seg
                           protected val utils: FinTsUtils = FinTsUtils()) {
 
     companion object {
-        const val MessageHeaderLength = 30
-        const val MessageEndingLength = 11
+        const val MessageHeaderMinLength = 30
+
         const val AddedSeparatorsLength = 3
     }
 
@@ -411,13 +411,17 @@ open class MessageBuilder(protected val generator: ISegmentNumberGenerator = Seg
 
         val formattedPayload = formatPayload(payloadSegments)
 
-        val messageSize = formattedPayload.length + MessageHeaderLength + MessageEndingLength + AddedSeparatorsLength
+        val ending = Nachrichtenabschluss(generator.getNextSegmentNumber(), dialogContext)
+        val formattedEnding = ending.format()
+
+        val minMessageSize = formattedPayload.length + MessageHeaderMinLength + formattedEnding.length + AddedSeparatorsLength
+        val headerWithMinMessageSize = Nachrichtenkopf(ISegmentNumberGenerator.FirstSegmentNumber, minMessageSize, dialogContext).format()
+
+        val messageSize = formattedPayload.length + headerWithMinMessageSize.length + formattedEnding.length + AddedSeparatorsLength
 
         val header = Nachrichtenkopf(ISegmentNumberGenerator.FirstSegmentNumber, messageSize, dialogContext)
 
-        val ending = Nachrichtenabschluss(generator.getNextSegmentNumber(), dialogContext)
-
-        return listOf(header.format(), formattedPayload, ending.format())
+        return listOf(header.format(), formattedPayload, formattedEnding)
             .joinToString(Separators.SegmentSeparator, postfix = Separators.SegmentSeparator)
     }
 
