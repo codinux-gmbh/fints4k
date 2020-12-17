@@ -35,7 +35,7 @@ open class MessageBuilder(protected val generator: ISegmentNumberGenerator = Seg
                           protected val utils: FinTsUtils = FinTsUtils()) {
 
     companion object {
-        const val MessageHeaderMinLength = 30
+        const val MessageHeaderMinLength = 28
 
         const val AddedSeparatorsLength = 3
     }
@@ -414,15 +414,21 @@ open class MessageBuilder(protected val generator: ISegmentNumberGenerator = Seg
         val ending = Nachrichtenabschluss(generator.getNextSegmentNumber(), dialogContext)
         val formattedEnding = ending.format()
 
-        val minMessageSize = formattedPayload.length + MessageHeaderMinLength + formattedEnding.length + AddedSeparatorsLength
-        val headerWithMinMessageSize = Nachrichtenkopf(ISegmentNumberGenerator.FirstSegmentNumber, minMessageSize, dialogContext).format()
-
-        val messageSize = formattedPayload.length + headerWithMinMessageSize.length + formattedEnding.length + AddedSeparatorsLength
+        val messageSize = calculateMessageSize(formattedPayload, formattedEnding, dialogContext)
 
         val header = Nachrichtenkopf(ISegmentNumberGenerator.FirstSegmentNumber, messageSize, dialogContext)
 
         return listOf(header.format(), formattedPayload, formattedEnding)
             .joinToString(Separators.SegmentSeparator, postfix = Separators.SegmentSeparator)
+    }
+
+    protected open fun calculateMessageSize(formattedPayload: String, formattedEnding: String, dialogContext: DialogContext): Int {
+        // we don't know Header's length yet - but already have to know its length in order to calculate message length.
+        // -> generate header with a known minimum header length added to message body length to calculate header length
+        val minMessageSize = formattedPayload.length + MessageHeaderMinLength + formattedEnding.length + AddedSeparatorsLength
+        val headerWithMinMessageSize = Nachrichtenkopf(ISegmentNumberGenerator.FirstSegmentNumber, minMessageSize, dialogContext).format()
+
+        return formattedPayload.length + headerWithMinMessageSize.length + formattedEnding.length + AddedSeparatorsLength
     }
 
 
