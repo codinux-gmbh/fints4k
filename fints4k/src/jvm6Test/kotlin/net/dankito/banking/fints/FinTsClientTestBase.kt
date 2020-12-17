@@ -17,6 +17,7 @@ import net.dankito.banking.fints.messages.segmente.id.CustomerSegmentId
 import net.dankito.banking.fints.model.*
 import net.dankito.banking.fints.response.client.AddAccountResponse
 import net.dankito.banking.fints.response.client.FinTsClientResponse
+import net.dankito.banking.fints.response.client.GetTanMediaListResponse
 import net.dankito.banking.fints.response.client.GetTransactionsResponse
 import net.dankito.banking.fints.util.PureKotlinBase64Service
 import net.dankito.banking.fints.webclient.KtorWebClient
@@ -176,11 +177,22 @@ open class FinTsClientTestBase {
 
         // this test is only senseful for accounts using chipTAN / TAN generator as TAN method
 
-        underTest.getAnonymousBankInfo(Bank) { }
+        // given
+        val response = AtomicReference<GetTanMediaListResponse>()
+        val countDownLatch = CountDownLatch(1)
+        val anonymousBankInfoCountDownLatch = CountDownLatch(1)
+
+
+        underTest.getAnonymousBankInfo(Bank) {
+            anonymousBankInfoCountDownLatch.countDown()
+        }
+        anonymousBankInfoCountDownLatch.await(30, TimeUnit.SECONDS)
+
 
         val supportsRetrievingTanMedia = Bank.supportedJobs.firstOrNull { it.jobName == "HKTAB" } != null
 
         if (supportsRetrievingTanMedia == false) { // accounts with appTAN, pushTAN, smsTAN, ... would fail here -> simply return
+            println("Bank ${Bank.bankName} does not support retrieving TAN media. Therefore cannot execute test getTanMediaList()")
             return
         }
 
@@ -189,16 +201,21 @@ open class FinTsClientTestBase {
 
         // when
         underTest.getTanMediaList(Bank, TanMedienArtVersion.Alle, TanMediumKlasse.AlleMedien) { result ->
-
-            // then
-            expect(result.successful).isTrue()
-
-            expect(result.tanMediaList).notToBeNull()
-            expect(result.tanMediaList!!.usageOption).toBe(TanEinsatzOption.KundeKannGenauEinMediumZuEinerZeitNutzen) // TODO: may adjust to your value
-            expect(result.tanMediaList!!.tanMedia).isNotEmpty()
-
-            expect(Bank.tanMedia).isNotEmpty()
+            response.set(result)
+            countDownLatch.countDown()
         }
+
+        // then
+        countDownLatch.await(30, TimeUnit.SECONDS)
+        val result = response.get()
+
+        expect(result.successful).isTrue()
+
+        expect(result.tanMediaList).notToBeNull()
+        expect(result.tanMediaList!!.usageOption).toBe(TanEinsatzOption.KundeKannGenauEinMediumZuEinerZeitNutzen) // TODO: may adjust to your value
+        expect(result.tanMediaList!!.tanMedia).isNotEmpty()
+
+        expect(Bank.tanMedia).isNotEmpty()
     }
 
     @Ignore // only works with banks that don't support HKTAB version 5
