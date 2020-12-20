@@ -73,7 +73,7 @@ open class SendMessageLogDialog : DialogFragment() {
             rootView.btnSendMessageLogViaEMail.isEnabled = false
         }
         else {
-            rootView.edtxtMessageLog.setText(context?.getString(R.string.dialog_send_message_courteously_add_error_description, messageLog))
+            rootView.edtxtMessageLog.setText(context?.getString(R.string.dialog_send_message_courteously_add_error_description, getDeviceInfoLine() + "\n\n" + messageLog))
         }
 
         rootView.btnSendMessageLogDirectly.setOnClickListener { sendMessageLogDirectly(rootView.edtxtMessageLog.text.toString()) }
@@ -101,7 +101,7 @@ open class SendMessageLogDialog : DialogFragment() {
     }
 
     protected open fun sendMessageLogDirectly(messageLog: String) {
-        val deviceInfo = DeviceInfo(Build.MANUFACTURER.capitalize(), Build.MODEL, "Android", Build.VERSION.RELEASE, System.getProperty("os.arch") ?: "")
+        val deviceInfo = getDeviceInfo()
 
         // TODO: sending with Ktor did not work
         //presenter.sendMessageLogDirectly(messageLog, deviceInfo)
@@ -115,6 +115,35 @@ open class SendMessageLogDialog : DialogFragment() {
                 handleSendMessageLogDirectlyResponseOnUiThread(response)
             }
         }
+    }
+
+    protected open fun getDeviceInfoLine(): String {
+        val deviceInfo = getDeviceInfo()
+
+        var line = deviceInfo.manufacturer ?: ""
+
+        deviceInfo.deviceModel?.let { model ->
+            line += (if (line.isEmpty()) "" else " ") + model
+        }
+
+        deviceInfo.osName?.let { osName ->
+            line += (if (line.isEmpty()) "" else " - ") + osName
+        }
+
+        deviceInfo.osVersion?.let { osVersion ->
+            line += (if (line.isEmpty()) "" else " ") + osVersion
+        }
+
+        deviceInfo.osArch?.let { osArch ->
+            line += (if (line.isEmpty()) "" else " ") + osArch
+        }
+
+        return line
+
+    }
+
+    protected open fun getDeviceInfo(): DeviceInfo {
+        return DeviceInfo(Build.MANUFACTURER.capitalize(), Build.MODEL, "Android", Build.VERSION.RELEASE, System.getProperty("os.arch") ?: "")
     }
 
     protected open fun handleSendMessageLogDirectlyResponseOnUiThread(response: WebClientResponse) {
