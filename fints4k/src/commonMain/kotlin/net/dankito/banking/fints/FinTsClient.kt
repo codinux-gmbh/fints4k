@@ -1132,7 +1132,8 @@ open class FinTsClient(
         return TanMethod(methodName, parameters.securityFunction,
             mapToTanMethodType(parameters) ?: TanMethodType.EnterTan, mapHhdVersion(parameters),
             parameters.maxTanInputLength, parameters.allowedTanFormat,
-            parameters.nameOfTanMediumRequired == BezeichnungDesTanMediumsErforderlich.BezeichnungDesTanMediumsMussAngegebenWerden)
+            parameters.nameOfTanMediumRequired == BezeichnungDesTanMediumsErforderlich.BezeichnungDesTanMediumsMussAngegebenWerden,
+            mapDecoupledTanMethodParameters(parameters))
     }
 
     protected open fun mapToTanMethodType(parameters: TanMethodParameters): TanMethodType? {
@@ -1210,6 +1211,20 @@ open class FinTsClient(
         }
 
         return false
+    }
+
+    protected open fun mapDecoupledTanMethodParameters(parameters: TanMethodParameters): DecoupledTanMethodParameters? {
+        parameters.manualConfirmationAllowedForDecoupled?.let { manualConfirmationAllowed ->
+            return DecoupledTanMethodParameters(
+                manualConfirmationAllowed,
+                parameters.periodicStateRequestsAllowedForDecoupled ?: false, // this and the following values are all set when manualConfirmationAllowedForDecoupled is set
+                parameters.maxNumberOfStateRequestsForDecoupled ?: 0,
+                parameters.initialDelayInSecondsForStateRequestsForDecoupled ?: Int.MAX_VALUE,
+                parameters.delayInSecondsForNextStateRequestsForDecoupled ?: Int.MAX_VALUE
+            )
+        }
+
+        return null
     }
 
 
