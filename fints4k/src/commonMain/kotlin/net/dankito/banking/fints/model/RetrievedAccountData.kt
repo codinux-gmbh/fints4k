@@ -10,7 +10,8 @@ open class RetrievedAccountData(
     open var bookedTransactions: Collection<AccountTransaction>,
     open var unbookedTransactions: Collection<Any>,
     open val retrievedTransactionsFrom: Date?,
-    open val retrievedTransactionsTo: Date?
+    open val retrievedTransactionsTo: Date?,
+    open val errorMessage: String? = null
 ) {
 
     companion object {

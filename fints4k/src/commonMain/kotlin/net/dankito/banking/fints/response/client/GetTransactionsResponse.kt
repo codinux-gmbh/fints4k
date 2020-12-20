@@ -18,4 +18,9 @@ open class GetTransactionsResponse(
                 && retrievedData.isNotEmpty()
                 && retrievedData.none { it.account.supportsRetrievingAccountTransactions && it.successfullyRetrievedData == false }
 
+    // TODO: remove again if then in AddAccountResponse errors get displayed that should or extract getRetrievingTransactionsError() and override in AddAccountResponse
+    override val errorMessage: String?
+        get() = super.errorMessage
+            ?: retrievedData.mapNotNull { it.errorMessage }.firstOrNull()
+
 }

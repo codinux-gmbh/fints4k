@@ -423,7 +423,7 @@ open class FinTsClient(
             val fromDate = parameter.fromDate
                 ?: parameter.account.countDaysForWhichTransactionsAreKept?.let { Date(Date.today.millisSinceEpoch - it * OneDayMillis) }
                 ?: bookedTransactions.map { it.valueDate }.sortedBy { it.millisSinceEpoch }.firstOrNull()
-            val retrievedData = RetrievedAccountData(parameter.account, successful, balance, bookedTransactions, unbookedTransactions, fromDate, parameter.toDate ?: Date.today)
+            val retrievedData = RetrievedAccountData(parameter.account, successful, balance, bookedTransactions, unbookedTransactions, fromDate, parameter.toDate ?: Date.today, response.errorMessage)
 
             callback(GetTransactionsResponse(response, listOf(retrievedData),
                 if (parameter.maxCountEntries != null) parameter.isSettingMaxCountEntriesAllowedByBank else null
