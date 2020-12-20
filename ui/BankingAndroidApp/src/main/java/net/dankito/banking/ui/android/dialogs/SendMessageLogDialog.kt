@@ -87,7 +87,7 @@ open class SendMessageLogDialog : DialogFragment() {
 
         val sendMailActivity = Intent(Intent.ACTION_SEND)
         sendMailActivity.type = "message/rfc822"
-        sendMailActivity.putExtra(Intent.EXTRA_EMAIL, arrayOf("panta.rhei@dankito.net"))
+        sendMailActivity.putExtra(Intent.EXTRA_EMAIL, arrayOf("issues@bankmeister.de"))
         sendMailActivity.putExtra(Intent.EXTRA_SUBJECT, context?.getString(R.string.dialog_send_message_log_mail_subject))
         sendMailActivity.putExtra(Intent.EXTRA_TEXT, messageLog)
 
