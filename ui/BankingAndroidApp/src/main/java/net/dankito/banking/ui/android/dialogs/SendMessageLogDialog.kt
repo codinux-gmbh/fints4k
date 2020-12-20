@@ -68,6 +68,9 @@ open class SendMessageLogDialog : DialogFragment() {
         if (messageLog.isBlank()) {
             rootView.txtvwInfoNoMessageLogEntriesYet.show()
             rootView.lytMessageLog.hide()
+
+            rootView.btnSendMessageLogDirectly.isEnabled = false
+            rootView.btnSendMessageLogViaEMail.isEnabled = false
         }
         else {
             rootView.edtxtMessageLog.setText(context?.getString(R.string.dialog_send_message_courteously_add_error_description, messageLog))
