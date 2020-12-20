@@ -1,8 +1,8 @@
 // TODO: move to versions.gradle
 ext {
-    appVersionName = '1.0.0 Alpha 8'
+    appVersionName = '1.0.0 Alpha 9'
 
-    appVersionCode = 8
+    appVersionCode = 9
 
 
     /*      MPP / basic dependencies        */
