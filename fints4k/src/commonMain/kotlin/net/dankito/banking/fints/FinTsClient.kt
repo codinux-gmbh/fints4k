@@ -410,9 +410,9 @@ open class FinTsClient(
                 parameter.retrievedChunkListener?.invoke(bookedTransactions)
             }
 
-            response.getFirstSegmentById<ReceivedCreditCardTransactionsAndBalance>(InstituteSegmentId.CreditCardTransactions)?.let { transactionsSegment ->
-                balance = Money(transactionsSegment.balance.amount, transactionsSegment.balance.currency ?: "EUR")
-                bookedTransactions.addAll(transactionsSegment.transactions.map { AccountTransaction(parameter.account, it.amount, it.description, it.bookingDate, it.transactionDescriptionBase ?: "", null, null, "", it.valueDate) })
+            response.getFirstSegmentById<ReceivedCreditCardTransactionsAndBalance>(InstituteSegmentId.CreditCardTransactions)?.let { creditCardTransactionsSegment ->
+                balance = Money(creditCardTransactionsSegment.balance.amount, creditCardTransactionsSegment.balance.currency ?: "EUR")
+                bookedTransactions.addAll(creditCardTransactionsSegment.transactions.map { AccountTransaction(parameter.account, it.amount, it.description, it.bookingDate, it.transactionDescriptionBase ?: "", null, null, "", it.valueDate) })
             }
         }
 
