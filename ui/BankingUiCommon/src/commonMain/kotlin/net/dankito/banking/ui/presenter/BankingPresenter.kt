@@ -35,8 +35,22 @@ import net.dankito.banking.util.extraction.NoOpTextExtractorRegistry
 import net.codinux.banking.tools.epcqrcode.*
 import net.dankito.banking.service.testaccess.TestAccessBankingClientCreator
 import net.dankito.utils.multiplatform.*
+import net.dankito.utils.multiplatform.getInnerExceptionMessage
 import net.dankito.utils.multiplatform.log.LoggerFactory
+import net.dankito.utils.multiplatform.os.DeviceInfo
+import net.dankito.utils.multiplatform.os.DeviceInfoRetriever
 import kotlin.collections.ArrayList
+import io.ktor.client.*
+import io.ktor.client.engine.cio.*
+import io.ktor.client.features.json.*
+import io.ktor.client.features.json.serializer.*
+import io.ktor.client.request.*
+import io.ktor.http.cio.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import net.dankito.banking.ui.model.issues.CreateTicketRequestDto
+import net.dankito.banking.ui.model.issues.IssueDescriptionFormat
 
 
 open class BankingPresenter(
@@ -83,6 +97,18 @@ open class BankingPresenter(
 
     var appSettings: AppSettings = AppSettings()
         protected set
+
+
+    protected val httpClient = HttpClient(CIO) {
+        install(JsonFeature) {
+            serializer = KotlinxSerializer(kotlinx.serialization.json.Json {
+                isLenient = true
+                ignoreUnknownKeys = true
+                allowSpecialFloatingPointValues = true
+                useArrayPolymorphism = false
+            })
+        }
+    }
 
 
     protected val bankingClientsForBanks = mutableMapOf<TypedBankData, IBankingClient>()
@@ -809,6 +835,39 @@ open class BankingPresenter(
             MessageLogEntryType.Sent -> "Sending message"
             MessageLogEntryType.Received -> "Received message"
             MessageLogEntryType.Error -> "Error"
+        }
+    }
+
+
+    open fun sendMessageLogDirectly(messageLog: String) {
+        return sendMessageLogDirectly(messageLog, DeviceInfoRetriever().getDeviceInfo())
+    }
+
+    open fun sendMessageLogDirectly(messageLog: String, deviceInfo: DeviceInfo) {
+        // TODO: serialization with @Serializable does not work
+        //val requestBody = CreateTicketRequestDto(messageLog, "Bankmeister", IssueDescriptionFormat.PlainText,
+            //deviceInfo.osName, deviceInfo.osVersion, deviceInfo.manufacturer, deviceInfo.deviceModel)
+
+        val requestBody = """{
+                    "applicationName": "Bankmeister",
+                    "osName": "Android",
+                    "issueDescription": "Test"
+                }""".trimIndent()
+        log.info("testBody: $requestBody")
+
+        GlobalScope.launch(Dispatchers.Main) {
+            try {
+                // TODO: sending with Ktor does not work. Sends request body in a way that it's not deserializable for Jackson
+                val response = httpClient.post<Response>("https://codinux.uber.space/issues") {
+                    header("Content-Type", "application/json")
+
+                    body = requestBody
+                }
+
+                log.info("Response: $response")
+            } catch (e: Exception) {
+                log.error("Could not create ticket directly: ${e.getInnerExceptionMessage()}", e)
+            }
         }
     }
 

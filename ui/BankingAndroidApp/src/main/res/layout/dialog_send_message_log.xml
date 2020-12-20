@@ -54,23 +54,33 @@
         >
 
         <Button
-            android:id="@+id/btnSendMessageLog"
+            android:id="@+id/btnCancel"
+            android:layout_width="@dimen/dialog_send_message_log_buttons_width"
+            android:layout_height="wrap_content"
+            android:layout_toLeftOf="@+id/btnSendMessageLogViaEMail"
+            android:layout_toStartOf="@+id/btnSendMessageLogViaEMail"
+            style="?android:attr/buttonBarButtonStyle"
+            android:text="@string/cancel"
+            />
+
+        <Button
+            android:id="@+id/btnSendMessageLogViaEMail"
+            android:layout_width="@dimen/dialog_send_message_log_buttons_width"
+            android:layout_height="wrap_content"
+            android:layout_toLeftOf="@+id/btnSendMessageLogDirectly"
+            android:layout_toStartOf="@+id/btnSendMessageLogDirectly"
+            style="?android:attr/buttonBarButtonStyle"
+            android:text="@string/dialog_send_message_log_send_via_e_mail"
+            />
+
+        <Button
+            android:id="@+id/btnSendMessageLogDirectly"
             android:layout_width="@dimen/dialog_send_message_log_buttons_width"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
             style="?android:attr/buttonBarButtonStyle"
-            android:text="@string/dialog_send_message_log_send"
-            />
-
-        <Button
-            android:id="@+id/btnCancel"
-            android:layout_width="@dimen/dialog_send_message_log_buttons_width"
-            android:layout_height="wrap_content"
-            android:layout_toLeftOf="@+id/btnSendMessageLog"
-            android:layout_toStartOf="@+id/btnSendMessageLog"
-            style="?android:attr/buttonBarButtonStyle"
-            android:text="@string/cancel"
+            android:text="@string/dialog_send_message_log_send_directly"
             />
 
     </RelativeLayout>

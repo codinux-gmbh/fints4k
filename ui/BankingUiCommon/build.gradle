@@ -42,6 +42,13 @@ kotlin {
                 api project(":BankFinder")
 
                 api project(":EpcQrCodeParser")
+
+                // Ktor
+                api "io.ktor:ktor-client-core:$ktorVersion"
+                api "io.ktor:ktor-client-cio:$ktorVersion"
+                api "io.ktor:ktor-client-serialization:$ktorVersion"
+                api "io.ktor:ktor-client-logging:$ktorVersion"
+                api "org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.1"
             }
         }
 

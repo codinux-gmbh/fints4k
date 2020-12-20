@@ -2,6 +2,7 @@ package net.dankito.banking.ui.android.dialogs
 
 import android.content.ActivityNotFoundException
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -15,6 +16,15 @@ import net.dankito.banking.ui.android.di.BankingComponent
 import net.dankito.banking.ui.presenter.BankingPresenter
 import net.dankito.utils.android.extensions.hide
 import net.dankito.utils.android.extensions.show
+import net.dankito.utils.multiplatform.getInnerExceptionMessage
+import net.dankito.utils.multiplatform.os.DeviceInfo
+import net.dankito.banking.ui.model.issues.CreateTicketRequestDto
+import net.dankito.banking.ui.model.issues.IssueDescriptionFormat
+import net.dankito.utils.android.extensions.asActivity
+import net.dankito.utils.serialization.JacksonJsonSerializer
+import net.dankito.utils.web.client.OkHttpWebClient
+import net.dankito.utils.web.client.RequestParameters
+import net.dankito.utils.web.client.WebClientResponse
 import javax.inject.Inject
 
 
@@ -63,12 +73,15 @@ open class SendMessageLogDialog : DialogFragment() {
             rootView.edtxtMessageLog.setText(context?.getString(R.string.dialog_send_message_courteously_add_error_description, messageLog))
         }
 
-        rootView.btnSendMessageLog.setOnClickListener { sendMessageLog(rootView.edtxtMessageLog.text.toString()) }
+        rootView.btnSendMessageLogDirectly.setOnClickListener { sendMessageLogDirectly(rootView.edtxtMessageLog.text.toString()) }
+        rootView.btnSendMessageLogViaEMail.setOnClickListener { sendMessageLogViaEMail(rootView.edtxtMessageLog.text.toString()) }
 
         rootView.btnCancel.setOnClickListener { dismiss() }
     }
 
-    protected open fun sendMessageLog(messageLog: String) {
+    protected open fun sendMessageLogViaEMail(messageLog: String) {
+        // TODO: check if message log exceeds 120.000 characters
+
         val sendMailActivity = Intent(Intent.ACTION_SEND)
         sendMailActivity.type = "message/rfc822"
         sendMailActivity.putExtra(Intent.EXTRA_EMAIL, arrayOf("panta.rhei@dankito.net"))
@@ -78,12 +91,43 @@ open class SendMessageLogDialog : DialogFragment() {
         try {
             startActivity(Intent.createChooser(sendMailActivity, context?.getString(R.string.dialog_send_message_log_action_send_chooser_title)))
 
-            Toast.makeText(context, context?.getString(R.string.dialog_send_message_log_thanks_for_helping_making_app_better), Toast.LENGTH_LONG).show()
-
-            dismiss()
+            showSuccessfullySentMessageLog()
         } catch (e: ActivityNotFoundException) {
             Toast.makeText(context, context?.getString(R.string.dialog_send_message_log_error_no_app_to_send_message_found), Toast.LENGTH_LONG).show()
         }
+    }
+
+    protected open fun sendMessageLogDirectly(messageLog: String) {
+        val deviceInfo = DeviceInfo(Build.MANUFACTURER.capitalize(), Build.MODEL, "Android", Build.VERSION.RELEASE, System.getProperty("os.arch") ?: "")
+
+        // TODO: sending with Ktor did not work
+        //presenter.sendMessageLogDirectly(messageLog, deviceInfo)
+
+        val requestBodyDto = CreateTicketRequestDto(messageLog, "Bankmeister", IssueDescriptionFormat.PlainText,
+            deviceInfo.osName, deviceInfo.osVersion, deviceInfo.manufacturer, deviceInfo.deviceModel)
+        val requestBody = JacksonJsonSerializer().serializeObject(requestBodyDto)
+
+        OkHttpWebClient().postAsync(RequestParameters("https://codinux.uber.space/issues", requestBody, "application/json")) { response ->
+            context?.asActivity()?.runOnUiThread {
+                handleSendMessageLogDirectlyResponseOnUiThread(response)
+            }
+        }
+    }
+
+    protected open fun handleSendMessageLogDirectlyResponseOnUiThread(response: WebClientResponse) {
+        if (response.isSuccessResponse) {
+            showSuccessfullySentMessageLog()
+        }
+        else {
+            Toast.makeText(context, context?.getString(R.string.dialog_send_message_log_error_could_not_sent_message_log, response.error?.getInnerExceptionMessage()),
+                Toast.LENGTH_LONG).show()
+        }
+    }
+
+    protected open fun showSuccessfullySentMessageLog() {
+        Toast.makeText(context, context?.getString(R.string.dialog_send_message_log_thanks_for_helping_making_app_better), Toast.LENGTH_LONG).show()
+
+        dismiss()
     }
 
 }

@@ -11,7 +11,7 @@ ext {
     kotlinCoroutinesVersion = "1.3.7"
 
 
-    ktorVersion = "1.3.2"
+    ktorVersion = "1.4.2"
 
 
     javaUtilsVersion = '1.0.16'
