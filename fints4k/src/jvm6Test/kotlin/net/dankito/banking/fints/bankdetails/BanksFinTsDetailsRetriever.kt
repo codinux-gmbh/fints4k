@@ -14,6 +14,7 @@ import net.dankito.banking.fints.messages.datenelemente.implementierte.tan.SmsAb
 import net.dankito.banking.fints.model.*
 import net.dankito.banking.bankfinder.BankInfo
 import net.dankito.banking.fints.FinTsJobExecutor
+import net.dankito.banking.fints.model.mapper.ModelMapper
 import net.dankito.banking.fints.response.BankResponse
 import net.dankito.banking.fints.response.segments.SepaAccountInfoParameters
 import net.dankito.banking.fints.response.segments.TanInfo
@@ -50,18 +51,18 @@ class BanksFinTsDetailsRetriever {
 
     private val messageBuilder = MessageBuilder()
 
-    private val jobExecutor = object : FinTsJobExecutor(NoOpFinTsClientCallback()) {
-
-        fun getAndHandleResponseForMessagePublic(message: MessageBuilderResult, dialogContext: DialogContext, callback: (BankResponse) -> Unit) {
-            getAndHandleResponseForMessage(message, dialogContext, callback)
-        }
-
-        fun updateBankDataPublic(bank: BankData, response: BankResponse) {
-            super.updateBankData(bank, response)
-        }
+    private val modelMapper = object : ModelMapper(messageBuilder) {
 
         fun mapToTanMethodTypePublic(parameters: TanMethodParameters): TanMethodType? {
             return super.mapToTanMethodType(parameters)
+        }
+
+    }
+
+    private val jobExecutor = object : FinTsJobExecutor(NoOpFinTsClientCallback(), modelMapper = modelMapper) {
+
+        fun getAndHandleResponseForMessagePublic(message: MessageBuilderResult, dialogContext: DialogContext, callback: (BankResponse) -> Unit) {
+            getAndHandleResponseForMessage(message, dialogContext, callback)
         }
     }
 
@@ -140,7 +141,7 @@ class BanksFinTsDetailsRetriever {
 
         countDownLatch.await(30, TimeUnit.SECONDS)
 
-        jobExecutor.updateBankDataPublic(bank, anonymousBankInfoResponse.get())
+        modelMapper.updateBankData(bank, anonymousBankInfoResponse.get())
 
         return anonymousBankInfoResponse.get()
     }
@@ -212,7 +213,7 @@ class BanksFinTsDetailsRetriever {
                 tanMethodParameter[methodParameter.methodName]?.add(methodParameter)
             }
 
-            val tanMethodType = jobExecutor.mapToTanMethodTypePublic(methodParameter)
+            val tanMethodType = modelMapper.mapToTanMethodTypePublic(methodParameter)
             if (tanMethodTypes.containsKey(tanMethodType) == false) {
                 tanMethodTypes.put(tanMethodType, mutableSetOf(methodParameter))
             }
