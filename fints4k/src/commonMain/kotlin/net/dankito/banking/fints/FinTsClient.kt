@@ -447,15 +447,6 @@ open class FinTsClient(
     }
 
 
-    open fun getTanMediaListAsync(bank: BankData, tanMediaKind: TanMedienArtVersion = TanMedienArtVersion.Alle,
-                                  tanMediumClass: TanMediumKlasse = TanMediumKlasse.AlleMedien,
-                                  callback: (GetTanMediaListResponse) -> Unit) {
-
-        GlobalScope.launch {
-            getTanMediaList(bank, tanMediaKind, tanMediumClass, callback)
-        }
-    }
-
     open fun getTanMediaList(bank: BankData, tanMediaKind: TanMedienArtVersion = TanMedienArtVersion.Alle,
                              tanMediumClass: TanMediumKlasse = TanMediumKlasse.AlleMedien, callback: (GetTanMediaListResponse) -> Unit) {
 
