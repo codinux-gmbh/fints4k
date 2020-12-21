@@ -33,6 +33,7 @@ import net.dankito.banking.fints.webclient.KtorWebClient
 import net.dankito.banking.fints.webclient.WebClientResponse
 import net.dankito.utils.multiplatform.Date
 import net.dankito.utils.multiplatform.getInnerExceptionMessage
+import net.dankito.utils.multiplatform.ObjectReference
 
 
 open class FinTsClient(
@@ -842,9 +843,15 @@ open class FinTsClient(
         val bank = dialogContext.bank // TODO: copy required data to TanChallenge
         val tanChallenge = createTanChallenge(tanResponse, bank)
 
+        val userDidCancelEnteringTan = ObjectReference(false)
+
         this.callback.enterTan(bank, tanChallenge)  { enteredTanResult ->
+            userDidCancelEnteringTan.value = true
+
             handleEnterTanResult(enteredTanResult, tanResponse, response, dialogContext, callback)
         }
+
+        mayRetrieveAutomaticallyIfUserEnteredDecoupledTan(tanChallenge, tanResponse, userDidCancelEnteringTan, dialogContext)
     }
 
     protected open fun createTanChallenge(tanResponse: TanResponse, bank: BankData): TanChallenge {
@@ -864,6 +871,19 @@ open class FinTsClient(
 
             else -> TanChallenge(messageToShowToUser, challenge, tanMethod, tanResponse.tanMediaIdentifier)
         }
+    }
+
+    protected open fun mayRetrieveAutomaticallyIfUserEnteredDecoupledTan(tanChallenge: TanChallenge, tanResponse: TanResponse,
+                                                                         userDidCancelEnteringTan: ObjectReference<Boolean>, dialogContext: DialogContext) {
+        dialogContext.bank.selectedTanMethod.decoupledParameters?.let { decoupledTanMethodParameters ->
+            if (tanResponse.tanProcess == TanProcess.AppTan && decoupledTanMethodParameters.periodicStateRequestsAllowed) {
+                automaticallyRetrieveIfUserEnteredDecoupledTan(tanChallenge, userDidCancelEnteringTan, dialogContext)
+            }
+        }
+    }
+
+    protected open fun automaticallyRetrieveIfUserEnteredDecoupledTan(tanChallenge: TanChallenge, userDidCancelEnteringTan: ObjectReference<Boolean>, dialogContext: DialogContext) {
+        log.info("automaticallyRetrieveIfUserEnteredDecoupledTan() called for $tanChallenge")
     }
 
     protected open fun handleEnterTanResult(enteredTanResult: EnterTanResult, tanResponse: TanResponse, response: BankResponse,
