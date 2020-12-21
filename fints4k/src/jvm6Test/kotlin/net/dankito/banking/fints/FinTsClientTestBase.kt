@@ -75,7 +75,7 @@ open class FinTsClientTestBase {
     }
 
 
-    private val underTest = FinTsClient(callback, KtorWebClient(), PureKotlinBase64Service())
+    private val underTest = FinTsClient(callback)
 
 
     private val BankDataAnonymous = BankData.anonymous("10070000", "https://fints.deutsche-bank.de/", "DEUTDEBBXXX")

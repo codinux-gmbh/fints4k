@@ -28,7 +28,7 @@ open class FinTsClientForCustomer(
     product: ProductData = ProductData("15E53C26816138699C7B6A3E8", "1.0.0") // TODO: get version dynamically){}
 ) {
 
-    protected val client = FinTsClient(callback, webClient, base64Service, messageBuilder, responseParser, mt940Parser, messageLogCollector, product)
+    protected val client = FinTsClient(FinTsJobExecutor(callback, webClient, base64Service, messageBuilder, responseParser, mt940Parser, messageLogCollector, product))
 
 
     open val messageLogWithoutSensitiveData: List<MessageLogEntry>
