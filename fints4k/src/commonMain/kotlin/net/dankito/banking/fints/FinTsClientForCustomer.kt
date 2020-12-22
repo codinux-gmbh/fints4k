@@ -1,11 +1,9 @@
 package net.dankito.banking.fints
 
 import net.dankito.banking.fints.callback.FinTsClientCallback
-import net.dankito.banking.fints.log.MessageLogCollector
 import net.dankito.banking.fints.messages.MessageBuilder
 import net.dankito.banking.fints.model.*
 import net.dankito.banking.fints.model.mapper.ModelMapper
-import net.dankito.banking.fints.response.ResponseParser
 import net.dankito.banking.fints.response.client.AddAccountResponse
 import net.dankito.banking.fints.response.client.FinTsClientResponse
 import net.dankito.banking.fints.response.client.GetTransactionsResponse
@@ -20,17 +18,19 @@ import net.dankito.banking.fints.webclient.KtorWebClient
 open class FinTsClientForCustomer(
     val bank: BankData,
     callback: FinTsClientCallback,
-    webClient: IWebClient = KtorWebClient(),
-    base64Service: IBase64Service = PureKotlinBase64Service(),
+    requestExecutor: RequestExecutor = RequestExecutor(),
     messageBuilder: MessageBuilder = MessageBuilder(),
-    responseParser: ResponseParser = ResponseParser(),
     mt940Parser: IAccountTransactionsParser = Mt940AccountTransactionsParser(),
-    messageLogCollector: MessageLogCollector = MessageLogCollector(),
     modelMapper: ModelMapper = ModelMapper(messageBuilder),
-    product: ProductData = ProductData("15E53C26816138699C7B6A3E8", "1.0.0") // TODO: get version dynamically){}
+    product: ProductData = ProductData("15E53C26816138699C7B6A3E8", "1.0.0") // TODO: get version dynamically)
 ) {
 
-    protected val client = FinTsClient(FinTsJobExecutor(callback, webClient, base64Service, messageBuilder, responseParser, mt940Parser, messageLogCollector, modelMapper, product))
+    constructor(bank: BankData, callback: FinTsClientCallback, webClient: IWebClient = KtorWebClient(), base64Service: IBase64Service = PureKotlinBase64Service(),
+                product: ProductData = ProductData("15E53C26816138699C7B6A3E8", "1.0.0"))  // TODO: get version dynamically)
+            : this(bank, callback, RequestExecutor(MessageBuilder(), webClient, base64Service))
+
+
+    protected val client = FinTsClient(FinTsJobExecutor(callback, requestExecutor, messageBuilder, mt940Parser, modelMapper, product))
 
 
     open val messageLogWithoutSensitiveData: List<MessageLogEntry>

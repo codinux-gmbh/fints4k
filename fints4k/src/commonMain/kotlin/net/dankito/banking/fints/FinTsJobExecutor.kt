@@ -1,8 +1,6 @@
 package net.dankito.banking.fints
 
 import net.dankito.banking.fints.callback.FinTsClientCallback
-import net.dankito.banking.fints.log.IMessageLogAppender
-import net.dankito.banking.fints.log.MessageLogCollector
 import net.dankito.banking.fints.messages.MessageBuilder
 import net.dankito.banking.fints.messages.MessageBuilderResult
 import net.dankito.banking.fints.messages.datenelemente.implementierte.signatur.VersionDesSicherheitsverfahrens
@@ -13,7 +11,6 @@ import net.dankito.banking.fints.model.*
 import net.dankito.banking.fints.model.mapper.ModelMapper
 import net.dankito.banking.fints.response.BankResponse
 import net.dankito.banking.fints.response.InstituteSegmentId
-import net.dankito.banking.fints.response.ResponseParser
 import net.dankito.banking.fints.response.client.FinTsClientResponse
 import net.dankito.banking.fints.response.client.GetTanMediaListResponse
 import net.dankito.banking.fints.response.client.GetTransactionsResponse
@@ -23,15 +20,8 @@ import net.dankito.banking.fints.tan.FlickerCodeDecoder
 import net.dankito.banking.fints.tan.TanImageDecoder
 import net.dankito.banking.fints.transactions.IAccountTransactionsParser
 import net.dankito.banking.fints.transactions.Mt940AccountTransactionsParser
-import net.dankito.banking.fints.util.IBase64Service
-import net.dankito.banking.fints.util.PureKotlinBase64Service
-import net.dankito.utils.multiplatform.log.Logger
 import net.dankito.utils.multiplatform.log.LoggerFactory
-import net.dankito.banking.fints.webclient.IWebClient
-import net.dankito.banking.fints.webclient.KtorWebClient
-import net.dankito.banking.fints.webclient.WebClientResponse
 import net.dankito.utils.multiplatform.Date
-import net.dankito.utils.multiplatform.getInnerExceptionMessage
 import net.dankito.utils.multiplatform.ObjectReference
 
 
@@ -42,12 +32,9 @@ import net.dankito.utils.multiplatform.ObjectReference
  */
 open class FinTsJobExecutor(
     protected open val callback: FinTsClientCallback,
-    protected open val webClient: IWebClient = KtorWebClient(),
-    protected open val base64Service: IBase64Service = PureKotlinBase64Service(),
+    protected open val requestExecutor: RequestExecutor = RequestExecutor(),
     protected open val messageBuilder: MessageBuilder = MessageBuilder(),
-    protected open val responseParser: ResponseParser = ResponseParser(),
     protected open val mt940Parser: IAccountTransactionsParser = Mt940AccountTransactionsParser(),
-    protected open val messageLogCollector: MessageLogCollector = MessageLogCollector(),
     protected open val modelMapper: ModelMapper = ModelMapper(messageBuilder),
     protected open val product: ProductData = ProductData("15E53C26816138699C7B6A3E8", "1.0.0") // TODO: get version dynamically
 ) {
@@ -58,20 +45,11 @@ open class FinTsJobExecutor(
 
 
     open val messageLogWithoutSensitiveData: List<MessageLogEntry>
-        get() = messageLogCollector.messageLogWithoutSensitiveData
-
-    protected open val messageLogAppender: IMessageLogAppender = object : IMessageLogAppender {
-
-        override fun logError(message: String, e: Exception?, logger: Logger?, bank: BankData?) {
-            messageLogCollector.logError(message, e, logger, bank)
-        }
-
-    }
+        get() = requestExecutor.messageLogWithoutSensitiveData
 
 
     init {
-        responseParser.logAppender = messageLogAppender
-        mt940Parser.logAppender = messageLogAppender
+        mt940Parser.logAppender = requestExecutor.messageLogAppender // TODO: find a better solution to append messages to MessageLog
     }
 
 
@@ -382,142 +360,17 @@ open class FinTsJobExecutor(
 
 
     protected open fun getAndHandleResponseForMessage(message: MessageBuilderResult, dialogContext: DialogContext, callback: (BankResponse) -> Unit) {
-        if (message.createdMessage == null) {
-            callback(BankResponse(false, messageCreationError = message))
-        }
-        else {
-            getAndHandleResponseForMessage(message.createdMessage, dialogContext) { response ->
-                handleMayRequiresTan(response, dialogContext) { handledResponse ->
-                    // if there's a Aufsetzpunkt (continuationId) set, then response is not complete yet, there's more information to fetch by sending this Aufsetzpunkt
-                    handledResponse.aufsetzpunkt?.let { continuationId ->
-                        if (handledResponse.followUpResponse == null) { // for re-sent messages followUpResponse is already set and dialog already closed -> would be overwritten with an error response that dialog is closed
-                            if (message.isSendEnteredTanMessage() == false) { // for sending TAN no follow up message can be created -> filter out, otherwise chunkedResponseHandler would get called twice for same response
-                                dialogContext.chunkedResponseHandler?.invoke(handledResponse)
-                            }
-
-                            getFollowUpMessageForContinuationId(handledResponse, continuationId, message, dialogContext) { followUpResponse ->
-                                handledResponse.followUpResponse = followUpResponse
-                                handledResponse.hasFollowUpMessageButCouldNotReceiveIt = handledResponse.followUpResponse == null
-
-                                callback(handledResponse)
-                            }
-                        }
-                        else {
-                            callback(handledResponse)
-                        }
-                    }
-                        ?: run {
-                            // e.g. response = enter TAN response, but handledResponse is then response after entering TAN, e.g. account transactions
-                            // -> chunkedResponseHandler would get called for same handledResponse multiple times
-                            if (response == handledResponse) {
-                                dialogContext.chunkedResponseHandler?.invoke(handledResponse)
-                            }
-
-                            callback(handledResponse)
-                        }
-                }
-            }
-        }
-    }
-
-    protected open fun getAndHandleResponseForMessage(requestBody: String, dialogContext: DialogContext, callback: (BankResponse) -> Unit) {
-        addMessageLog(requestBody, MessageLogEntryType.Sent, dialogContext)
-
-        getResponseForMessage(requestBody, dialogContext.bank.finTs3ServerAddress) { webResponse ->
-            val response = handleResponse(webResponse, dialogContext)
-
-            dialogContext.response = response
-
-            response.messageHeader?.let { header -> dialogContext.dialogId = header.dialogId }
-            dialogContext.didBankCloseDialog = response.didBankCloseDialog
-
-            callback(response)
-        }
-    }
-
-    protected open fun getResponseForMessage(requestBody: String, finTs3ServerAddress: String, callback: (WebClientResponse) -> Unit) {
-        val encodedRequestBody = base64Service.encode(requestBody)
-
-        webClient.post(finTs3ServerAddress, encodedRequestBody, "application/octet-stream", IWebClient.DefaultUserAgent, callback)
+        requestExecutor.getAndHandleResponseForMessage(
+            message,
+            dialogContext,
+            { tanResponse, bankResponse, tanRequiredCallback -> handleEnteringTanRequired(tanResponse, bankResponse, dialogContext, tanRequiredCallback) },
+            callback)
     }
 
     protected open fun fireAndForgetMessage(message: MessageBuilderResult, dialogContext: DialogContext) {
-        message.createdMessage?.let { requestBody ->
-            addMessageLog(requestBody, MessageLogEntryType.Sent, dialogContext)
-
-            getResponseForMessage(requestBody, dialogContext.bank.finTs3ServerAddress) { }
-
-            // if really needed add received response to message log here
-        }
+        requestExecutor.fireAndForgetMessage(message, dialogContext)
     }
 
-    protected open fun handleResponse(webResponse: WebClientResponse, dialogContext: DialogContext): BankResponse {
-        val responseBody = webResponse.body
-
-        if (webResponse.successful && responseBody != null) {
-
-            try {
-                val decodedResponse = decodeBase64Response(responseBody)
-
-                addMessageLog(decodedResponse, MessageLogEntryType.Received, dialogContext)
-
-                return responseParser.parse(decodedResponse)
-            } catch (e: Exception) {
-                logError("Could not decode responseBody:\r\n'$responseBody'", dialogContext, e)
-
-                return BankResponse(false, errorMessage = e.getInnerExceptionMessage())
-            }
-        }
-        else {
-            val bank = dialogContext.bank
-            logError("Request to $bank (${bank.finTs3ServerAddress}) failed", dialogContext, webResponse.error)
-        }
-
-        return BankResponse(false, errorMessage = webResponse.error?.getInnerExceptionMessage())
-    }
-
-    protected open fun decodeBase64Response(responseBody: String): String {
-        return base64Service.decode(responseBody.replace("\r", "").replace("\n", ""))
-    }
-
-
-    protected open fun getFollowUpMessageForContinuationId(response: BankResponse, continuationId: String, message: MessageBuilderResult,
-                                                           dialogContext: DialogContext, callback: (BankResponse?) -> Unit) {
-
-        messageBuilder.rebuildMessageWithContinuationId(message, continuationId, dialogContext)?.let { followUpMessage ->
-            getAndHandleResponseForMessage(followUpMessage, dialogContext, callback)
-        }
-            ?: run { callback(null) }
-    }
-
-
-    protected open fun handleMayRequiresTan(response: BankResponse, dialogContext: DialogContext, callback: (BankResponse) -> Unit) { // TODO: use response from DialogContext
-
-        if (response.isStrongAuthenticationRequired) {
-            if (dialogContext.abortIfTanIsRequired) {
-                response.tanRequiredButWeWereToldToAbortIfSo = true
-
-                callback(response)
-                return
-            }
-            else if (response.tanResponse != null) {
-                response.tanResponse?.let { tanResponse ->
-                    handleEnteringTanRequired(tanResponse, response, dialogContext, callback)
-                }
-
-                return
-            }
-        }
-
-        // TODO: check if response contains '3931 TAN-Generator gesperrt, Synchronisierung erforderlich' or
-        //  '3933 TAN-Generator gesperrt, Synchronisierung erforderlich Kartennummer ##########' message,
-        //  call callback.enterAtc() and implement and call HKTSY job  (p. 77)
-
-        // TODO: also check '9931 Sperrung des Kontos nach %1 Fehlversuchen' -> if %1 == 3 synchronize TAN generator
-        //  as it's quite unrealistic that user entered TAN wrong three times, in most cases TAN generator is not synchronized
-
-        callback(response)
-    }
 
     protected open fun handleEnteringTanRequired(tanResponse: TanResponse, response: BankResponse, dialogContext: DialogContext, callback: (BankResponse) -> Unit) {
         val bank = dialogContext.bank // TODO: copy required data to TanChallenge
@@ -555,7 +408,8 @@ open class FinTsJobExecutor(
     }
 
     protected open fun mayRetrieveAutomaticallyIfUserEnteredDecoupledTan(tanChallenge: TanChallenge, tanResponse: TanResponse,
-                                                                         userDidCancelEnteringTan: ObjectReference<Boolean>, dialogContext: DialogContext) {
+                                                                         userDidCancelEnteringTan: ObjectReference<Boolean>, dialogContext: DialogContext
+    ) {
         dialogContext.bank.selectedTanMethod.decoupledParameters?.let { decoupledTanMethodParameters ->
             if (tanResponse.tanProcess == TanProcess.AppTan && decoupledTanMethodParameters.periodicStateRequestsAllowed) {
                 automaticallyRetrieveIfUserEnteredDecoupledTan(tanChallenge, userDidCancelEnteringTan, dialogContext)
@@ -838,15 +692,6 @@ open class FinTsJobExecutor(
 
     open fun isJobSupported(bank: BankData, segmentId: ISegmentId): Boolean {
         return modelMapper.isJobSupported(bank, segmentId)
-    }
-
-
-    protected open fun addMessageLog(message: String, type: MessageLogEntryType, dialogContext: DialogContext) {
-        messageLogCollector.addMessageLog(message, type, dialogContext.bank)
-    }
-
-    protected open fun logError(message: String, dialogContext: DialogContext, e: Exception?) {
-        messageLogAppender.logError(message, e, log, dialogContext.bank)
     }
 
 }
