@@ -23,7 +23,7 @@ open class DtoMapper {
     protected open fun map(bank: BankData): BankResponseDto {
         return BankResponseDto(
             bank.bankCode,
-            bank.userName,
+            bank.customerId,
             bank.finTs3ServerAddress,
             bank.bic,
             bank.bankName,
@@ -47,8 +47,8 @@ open class DtoMapper {
         val bookedTransactions = map(retrievedData.bookedTransactions)
 
         return GetAccountTransactionsResponseDto(
-            retrievedData.accountData.accountIdentifier,
-            retrievedData.accountData.productName,
+            retrievedData.account.accountIdentifier,
+            retrievedData.account.productName,
             accountTransactions.successful,
             mapErrorMessage(accountTransactions),
             balance,
@@ -63,19 +63,20 @@ open class DtoMapper {
     }
 
     protected open fun map(accountData: RetrievedAccountData): BankAccountResponseDto {
+        val account = accountData.account
+
         return BankAccountResponseDto(
-            accountData.accountData.accountIdentifier,
-            accountData.accountData.subAccountAttribute,
-            accountData.accountData.iban,
-            accountData.accountData.userName,
-            accountData.accountData.accountType,
-            accountData.accountData.currency,
-            accountData.accountData.accountHolderName,
-            accountData.accountData.productName,
-            accountData.accountData.supportsRetrievingBalance,
-            accountData.accountData.supportsRetrievingAccountTransactions,
-            accountData.accountData.supportsTransferringMoney,
-            accountData.accountData.supportsRealTimeTransfer,
+            account.accountIdentifier,
+            account.subAccountAttribute,
+            account.iban,
+            account.accountType,
+            account.currency,
+            account.accountHolderName,
+            account.productName,
+            account.supportsRetrievingBalance,
+            account.supportsRetrievingAccountTransactions,
+            account.supportsTransferringMoney,
+            account.supportsRealTimeTransfer,
             accountData.successfullyRetrievedData,
             mapNullable(accountData.balance),
             accountData.retrievedTransactionsFrom,

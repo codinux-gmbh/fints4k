@@ -39,7 +39,7 @@ class fints4kService {
     // TODO: as in most cases we really just want the account data, so just retrieve these without balances and transactions
     protected fun getAccountData(bank: BankData): AddAccountResponse {
         return getAsyncResponse { client, responseRetrieved ->
-            client.addAccountAsync(bank) { response ->
+            client.addAccountAsync(AddAccountParameter(bank)) { response ->
                 responseRetrieved(response)
             }
         }
@@ -102,7 +102,8 @@ class fints4kService {
 
         val tanRequestId = UUID.randomUUID().toString()
 
-        originatingRequestResult.set(EnteringTanRequested(tanRequestId, bank, tanChallenge))
+        // TODO: find a solution for returning TAN challenge to caller
+        //originatingRequestResult.set(EnteringTanRequested(tanRequestId, bank, tanChallenge))
         originatingRequestLatch.countDown()
 
         tanRequests.put(tanRequestId, EnterTanContext(enterTanResult, enterTanLatch))

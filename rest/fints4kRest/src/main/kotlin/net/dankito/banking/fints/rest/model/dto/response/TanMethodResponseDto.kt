@@ -10,6 +10,6 @@ open class TanMethodResponseDto(
     open val type: TanMethodType,
     open val hhdVersion: String? = null,
     open val maxTanInputLength: Int? = null,
-    open val allowedTanFormat: AllowedTanFormat = AllowedTanFormat.Alphanumeric,
+    open val allowedTanFormat: AllowedTanFormat? = null,
     open val nameOfTanMediumRequired: Boolean = false
 )
