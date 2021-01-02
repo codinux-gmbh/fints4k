@@ -27,6 +27,11 @@ open class ModelMapper(
             bank.supportedHbciVersions = bankParameters.supportedHbciVersions
             bank.supportedLanguages = bankParameters.supportedLanguages
 
+            if (bank.bankName.isBlank()) {
+                // just as fallback as this value contains a lot of confusing and irrelevant names (like DB24 for Deutsche Bank and Rechenzentrum Bayer. Gen. for Bavarian Raiffeisen banks)
+                bank.bankName = bankParameters.bankName
+            }
+
 //            bank.bic = bankParameters. // TODO: where's the BIC?
         }
 
