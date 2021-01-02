@@ -127,6 +127,7 @@ open class FinTsClient(
 
         if (countAccountsSupportingRetrievingTransactions == 0) {
             addAccountDone(bank, getAccountsResponse, retrievedAccountData, callback)
+            return // no necessary just to make it clearer that code below doesn't get called
         }
 
         accountsSupportingRetrievingTransactions.forEach { account ->
