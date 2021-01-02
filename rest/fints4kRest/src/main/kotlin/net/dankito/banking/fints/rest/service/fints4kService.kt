@@ -117,7 +117,10 @@ class fints4kService {
     protected fun mapToBankData(accessData: BankAccessData): Pair<BankData, String?> {
         val bankSearchResult = bankFinder.findBankByBankCode(accessData.bankCode)
         val fintsServerAddress = accessData.finTsServerAddress ?: bankSearchResult.firstOrNull { it.pinTanAddress != null }?.pinTanAddress
-        val bank = BankData(accessData.bankCode, accessData.loginName, accessData.password, fintsServerAddress ?: "",  bankSearchResult.firstOrNull()?.bic ?: "")
+        val potentialBankInfo = bankSearchResult.firstOrNull()
+
+        val bank = BankData(accessData.bankCode, accessData.loginName, accessData.password, fintsServerAddress ?: "",
+            potentialBankInfo?.bic ?: "", potentialBankInfo?.name ?: "")
 
         if (fintsServerAddress == null) {
             val errorMessage = if (bankSearchResult.isEmpty()) "No bank found for bank code '${accessData.bankCode}'" else "Bank '${bankSearchResult.firstOrNull()?.name} does not support FinTS 3.0"
