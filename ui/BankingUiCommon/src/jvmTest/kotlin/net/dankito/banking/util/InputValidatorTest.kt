@@ -131,7 +131,7 @@ class InputValidatorTest {
     fun validateRecipientName_TooLong() {
 
         // given
-        val nameWithMaxLength = IntRange(0, InputValidator.RemitteNameMaxLength - 1).map { "a" }.joinToString("")
+        val nameWithMaxLength = IntRange(0, InputValidator.RecipientNameMaxLength - 1).map { "a" }.joinToString("")
         val enteredName = nameWithMaxLength + "a"
 
         // when
