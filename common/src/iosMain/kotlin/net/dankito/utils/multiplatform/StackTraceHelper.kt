@@ -1,7 +1,7 @@
 package net.dankito.utils.multiplatform
 
 
-actual class StackTraceHelper {
+actual class StackTraceHelper() {
 
     actual fun getStackTrace(e: Throwable, maxCountStackTraceElements: Int?): String {
         var stackTrace = e.getStackTrace()

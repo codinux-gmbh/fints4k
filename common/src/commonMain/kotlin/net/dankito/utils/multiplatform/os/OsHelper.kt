@@ -1,7 +1,7 @@
 package net.dankito.utils.multiplatform.os
 
 
-expect class OsHelper {
+expect class OsHelper() {
 
     val osType: OsType
 

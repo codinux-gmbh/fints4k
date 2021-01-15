@@ -4,7 +4,7 @@ import java.io.PrintWriter
 import java.io.StringWriter
 
 
-actual class StackTraceHelper {
+actual class StackTraceHelper actual constructor() {
 
     actual fun getStackTrace(e: Throwable, maxCountStackTraceElements: Int?): String {
         val stringWriter = StringWriter()
