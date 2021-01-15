@@ -17,7 +17,7 @@ dependencies {
 
     implementation "org.slf4j:slf4j-api:$slf4jVersion"
 
-    implementation enforcedPlatform("io.quarkus:quarkus-universe-bom:$quarkusVersion")
+    implementation enforcedPlatform("io.quarkus:quarkus-bom:$quarkusVersion")
     implementation 'io.quarkus:quarkus-kotlin'
     implementation 'io.quarkus:quarkus-resteasy'
     implementation 'io.quarkus:quarkus-resteasy-jackson'

@@ -98,7 +98,7 @@ ext {
 
     /*      REST APIs   */
     
-    quarkusVersion="1.8.1.Final"
+    quarkusVersion="1.11.0.Final"
 
 
     /*      Test        */

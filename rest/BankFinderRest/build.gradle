@@ -21,7 +21,7 @@ dependencies {
 
     implementation "net.dankito.utils:java-utils:$javaUtilsVersion"
 
-    implementation enforcedPlatform("io.quarkus:quarkus-universe-bom:$quarkusVersion")
+    implementation enforcedPlatform("io.quarkus:quarkus-bom:$quarkusVersion")
     implementation 'io.quarkus:quarkus-kotlin'
     implementation 'io.quarkus:quarkus-resteasy'
     implementation 'io.quarkus:quarkus-resteasy-jackson'
