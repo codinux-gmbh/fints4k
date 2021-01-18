@@ -23,7 +23,7 @@ android {
         minSdkVersion androidMinSdkVersion
         targetSdkVersion androidTargetSdkVersion
 
-        versionName version
+        versionName version.replace("-", " ")
         versionCode appVersionCode
 
         multiDexEnabled true
