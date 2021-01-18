@@ -96,11 +96,6 @@ ext {
     javaFxUtilsVersion = '1.0.9'
 
 
-    /*      REST APIs   */
-    
-    quarkusVersion="1.11.0.Final"
-
-
     /*      Test        */
 
     junitVersion = '4.12'
