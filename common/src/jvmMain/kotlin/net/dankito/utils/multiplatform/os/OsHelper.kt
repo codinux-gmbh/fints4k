@@ -1,7 +1,7 @@
 package net.dankito.utils.multiplatform.os
 
 
-actual open class OsHelper actual constructor() {
+actual open class OsHelper {
 
 
     actual val osType: OsType
