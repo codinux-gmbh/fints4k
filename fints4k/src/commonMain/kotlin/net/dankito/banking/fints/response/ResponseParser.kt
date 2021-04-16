@@ -680,12 +680,14 @@ open class ResponseParser(
             date = parseDate(dataElements[++dateIndex])
         }
 
-        return Balance(
-            parseAmount(dataElements[1], isCredit),
-            currency,
-            date,
-            if (dataElements.size > dateIndex + 1) parseTime(dataElements[dateIndex + 1]) else null
-        )
+        var time: Date? = null
+        if (dataElements.size > dateIndex + 1) {
+            try {
+                time = parseTime(dataElements[dateIndex + 1])
+            } catch (e: Exception) { log.error("Could not parse balance time '${dataElementGroup[dateIndex + 1]}' of data element group: $dataElementGroup") }
+        }
+
+        return Balance(parseAmount(dataElements[1], isCredit), currency, date, time)
     }
 
     protected open fun parseIsCredit(isCredit: String): Boolean {
