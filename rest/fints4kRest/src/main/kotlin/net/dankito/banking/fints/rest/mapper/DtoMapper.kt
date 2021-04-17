@@ -6,6 +6,7 @@ import net.dankito.banking.fints.response.client.FinTsClientResponse
 import net.dankito.banking.fints.response.client.GetTransactionsResponse
 import net.dankito.banking.fints.rest.model.dto.response.*
 import java.math.BigDecimal
+import javax.ws.rs.InternalServerErrorException
 
 
 open class DtoMapper {
@@ -37,7 +38,12 @@ open class DtoMapper {
     }
 
 
-    open fun mapTransactions(accountsTransactions: List<GetTransactionsResponse>): GetAccountsTransactionsResponseDto {
+    open fun mapTransactions(accountsTransactions: List<GetTransactionsResponse>?): GetAccountsTransactionsResponseDto {
+        // TODO: if a TAN is required then accountsTransactions contains null value(s) (but why?) -> application crashes
+        if (accountsTransactions == null) {
+            throw InternalServerErrorException("Could not fetch account transactions. Either TAN hasn't been entered or developers made a mistake.")
+        }
+
         return GetAccountsTransactionsResponseDto(accountsTransactions.map { map(it) })
     }
 
