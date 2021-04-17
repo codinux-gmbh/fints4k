@@ -56,6 +56,15 @@ actual class Date actual constructor(millisSinceEpoch: Long) : java.util.Date(mi
         return super.getDate()
     }
 
+    actual fun addDays(days: Int): Date {
+        val calendar = Calendar.getInstance()
+        calendar.time = this
+        calendar.add(Calendar.DATE, days)
+
+        return Date(calendar.time.time)
+    }
+
+
     private fun formatDate(dateFormatStyle: Int): Int {
         val dateStringString = DateFormat.getDateInstance(dateFormatStyle).format(this)
 

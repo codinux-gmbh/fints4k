@@ -80,8 +80,6 @@ open class BankingPresenter(
         val OpticalTanMethods = listOf(TanMethodType.ChipTanFlickercode, TanMethodType.ChipTanQrCode,
             TanMethodType.ChipTanPhotoTanMatrixCode, TanMethodType.photoTan, TanMethodType.QrCode)
 
-        protected const val OneDayMillis = 24 * 60 * 60 * 1000L
-
         protected val ShortDateStyleDateFormatter = DateFormatter(DateFormatStyle.Short)
 
         protected val MediumDateStyleDateFormatter = DateFormatter(DateFormatStyle.Medium)
@@ -432,7 +430,7 @@ open class BankingPresenter(
     }
 
     open fun updateAccountTransactionsAsync(account: TypedBankAccount, abortIfTanIsRequired: Boolean = false, callback: ((GetTransactionsResponse) -> Unit)? = null) {
-        val fromDate = account.retrievedTransactionsUpTo?.let { Date(it.millisSinceEpoch - OneDayMillis) } // one day before last received transactions
+        val fromDate = account.retrievedTransactionsUpTo?.addDays(-1) // one day before last received transactions
 
         fetchAccountTransactionsAsync(account, fromDate, abortIfTanIsRequired, callback)
     }
@@ -477,7 +475,7 @@ open class BankingPresenter(
     }
 
     open fun getDayOfFirstTransactionStoredOnBankServer(account: IBankAccount<IAccountTransaction>): Date {
-        return Date(Date.today.millisSinceEpoch - (account.countDaysForWhichTransactionsAreKept ?: 0) * OneDayMillis)
+        return Date.today.addDays((account.countDaysForWhichTransactionsAreKept ?: 0) * -1)
     }
 
     protected open fun getDateOfFirstRetrievedTransaction(transactions: Collection<IAccountTransaction>): Date? {

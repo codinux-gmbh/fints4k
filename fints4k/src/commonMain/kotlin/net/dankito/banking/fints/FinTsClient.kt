@@ -22,9 +22,6 @@ open class FinTsClient(
 
     companion object {
         val SupportedAccountTypes = listOf(AccountType.Girokonto, AccountType.Festgeldkonto, AccountType.Kreditkartenkonto)
-
-        const val OneDayMillis = 24 * 60 * 60 * 1000L
-        const val NinetyDaysMillis = 90 * OneDayMillis
     }
 
 
@@ -159,7 +156,7 @@ open class FinTsClient(
      */
     open fun tryGetTransactionsOfLast90DaysWithoutTan(bank: BankData, account: AccountData, callback: (GetTransactionsResponse) -> Unit) {
 
-        val ninetyDaysAgo = Date(Date.today.millisSinceEpoch - NinetyDaysMillis)
+        val ninetyDaysAgo = Date.today.addDays(-90)
 
         getTransactionsAsync(GetTransactionsParameter(account, account.supportsRetrievingBalance, ninetyDaysAgo, abortIfTanIsRequired = true), bank) { response ->
             callback(response)

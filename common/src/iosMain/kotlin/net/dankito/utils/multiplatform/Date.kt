@@ -86,6 +86,12 @@ actual class Date(val date: NSDate) { // cannot subclass NSDate as it's a class 
         return components.day.toInt()
     }
 
+    actual fun addDays(days: Int): Date {
+        val calendar = NSCalendar.currentCalendar
+
+        return calendar.dateByAddingUnit(NSCalendarUnitDay, days, this.date, 0)!!
+    }
+
 
 
     actual fun compareTo(other: Date): Int {

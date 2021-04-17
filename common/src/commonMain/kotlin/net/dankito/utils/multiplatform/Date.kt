@@ -38,6 +38,8 @@ expect class Date(millisSinceEpoch: Long) {
 
     fun day(): Int
 
+    fun addDays(days: Int): Date
+
 
     fun compareTo(other: Date): Int
 

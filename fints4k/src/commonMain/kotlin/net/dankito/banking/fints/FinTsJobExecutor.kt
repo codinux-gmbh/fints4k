@@ -242,7 +242,7 @@ open class FinTsJobExecutor(
 
             val successful = response.successful && (parameter.alsoRetrieveBalance == false || balance != null)
             val fromDate = parameter.fromDate
-                ?: parameter.account.countDaysForWhichTransactionsAreKept?.let { Date(Date.today.millisSinceEpoch - it * FinTsClient.OneDayMillis) }
+                ?: parameter.account.countDaysForWhichTransactionsAreKept?.let { Date.today.addDays(it * -1) }
                 ?: bookedTransactions.map { it.valueDate }.sortedBy { it.millisSinceEpoch }.firstOrNull()
             val retrievedData = RetrievedAccountData(parameter.account, successful, balance, bookedTransactions, unbookedTransactions, fromDate, parameter.toDate ?: Date.today, response.errorMessage)
 
