@@ -36,7 +36,7 @@ open class MessageLogCollector {
         val timeStamp = Date()
         val prettyPrintMessage = prettyPrintHbciMessage(message)
 
-        log.debug { "${if (type == MessageLogEntryType.Sent) "Sending" else "Received"} message:\r\n" + prettyPrintMessage }
+        log.debug { "${if (type == MessageLogEntryType.Sent) "[${bank.bankCode}-${bank.customerId}] Sending" else "Received"} message:\r\n" + prettyPrintMessage }
 
         messageLog.add(MessageLogEntry(prettyPrintMessage, type, timeStamp, bank))
     }
