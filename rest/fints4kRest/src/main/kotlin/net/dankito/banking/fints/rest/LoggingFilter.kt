@@ -28,8 +28,8 @@ class LoggingFilter : ContainerResponseFilter {
                     + System.lineSeparator() + getHeadersAsString(responseContext)
                     + System.lineSeparator() + getBodyAsString(responseContext))
         }
-        else if (log.isDebugEnabled) {
-            log.debug("Result of request ${geRequestUrl(requestContext)}: ${getResponseStatus(responseContext)}"
+        else if (log.isInfoEnabled) {
+            log.info("Result of request ${geRequestUrl(requestContext)}: ${getResponseStatus(responseContext)}"
                     + System.lineSeparator() + getHeadersAsString(responseContext)
                     + System.lineSeparator() + getBodyAsString(responseContext))
         }
