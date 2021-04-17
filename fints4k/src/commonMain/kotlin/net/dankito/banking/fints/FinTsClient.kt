@@ -132,6 +132,10 @@ open class FinTsClient(
             tryGetTransactionsOfLast90DaysWithoutTan(bank, account) { response ->
                 retrievedAccountData.put(account, response.retrievedData.first())
 
+                if (response.errorMessage != null) {
+                    //getAccountsResponse.errorMessage = response.errorMessage
+                }
+
                 countRetrievedAccounts++
                 if (countRetrievedAccounts == countAccountsSupportingRetrievingTransactions) {
                     addAccountDone(bank, getAccountsResponse, retrievedAccountData, callback)

@@ -240,7 +240,8 @@ open class FinTsJobExecutor(
         getAndHandleResponseForMessage(message, dialogContext) { response ->
             closeDialog(dialogContext)
 
-            val successful = response.successful && (parameter.alsoRetrieveBalance == false || balance != null)
+            val successful = response.tanRequiredButWeWereToldToAbortIfSo
+                    || (response.successful && (parameter.alsoRetrieveBalance == false || balance != null))
             val fromDate = parameter.fromDate
                 ?: parameter.account.countDaysForWhichTransactionsAreKept?.let { Date.today.addDays(it * -1) }
                 ?: bookedTransactions.map { it.valueDate }.sortedBy { it.millisSinceEpoch }.firstOrNull()
