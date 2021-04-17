@@ -44,10 +44,14 @@ open class DtoMapper {
             throw InternalServerErrorException("Could not fetch account transactions. Either TAN hasn't been entered or developers made a mistake.")
         }
 
-        return GetAccountsTransactionsResponseDto(accountsTransactions.map { map(it) })
+        return GetAccountsTransactionsResponseDto(accountsTransactions.mapNotNull { map(it) }) // TODO: is this correct removing accounts from result for which no transactions have been retrieved?
     }
 
-    open fun map(accountTransactions: GetTransactionsResponse): GetAccountTransactionsResponseDto {
+    open fun map(accountTransactions: GetTransactionsResponse): GetAccountTransactionsResponseDto? {
+        if (accountTransactions.retrievedData.isEmpty()) {
+            return null
+        }
+
         val retrievedData = accountTransactions.retrievedData.first()
         val balance = mapNullable(retrievedData.balance)
         val bookedTransactions = map(retrievedData.bookedTransactions)
