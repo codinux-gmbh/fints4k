@@ -94,7 +94,9 @@ open class DtoMapper {
     protected open fun map(transaction: AccountTransaction): AccountTransactionResponseDto {
         return AccountTransactionResponseDto(
             map(transaction.amount),
+            transaction.amount.currency.code,
             transaction.reference,
+            transaction.bookingDate,
             transaction.otherPartyName,
             transaction.otherPartyBankCode,
             transaction.otherPartyAccountId,

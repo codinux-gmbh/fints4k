@@ -6,7 +6,9 @@ import java.math.BigDecimal
 
 open class AccountTransactionResponseDto(
     open val amount: BigDecimal,
+    open val currency: String,
     open val reference: String,
+    open val bookingDate: Date,
     open val otherPartyName: String?,
     open val otherPartyBankCode: String?,
     open val otherPartyAccountId: String?,
