@@ -10,7 +10,7 @@ import javax.ws.rs.*
 import javax.ws.rs.core.MediaType
 
 
-@Path("/")
+@Path("/fints/v1")
 class fints4kResource {
 
     @Inject
