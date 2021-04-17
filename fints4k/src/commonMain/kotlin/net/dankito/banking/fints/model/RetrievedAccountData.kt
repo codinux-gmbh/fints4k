@@ -16,6 +16,10 @@ open class RetrievedAccountData(
 
     companion object {
 
+        fun balanceAndTransactionsNotRequestedByUser(account: AccountData): RetrievedAccountData {
+            return RetrievedAccountData(account, true, null, listOf(), listOf(), null, null)
+        }
+
         fun unsuccessful(account: AccountData): RetrievedAccountData {
             return RetrievedAccountData(account, false, null, listOf(), listOf(), null, null)
         }

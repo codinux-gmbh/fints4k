@@ -111,7 +111,8 @@ open class FinTsClient(
                 addAccountGetAccountBalancesAndTransactions(bank, getAccountsResponse, callback)
             }
             else {
-                addAccountDone(bank, getAccountsResponse, mapOf(), callback)
+                val retrievedAccountData = bank.accounts.associateBy( { it }, { RetrievedAccountData.balanceAndTransactionsNotRequestedByUser(it) } )
+                addAccountDone(bank, getAccountsResponse, retrievedAccountData, callback)
             }
         }
     }
