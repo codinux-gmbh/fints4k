@@ -1,6 +1,8 @@
 package net.dankito.utils.multiplatform
 
-
+/**
+ * Be aware that Java DateFormat is not thread safe!
+ */
 expect class DateFormatter constructor(pattern: String) {
 
     constructor(dateStyle: DateFormatStyle)
