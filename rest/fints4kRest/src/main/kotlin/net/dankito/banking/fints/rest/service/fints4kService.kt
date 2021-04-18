@@ -2,15 +2,18 @@ package net.dankito.banking.fints.rest.service
 
 import net.dankito.banking.bankfinder.InMemoryBankFinder
 import net.dankito.banking.fints.FinTsClientForCustomer
+import net.dankito.banking.fints.callback.FinTsClientCallback
 import net.dankito.banking.fints.callback.SimpleFinTsClientCallback
 import net.dankito.banking.fints.model.*
-import net.dankito.banking.fints.response.BankResponse
 import net.dankito.banking.fints.response.client.AddAccountResponse
 import net.dankito.banking.fints.response.client.GetTransactionsResponse
 import net.dankito.banking.fints.rest.model.BankAccessData
 import net.dankito.banking.fints.rest.model.EnterTanContext
-import net.dankito.banking.fints.rest.model.dto.request.AccountRequestDto
+import net.dankito.banking.fints.rest.model.EnteringTanRequested
+import net.dankito.banking.fints.rest.model.ResponseHolder
 import net.dankito.banking.fints.rest.model.dto.request.GetAccountsTransactionsRequestDto
+import net.dankito.banking.fints.rest.model.dto.request.TanResponseDto
+import net.dankito.banking.fints.rest.service.model.GetAccountsTransactionsResponse
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CountDownLatch
@@ -25,21 +28,21 @@ class fints4kService {
 
     protected val clientCache = ConcurrentHashMap<String, FinTsClientForCustomer>()
 
-    protected val tanRequests = mutableMapOf<String, EnterTanContext>()
+    // TODO: create clean up job for timed out TAN requests
+    protected val tanRequests = ConcurrentHashMap<String, EnterTanContext>()
 
 
-    fun getAddAccountResponse(accessData: BankAccessData): AddAccountResponse {
+    fun getAddAccountResponse(accessData: BankAccessData): ResponseHolder<AddAccountResponse> {
         val (bank, errorMessage) = mapToBankData(accessData)
 
         if (errorMessage != null) {
-            return AddAccountResponse(BankResponse(false, errorMessage = errorMessage), bank)
+            return ResponseHolder(errorMessage)
         }
 
         return getAccountData(bank)
     }
 
-    // TODO: as in most cases we really just want the account data, so just retrieve these without balances and transactions
-    protected fun getAccountData(bank: BankData): AddAccountResponse {
+    protected fun getAccountData(bank: BankData): ResponseHolder<AddAccountResponse> {
         return getAsyncResponse(bank) { client, responseRetrieved ->
             client.addAccountAsync(AddAccountParameter(bank)) { response ->
                 responseRetrieved(response)
@@ -48,28 +51,32 @@ class fints4kService {
     }
 
 
-    fun getAccountTransactions(dto: GetAccountsTransactionsRequestDto): List<GetTransactionsResponse> {
+    fun getAccountTransactions(dto: GetAccountsTransactionsRequestDto): GetAccountsTransactionsResponse {
         val (bank, errorMessage) = mapToBankData(dto.credentials)
 
         if (errorMessage != null) {
-            return listOf(GetTransactionsResponse(BankResponse(false, errorMessage = errorMessage)))
+            return GetAccountsTransactionsResponse(listOf(ResponseHolder(errorMessage)))
         }
 
-        return dto.accounts.map { accountDto ->
-            val account = findAccount(dto.credentials, accountDto)
+        val retrievedAccounts = getAccounts(bank)
+
+        val transactionsPerAccount = dto.accounts.map { accountDto ->
+            val account = retrievedAccounts?.firstOrNull { it.accountIdentifier == accountDto.identifier }
 
             return@map if (account != null) {
                 val parameter = GetTransactionsParameter(account, dto.alsoRetrieveBalance, dto.fromDate, dto.toDate, abortIfTanIsRequired = dto.abortIfTanIsRequired)
                 getAccountTransactions(bank, parameter)
             }
             else {
-                GetTransactionsResponse(BankResponse(false, errorMessage = "Account with identifier '${accountDto.identifier}' not found. Available accounts: " +
-                        "${getCachedClient(dto.credentials)?.bank?.accounts?.map { it.accountIdentifier }?.joinToString(", ")}"))
+                ResponseHolder("Account with identifier '${accountDto.identifier}' not found. Available accounts: " +
+                        "${retrievedAccounts?.joinToString(", ") { it.accountIdentifier }}")
             }
         }
+
+        return GetAccountsTransactionsResponse(transactionsPerAccount)
     }
 
-    fun getAccountTransactions(bank: BankData, parameter: GetTransactionsParameter): GetTransactionsResponse {
+    fun getAccountTransactions(bank: BankData, parameter: GetTransactionsParameter): ResponseHolder<GetTransactionsResponse> {
         return getAsyncResponse(bank) { client, responseRetrieved ->
             client.getTransactionsAsync(parameter) { response ->
                 responseRetrieved(response)
@@ -78,50 +85,68 @@ class fints4kService {
     }
 
 
-    protected fun <T> getAsyncResponse(bank: BankData, executeRequest: (FinTsClientForCustomer, ((T) -> Unit)) -> Unit): T {
-        val result = AtomicReference<T>()
-        val countDownLatch = CountDownLatch(1)
+    fun handleTanResponse(dto: TanResponseDto): ResponseHolder<*> {
+        tanRequests.remove(dto.tanRequestId)?.let { enterTanContext ->
+            val responseHolder = enterTanContext.responseHolder
+            responseHolder.resetAfterEnteringTan()
 
-        val client = getClient(bank, result, countDownLatch)
+            enterTanContext.enterTanResult.set(dto.enterTanResult)
+            enterTanContext.countDownLatch.countDown()
 
-        executeRequest(client) { response ->
-            result.set(response)
-            countDownLatch.countDown()
+            responseHolder.waitForResponse()
+
+            return responseHolder
         }
 
-        countDownLatch.await()
-
-        return result.get()
+        return ResponseHolder<Any>("No TAN request found for TAN Request ID '${dto.tanRequestId}'")
     }
 
-    private fun <T> getClient(bank: BankData, result: AtomicReference<T>, countDownLatch: CountDownLatch): FinTsClientForCustomer {
+
+    protected fun <T> getAsyncResponse(bank: BankData, executeRequest: (FinTsClientForCustomer, ((T) -> Unit)) -> Unit): ResponseHolder<T> {
+        val responseHolder = ResponseHolder<T>()
+
+        val client = getClient(bank, responseHolder)
+
+        executeRequest(client) { response ->
+            responseHolder.setResponse(response)
+        }
+
+        responseHolder.waitForResponse()
+
+        return responseHolder
+    }
+
+    private fun <T> getClient(bank: BankData, responseHolder: ResponseHolder<T>): FinTsClientForCustomer {
         val cacheKey = getCacheKey(bank.bankCode, bank.customerId)
 
         clientCache[cacheKey]?.let {
+            // TODO: this will not work for two parallel calls for the same account if both calls require entering a TAN as second one overwrites callback and ResponseHolder of first one -> first one blocks forever
+            it.setCallback(createFinTsClientCallback(responseHolder)) // we have to newly create callback otherwise ResponseHolder instance of when client was created is used -> its CountDownLatch would never signal
             return it
         }
 
-//        val client = FinTsClient(SimpleFinTsClientCallback { supportedTanMethods: List<TanMethod>, suggestedTanMethod: TanMethod? ->
-        val client = FinTsClientForCustomer(bank, SimpleFinTsClientCallback({ bank, tanChallenge -> handleEnterTan(bank, tanChallenge, countDownLatch, result) }) { supportedTanMethods, suggestedTanMethod ->
-            suggestedTanMethod
-        })
+        val client = FinTsClientForCustomer(bank, createFinTsClientCallback(responseHolder))
 
         clientCache[cacheKey] = client
 
         return client
     }
 
-    protected fun <T> handleEnterTan(bank: BankData, tanChallenge: TanChallenge, originatingRequestLatch: CountDownLatch, originatingRequestResult: AtomicReference<T>): EnterTanResult {
+    private fun <T> createFinTsClientCallback(responseHolder: ResponseHolder<T>): FinTsClientCallback {
+        return SimpleFinTsClientCallback({ bank, tanChallenge -> handleEnterTan(bank, tanChallenge, responseHolder) }) { supportedTanMethods, suggestedTanMethod ->
+            suggestedTanMethod
+        }
+    }
+
+    protected fun <T> handleEnterTan(bank: BankData, tanChallenge: TanChallenge, responseHolder: ResponseHolder<T>): EnterTanResult {
         val enterTanResult = AtomicReference<EnterTanResult>()
         val enterTanLatch = CountDownLatch(1)
 
         val tanRequestId = UUID.randomUUID().toString()
 
-        // TODO: find a solution for returning TAN challenge to caller
-        //originatingRequestResult.set(EnteringTanRequested(tanRequestId, bank, tanChallenge))
-        originatingRequestLatch.countDown()
+        tanRequests.put(tanRequestId, EnterTanContext(enterTanResult, responseHolder, enterTanLatch))
 
-        tanRequests.put(tanRequestId, EnterTanContext(enterTanResult, enterTanLatch))
+        responseHolder.setEnterTanRequest(EnteringTanRequested(tanRequestId, tanChallenge))
 
         enterTanLatch.await()
 
@@ -146,10 +171,23 @@ class fints4kService {
         return Pair(bank, null)
     }
 
-    protected fun findAccount(credentials: BankAccessData, accountDto: AccountRequestDto): AccountData? {
-        return getCachedClient(credentials)?.bank?.accounts?.firstOrNull { it.accountIdentifier == accountDto.identifier }
+
+    protected fun getAccounts(bank: BankData): List<AccountData>? {
+        getCachedClient(bank)?.bank?.accounts?.let {
+            return it
+        }
+
+        val addAccountResponse = getAccountData(bank)
+
+        return addAccountResponse.response?.bank?.accounts
     }
 
+
+    private fun getCachedClient(bank: BankData): FinTsClientForCustomer? {
+        val cacheKey = getCacheKey(bank.bankCode, bank.customerId)
+
+        return clientCache[cacheKey]
+    }
 
     private fun getCachedClient(credentials: BankAccessData): FinTsClientForCustomer? {
         val cacheKey = getCacheKey(credentials.bankCode, credentials.loginName)

@@ -4,12 +4,27 @@ import net.dankito.banking.fints.model.*
 import net.dankito.banking.fints.response.client.AddAccountResponse
 import net.dankito.banking.fints.response.client.FinTsClientResponse
 import net.dankito.banking.fints.response.client.GetTransactionsResponse
+import net.dankito.banking.fints.rest.model.ResponseHolder
 import net.dankito.banking.fints.rest.model.dto.response.*
+import net.dankito.banking.fints.rest.service.model.GetAccountsTransactionsResponse
 import java.math.BigDecimal
 import javax.ws.rs.InternalServerErrorException
 
 
 open class DtoMapper {
+
+    fun <DomainType, DtoType> createRestResponse(responseHolder: ResponseHolder<DomainType>, responseMapper: (DomainType) -> DtoType): RestResponse<DtoType> {
+        responseHolder.response?.let { response ->
+            return RestResponse.success(responseMapper(response))
+        }
+
+        responseHolder.enterTanRequest?.let { enterTanRequest ->
+            return RestResponse.requiresTan(enterTanRequest)
+        }
+
+        return RestResponse.error(responseHolder.error ?: "Unknown error")
+    }
+
 
     open fun map(response: AddAccountResponse): AddAccountResponseDto {
         return AddAccountResponseDto(
@@ -38,20 +53,21 @@ open class DtoMapper {
     }
 
 
-    open fun mapTransactions(accountsTransactions: List<GetTransactionsResponse>?): GetAccountsTransactionsResponseDto {
+    open fun map(response: GetAccountsTransactionsResponse?): GetAccountsTransactionsResponseDto {
+        // TODO: is this still the case?
         // TODO: if a TAN is required then accountsTransactions contains null value(s) (but why?) -> application crashes
-        if (accountsTransactions == null) {
+        if (response == null) {
             throw InternalServerErrorException("Could not fetch account transactions. Either TAN hasn't been entered or developers made a mistake.")
         }
 
-        return GetAccountsTransactionsResponseDto(accountsTransactions.mapNotNull { map(it) }) // TODO: is this correct removing accounts from result for which no transactions have been retrieved?
+        return GetAccountsTransactionsResponseDto(
+            // TODO: is this correct removing accounts from result for which no transactions have been retrieved?
+            response.transactionsPerAccount.filter { it.response?.retrievedData?.isNotEmpty() != false }
+                .map { createRestResponse(it) { transactionsResponse -> mapTransactions(transactionsResponse) } }
+        )
     }
 
-    open fun map(accountTransactions: GetTransactionsResponse): GetAccountTransactionsResponseDto? {
-        if (accountTransactions.retrievedData.isEmpty()) {
-            return null
-        }
-
+    open fun mapTransactions(accountTransactions: GetTransactionsResponse): GetAccountTransactionsResponseDto {
         val retrievedData = accountTransactions.retrievedData.first()
         val balance = mapNullable(retrievedData.balance)
         val bookedTransactions = map(retrievedData.bookedTransactions)

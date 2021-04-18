@@ -6,8 +6,9 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.atomic.AtomicReference
 
 
-open class EnterTanContext(
-    open val enterTanResult: AtomicReference<EnterTanResult>,
-    open val countDownLatch: CountDownLatch,
-    open val tanRequestedTimeStamp: Date = Date()
+class EnterTanContext(
+    val enterTanResult: AtomicReference<EnterTanResult>,
+    val responseHolder: ResponseHolder<*>,
+    val countDownLatch: CountDownLatch,
+    val tanRequestedTimeStamp: Date = Date()
 )
