@@ -36,6 +36,10 @@ open class FinTsClientForCustomer(
     open val messageLogWithoutSensitiveData: List<MessageLogEntry>
         get() = client.messageLogWithoutSensitiveData
 
+    open fun setCallback(callback: FinTsClientCallback) {
+        client.setCallback(callback)
+    }
+
 
     open fun addAccountAsync(callback: (AddAccountResponse) -> Unit) {
         addAccountAsync(bank.toAddAccountParameter(), callback)

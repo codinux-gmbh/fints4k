@@ -17,7 +17,7 @@ import net.dankito.utils.multiplatform.Date
  * [addAccountAsync] gets user's TAN methods, user's TAN media, user's bank accounts and may even current balance and account transactions of last 90 days.
  */
 open class FinTsClient(
-    protected open val jobExecutor: FinTsJobExecutor
+    protected open val jobExecutor: FinTsJobExecutor // TODO: recreate when callback is set to avoid multithreading issues - but use its configured instances like RequestExecutor
 ) {
 
     companion object {
@@ -30,6 +30,10 @@ open class FinTsClient(
 
     open val messageLogWithoutSensitiveData: List<MessageLogEntry>
         get() = jobExecutor.messageLogWithoutSensitiveData
+
+    open fun setCallback(callback: FinTsClientCallback) {
+        jobExecutor.callback = callback
+    }
 
 
     /**

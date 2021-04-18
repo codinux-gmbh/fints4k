@@ -31,7 +31,7 @@ import net.dankito.utils.multiplatform.ObjectReference
  * In almost all cases you want to use [FinTsClient] which wraps these business transactions to a higher level API.
  */
 open class FinTsJobExecutor(
-    protected open val callback: FinTsClientCallback,
+    open var callback: FinTsClientCallback,
     protected open val requestExecutor: RequestExecutor = RequestExecutor(),
     protected open val messageBuilder: MessageBuilder = MessageBuilder(),
     protected open val mt940Parser: IAccountTransactionsParser = Mt940AccountTransactionsParser(),
