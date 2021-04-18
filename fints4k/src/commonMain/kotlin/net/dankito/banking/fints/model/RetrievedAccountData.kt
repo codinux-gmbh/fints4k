@@ -30,4 +30,9 @@ open class RetrievedAccountData(
 
     }
 
+
+    override fun toString(): String {
+        return "Was retrieving AccountData for ${account.accountIdentifier} successful? $successfullyRetrievedData. Balance = ${balance}, ${bookedTransactions.size} transactions"
+    }
+
 }

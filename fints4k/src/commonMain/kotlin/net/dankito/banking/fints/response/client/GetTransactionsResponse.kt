@@ -23,4 +23,9 @@ open class GetTransactionsResponse(
         get() = super.errorMessage
             ?: retrievedData.mapNotNull { it.errorMessage }.firstOrNull()
 
+
+    override fun toString(): String {
+        return super.toString() + ": Retrieved data: $retrievedData"
+    }
+
 }
