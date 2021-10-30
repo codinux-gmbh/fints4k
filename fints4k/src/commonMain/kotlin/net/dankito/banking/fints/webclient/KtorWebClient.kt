@@ -28,6 +28,7 @@ open class KtorWebClient : IWebClient {
         try {
             client.close()
         } catch (e: Exception) {
+            log.error(e) { "Could not close client" }
             // Cancel after timeout
             client.cancel()
         }
