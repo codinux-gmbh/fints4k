@@ -196,7 +196,7 @@ open class FinTsJobExecutor(
             else {
                 mayGetBalance(parameter, dialogContext) { balanceResponse ->
                     if (dialogContext.didBankCloseDialog) {
-                        callback(GetTransactionsResponse(balanceResponse, RetrievedAccountData.unsuccessfulList(parameter.account)))
+                        callback(GetTransactionsResponse(balanceResponse ?: initDialogResponse, RetrievedAccountData.unsuccessfulList(parameter.account)))
                     }
                     else {
                         getTransactionsAfterInitAndGetBalance(parameter, dialogContext, balanceResponse, callback)
@@ -207,8 +207,8 @@ open class FinTsJobExecutor(
     }
 
     protected open fun getTransactionsAfterInitAndGetBalance(parameter: GetTransactionsParameter, dialogContext: DialogContext,
-                                                             balanceResponse: BankResponse, callback: (GetTransactionsResponse) -> Unit) {
-        var balance: Money? = balanceResponse.getFirstSegmentById<BalanceSegment>(InstituteSegmentId.Balance)?.let {
+                                                             balanceResponse: BankResponse?, callback: (GetTransactionsResponse) -> Unit) {
+        var balance: Money? = balanceResponse?.getFirstSegmentById<BalanceSegment>(InstituteSegmentId.Balance)?.let {
             Money(it.balance, it.currency)
         }
         val bookedTransactions = mutableSetOf<AccountTransaction>()
@@ -255,7 +255,7 @@ open class FinTsJobExecutor(
         }
     }
 
-    protected open fun mayGetBalance(parameter: GetTransactionsParameter, dialogContext: DialogContext, callback: (BankResponse) -> Unit) {
+    protected open fun mayGetBalance(parameter: GetTransactionsParameter, dialogContext: DialogContext, callback: (BankResponse?) -> Unit) {
         if (parameter.alsoRetrieveBalance && parameter.account.supportsRetrievingBalance) {
             val message = messageBuilder.createGetBalanceMessage(parameter.account, dialogContext)
 
@@ -264,8 +264,7 @@ open class FinTsJobExecutor(
             }
         }
         else {
-            callback(BankResponse(false, errorMessage = "Either not requested to get balance or account does not support retrieving balance. " +
-                    "Should retrieve balance = ${parameter.alsoRetrieveBalance}, account supports retrieving balance = ${parameter.account.supportsRetrievingBalance}."))
+            callback(null)
         }
     }
 
