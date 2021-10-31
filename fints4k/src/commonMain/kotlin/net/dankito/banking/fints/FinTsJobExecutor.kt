@@ -110,7 +110,15 @@ open class FinTsJobExecutor(
         getAndHandleResponseForMessage(message, dialogContext) { response ->
             closeDialog(dialogContext)
 
-            handleGetUsersTanMethodsResponse(response, dialogContext, callback)
+            handleGetUsersTanMethodsResponse(response, dialogContext) { getTanMethodsResponse ->
+                if (bank.tanMethodsAvailableForUser.isEmpty()) { // could not retrieve supported tan methods for user
+                    callback(BankResponse(false, noTanMethodSelected = true))
+                } else {
+                    getUsersTanMethod(bank) {
+                        callback(BankResponse(bank.isTanMethodSelected, noTanMethodSelected = !!!bank.isTanMethodSelected))
+                    }
+                }
+            }
         }
     }
 
@@ -632,15 +640,8 @@ open class FinTsJobExecutor(
     protected open fun ensureTanMethodIsSelected(bank: BankData, callback: (BankResponse) -> Unit) {
         if (bank.isTanMethodSelected == false) {
             if (bank.tanMethodsAvailableForUser.isEmpty()) {
-                retrieveBasicDataLikeUsersTanMethods(bank) {
-                    if (bank.tanMethodsAvailableForUser.isEmpty()) { // could not retrieve supported tan methods for user
-                        callback(BankResponse(false, noTanMethodSelected = true))
-                    }
-                    else {
-                        getUsersTanMethod(bank) {
-                            callback(BankResponse(bank.isTanMethodSelected, noTanMethodSelected = !!!bank.isTanMethodSelected))
-                        }
-                    }
+                retrieveBasicDataLikeUsersTanMethods(bank) { retrieveBasicDataResponse ->
+                    callback(retrieveBasicDataResponse)
                 }
             }
             else {

@@ -74,22 +74,14 @@ open class FinTsClient(
                 return@retrieveBasicDataLikeUsersTanMethods
             }
 
-            jobExecutor.getUsersTanMethod(bank) { didSelectTanMethod ->
+            /*      Second dialog: some banks require that in order to initialize a dialog with strong customer authorization TAN media is required       */
 
-                if (didSelectTanMethod == false) {
-                    callback(AddAccountResponse(BankResponse(false), bank))
-                    return@getUsersTanMethod
-                }
-
-                /*      Second dialog: some banks require that in order to initialize a dialog with strong customer authorization TAN media is required       */
-
-                if (jobExecutor.isJobSupported(bank, CustomerSegmentId.TanMediaList)) {
-                    getTanMediaList(bank, TanMedienArtVersion.Alle, TanMediumKlasse.AlleMedien) {
-                        addAccountGetAccountsAndTransactions(parameter, bank, callback)
-                    }
-                } else {
+            if (jobExecutor.isJobSupported(bank, CustomerSegmentId.TanMediaList)) {
+                getTanMediaList(bank, TanMedienArtVersion.Alle, TanMediumKlasse.AlleMedien) {
                     addAccountGetAccountsAndTransactions(parameter, bank, callback)
                 }
+            } else {
+                addAccountGetAccountsAndTransactions(parameter, bank, callback)
             }
         }
     }
