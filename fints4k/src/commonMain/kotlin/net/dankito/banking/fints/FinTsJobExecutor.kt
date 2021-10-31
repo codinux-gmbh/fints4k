@@ -194,6 +194,9 @@ open class FinTsJobExecutor(
                 callback(GetTransactionsResponse(initDialogResponse, RetrievedAccountData.unsuccessfulList(parameter.account)))
             }
             else {
+                // we now retrieved the fresh account information from FinTS server, use that one
+                 parameter.account = getUpdatedAccount(bank, parameter.account)
+
                 mayGetBalance(parameter, dialogContext) { balanceResponse ->
                     if (dialogContext.didBankCloseDialog) {
                         callback(GetTransactionsResponse(balanceResponse ?: initDialogResponse, RetrievedAccountData.unsuccessfulList(parameter.account)))
@@ -204,6 +207,10 @@ open class FinTsJobExecutor(
                 }
             }
         }
+    }
+
+    private fun getUpdatedAccount(bank: BankData, account: AccountData): AccountData {
+        return bank.accounts.firstOrNull { it.accountIdentifier == account.accountIdentifier } ?: account
     }
 
     protected open fun getTransactionsAfterInitAndGetBalance(parameter: GetTransactionsParameter, dialogContext: DialogContext,
@@ -352,7 +359,8 @@ open class FinTsJobExecutor(
     open fun doBankTransferAsync(bankTransferData: BankTransferData, bank: BankData, account: AccountData, callback: (FinTsClientResponse) -> Unit) {
 
         sendMessageAndHandleResponse(bank, null, true, { dialogContext ->
-            messageBuilder.createBankTransferMessage(bankTransferData, account, dialogContext)
+            val updatedAccount = getUpdatedAccount(bank, account)
+            messageBuilder.createBankTransferMessage(bankTransferData, updatedAccount, dialogContext)
         }) { response ->
             callback(FinTsClientResponse(response))
         }
