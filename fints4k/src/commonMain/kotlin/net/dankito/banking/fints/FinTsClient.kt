@@ -76,13 +76,7 @@ open class FinTsClient(
 
             /*      Second dialog: some banks require that in order to initialize a dialog with strong customer authorization TAN media is required       */
 
-            if (jobExecutor.isJobSupported(bank, CustomerSegmentId.TanMediaList)) {
-                getTanMediaList(bank, TanMedienArtVersion.Alle, TanMediumKlasse.AlleMedien) {
-                    addAccountGetAccountsAndTransactions(parameter, bank, callback)
-                }
-            } else {
-                addAccountGetAccountsAndTransactions(parameter, bank, callback)
-            }
+            addAccountGetAccountsAndTransactions(parameter, bank, callback)
         }
     }
 

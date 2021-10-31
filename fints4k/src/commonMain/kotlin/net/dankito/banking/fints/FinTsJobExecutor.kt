@@ -115,7 +115,15 @@ open class FinTsJobExecutor(
                     callback(BankResponse(false, noTanMethodSelected = true))
                 } else {
                     getUsersTanMethod(bank) {
-                        callback(BankResponse(bank.isTanMethodSelected, noTanMethodSelected = !!!bank.isTanMethodSelected))
+                        if (bank.isTanMethodSelected == false) {
+                            callback(BankResponse(false, noTanMethodSelected = true))
+                        } else if (bank.tanMedia.isEmpty() && isJobSupported(bank, CustomerSegmentId.TanMediaList)) { // tan media not retrieved yet
+                            getTanMediaList(bank, TanMedienArtVersion.Alle, TanMediumKlasse.AlleMedien) {
+                                callback(getTanMethodsResponse) // TODO: judge if bank requires selecting TAN media and if though evaluate getTanMediaListResponse
+                            }
+                        } else {
+                            callback(getTanMethodsResponse)
+                        }
                     }
                 }
             }
