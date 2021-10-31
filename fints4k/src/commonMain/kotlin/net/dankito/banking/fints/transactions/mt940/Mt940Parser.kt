@@ -345,7 +345,7 @@ open class Mt940Parser : IMt940Parser {
         val reference = if (isFormattedReference(referenceParts)) joinReferenceParts(referenceParts)
                     else referenceParts.joinToString(" ")
 
-        val otherPartyNameString = if (otherPartyName.isEmpty()) null else otherPartyName.toString()
+        val otherPartyNameString = if (otherPartyName.isBlank()) null else otherPartyName.toString()
 
         return InformationToAccountOwner(
             reference, otherPartyNameString, otherPartyBankCode, otherPartyAccountId,
