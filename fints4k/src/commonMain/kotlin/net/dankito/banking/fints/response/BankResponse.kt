@@ -18,11 +18,11 @@ open class BankResponse(
      */
     val errorMessage: String? = null,
     val noTanMethodSelected: Boolean = false,
-    val messageCreationError: MessageBuilderResult? = null
+    val messageThatCouldNotBeCreated: MessageBuilderResult? = null // i think that can be removed
 ) {
 
     open val couldCreateMessage: Boolean
-        get() = messageCreationError == null
+        get() = messageThatCouldNotBeCreated == null
 
     open val responseContainsErrors: Boolean
         get() = errorMessage == null &&

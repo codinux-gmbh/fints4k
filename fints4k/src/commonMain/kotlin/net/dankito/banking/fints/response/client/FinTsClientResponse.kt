@@ -26,6 +26,7 @@ open class FinTsClientResponse(
 
     open val tanRequiredButWeWereToldToAbortIfSo: Boolean = false,
 
+    // i think they can be removed
     open val isJobAllowed: Boolean = true,
     open val isJobVersionSupported: Boolean = true,
     open val allowedVersions: List<Int> = listOf(),
@@ -37,10 +38,10 @@ open class FinTsClientResponse(
         response.isStrongAuthenticationRequired, response.tanResponse, response.errorsToShowToUser,
         response.errorMessage, response.wrongCredentialsEntered,
         response.tanRequiredButUserDidNotEnterOne, response.tanRequiredButWeWereToldToAbortIfSo,
-        response.messageCreationError?.isJobAllowed ?: true,
-        response.messageCreationError?.isJobVersionSupported ?: true,
-        response.messageCreationError?.allowedVersions ?: listOf(),
-        response.messageCreationError?.supportedVersions ?: listOf())
+        response.messageThatCouldNotBeCreated?.isJobAllowed ?: true,
+        response.messageThatCouldNotBeCreated?.isJobVersionSupported ?: true,
+        response.messageThatCouldNotBeCreated?.allowedVersions ?: listOf(),
+        response.messageThatCouldNotBeCreated?.supportedVersions ?: listOf())
 
 
     override fun toString(): String {
