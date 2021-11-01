@@ -171,9 +171,10 @@ open class BankIconFinder : IBankIconFinder {
 
             if (urlEncoded.startsWith("http")) {
                 return urlEncoded
-            }
-            else {
-                return "https://" + urlEncoded
+            } else if (urlEncoded.startsWith("//")) {
+                return "https:$urlEncoded"
+            } else {
+                return "https://$urlEncoded"
             }
         }
 
