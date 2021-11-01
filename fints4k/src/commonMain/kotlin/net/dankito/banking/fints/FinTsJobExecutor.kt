@@ -156,10 +156,10 @@ open class FinTsJobExecutor(
         getAnonymousBankInfo(bank) { anonymousBankInfoResponse ->
             if (anonymousBankInfoResponse.successful == false) {
                 callback(anonymousBankInfoResponse)
-            } else if (bank.tanMethodSupportedByBank.isEmpty()) { // should only be a theoretical error
+            } else if (bank.tanMethodsSupportedByBank.isEmpty()) { // should only be a theoretical error
                 callback(BankResponse(true, internalError = "Die TAN Verfahren der Bank konnten nicht ermittelt werden")) // TODO: translate
             } else {
-                bank.tanMethodsAvailableForUser = bank.tanMethodSupportedByBank
+                bank.tanMethodsAvailableForUser = bank.tanMethodsSupportedByBank
 
                 getUsersTanMethod(bank) { didSelectTanMethod ->
                     if (didSelectTanMethod) {
@@ -622,11 +622,11 @@ open class FinTsJobExecutor(
 
 
     protected open fun ensureBasicBankDataRetrieved(bank: BankData, callback: (BankResponse) -> Unit) {
-        if (bank.tanMethodSupportedByBank.isEmpty() || bank.supportedJobs.isEmpty()) {
+        if (bank.tanMethodsSupportedByBank.isEmpty() || bank.supportedJobs.isEmpty()) {
             retrieveBasicDataLikeUsersTanMethods(bank) { getBankInfoResponse ->
                 if (getBankInfoResponse.successful == false) {
                     callback(getBankInfoResponse)
-                } else if (bank.tanMethodSupportedByBank.isEmpty() || bank.supportedJobs.isEmpty()) {
+                } else if (bank.tanMethodsSupportedByBank.isEmpty() || bank.supportedJobs.isEmpty()) {
                     callback(BankResponse(false, internalError =
                     "Could not retrieve basic bank data like supported tan methods or supported jobs")) // TODO: translate // TODO: add as messageToShowToUser
                 } else {

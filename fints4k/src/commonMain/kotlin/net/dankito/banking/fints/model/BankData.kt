@@ -17,14 +17,14 @@ open class BankData(
     open var bic: String,
 
     open var bankName: String = "",
-    open var countryCode: Int = Laenderkennzeichen.Germany, // TODO: currently there are only German banks. But change this if ever other countries get supported
+    open var countryCode: Int = Laenderkennzeichen.Germany, // TODO: currently we only support German banks. But change this if ever other countries get supported
     open var bpdVersion: Int = BPDVersion.VersionNotReceivedYet,
 
     open var userId: String = customerId,
     open var customerName: String = "",
     open var updVersion: Int = UPDVersion.VersionNotReceivedYet,
 
-    open var tanMethodSupportedByBank: List<TanMethod> = listOf(),
+    open var tanMethodsSupportedByBank: List<TanMethod> = listOf(),
     open var tanMethodsAvailableForUser: List<TanMethod> = listOf(),
     open var selectedTanMethod: TanMethod = TanMethodNotSelected,
     open var tanMedia: List<TanMedium> = listOf(),

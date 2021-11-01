@@ -19,8 +19,6 @@ import net.dankito.banking.fints.response.client.AddAccountResponse
 import net.dankito.banking.fints.response.client.FinTsClientResponse
 import net.dankito.banking.fints.response.client.GetTanMediaListResponse
 import net.dankito.banking.fints.response.client.GetTransactionsResponse
-import net.dankito.banking.fints.util.PureKotlinBase64Service
-import net.dankito.banking.fints.webclient.KtorWebClient
 import net.dankito.utils.multiplatform.Date
 import net.dankito.utils.multiplatform.DateFormatter
 import net.dankito.utils.multiplatform.UUID
@@ -94,7 +92,7 @@ open class FinTsClientTestBase {
             // then
             expect(result.successful).isTrue()
             expect(BankDataAnonymous.supportedHbciVersions).isNotEmpty()
-            expect(BankDataAnonymous.tanMethodSupportedByBank).isNotEmpty()
+            expect(BankDataAnonymous.tanMethodsSupportedByBank).isNotEmpty()
             expect(BankDataAnonymous.supportedJobs).isNotEmpty()
             expect(BankDataAnonymous.supportedLanguages).isNotEmpty()
             expect(BankDataAnonymous.bankName).isNotEmpty()
@@ -127,7 +125,7 @@ open class FinTsClientTestBase {
 
         expect(Bank.bankName).isNotEmpty()
         expect(Bank.supportedJobs).isNotEmpty() // supported jobs are now known
-        expect(Bank.tanMethodSupportedByBank).isNotEmpty() // supported tan methods are now known
+        expect(Bank.tanMethodsSupportedByBank).isNotEmpty() // supported tan methods are now known
         expect(Bank.supportedHbciVersions).isNotEmpty() // supported HBIC versions are now known
         expect(Bank.supportedLanguages).isNotEmpty() // supported languages are now known
 

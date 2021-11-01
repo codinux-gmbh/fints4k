@@ -1,7 +1,6 @@
 package net.dankito.banking.fints.bankdetails
 
 import kotlinx.coroutines.runBlocking
-import net.dankito.banking.fints.FinTsClient
 import net.dankito.banking.bankfinder.InMemoryBankFinder
 import net.dankito.banking.fints.callback.NoOpFinTsClientCallback
 import net.dankito.banking.fints.messages.MessageBuilder
@@ -20,7 +19,6 @@ import net.dankito.banking.fints.response.segments.SepaAccountInfoParameters
 import net.dankito.banking.fints.response.segments.TanInfo
 import net.dankito.banking.fints.response.segments.TanMethodParameters
 import net.dankito.banking.fints.util.*
-import net.dankito.banking.fints.webclient.KtorWebClient
 import org.apache.commons.csv.CSVFormat
 import org.apache.commons.csv.CSVPrinter
 import org.junit.Ignore
@@ -186,7 +184,7 @@ class BanksFinTsDetailsRetriever {
 
         csvPrinter.printRecord(bankInfo.bankCode, bankInfo.name, bankInfo.city,
             bank.bpdVersion,
-            bank.tanMethodSupportedByBank.joinToString(", ") { it.securityFunction.code + ": " + it.displayName + " (" + it.type + ")" },
+            bank.tanMethodsSupportedByBank.joinToString(", ") { it.securityFunction.code + ": " + it.displayName + " (" + it.type + ")" },
             supportedTanMethods.joinToString(", "),
             hhd13Supported,
             hhd14Supported,

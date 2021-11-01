@@ -40,7 +40,7 @@ open class ModelMapper(
         }
 
         response.getFirstSegmentById<TanInfo>(InstituteSegmentId.TanInfo)?.let { tanInfo ->
-            bank.tanMethodSupportedByBank = mapToTanMethods(tanInfo)
+            bank.tanMethodsSupportedByBank = mapToTanMethods(tanInfo)
         }
 
         response.getFirstSegmentById<CommunicationInfo>(InstituteSegmentId.CommunicationInfo)?.let { communicationInfo ->
@@ -161,7 +161,7 @@ open class ModelMapper(
     }
 
     protected open fun findTanMethod(securityFunction: Sicherheitsfunktion, bank: BankData): TanMethod? {
-        return bank.tanMethodSupportedByBank.firstOrNull { it.securityFunction == securityFunction }
+        return bank.tanMethodsSupportedByBank.firstOrNull { it.securityFunction == securityFunction }
     }
 
     protected open fun setAllowedJobsForAccount(bank: BankData, account: AccountData, supportedJobs: List<JobParameters>) {
