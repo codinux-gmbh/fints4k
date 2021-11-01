@@ -11,6 +11,7 @@ import net.dankito.banking.fints.transactions.IAccountTransactionsParser
 import net.dankito.banking.fints.transactions.Mt940AccountTransactionsParser
 import net.dankito.banking.fints.util.IBase64Service
 import net.dankito.banking.fints.util.PureKotlinBase64Service
+import net.dankito.banking.fints.util.TanMethodSelector
 import net.dankito.banking.fints.webclient.IWebClient
 import net.dankito.banking.fints.webclient.KtorWebClient
 
@@ -22,6 +23,7 @@ open class FinTsClientForCustomer(
     messageBuilder: MessageBuilder = MessageBuilder(),
     mt940Parser: IAccountTransactionsParser = Mt940AccountTransactionsParser(),
     modelMapper: ModelMapper = ModelMapper(messageBuilder),
+    protected open val tanMethodSelector: TanMethodSelector = TanMethodSelector(),
     product: ProductData = ProductData("15E53C26816138699C7B6A3E8", "1.0.0") // TODO: get version dynamically)
 ) {
 
@@ -30,7 +32,7 @@ open class FinTsClientForCustomer(
             : this(bank, callback, RequestExecutor(MessageBuilder(), webClient, base64Service))
 
 
-    protected val client = FinTsClient(FinTsJobExecutor(callback, requestExecutor, messageBuilder, mt940Parser, modelMapper, product))
+    protected val client = FinTsClient(FinTsJobExecutor(callback, requestExecutor, messageBuilder, mt940Parser, modelMapper, tanMethodSelector, product))
 
 
     open val messageLogWithoutSensitiveData: List<MessageLogEntry>

@@ -20,6 +20,7 @@ import net.dankito.banking.fints.tan.FlickerCodeDecoder
 import net.dankito.banking.fints.tan.TanImageDecoder
 import net.dankito.banking.fints.transactions.IAccountTransactionsParser
 import net.dankito.banking.fints.transactions.Mt940AccountTransactionsParser
+import net.dankito.banking.fints.util.TanMethodSelector
 import net.dankito.utils.multiplatform.log.LoggerFactory
 import net.dankito.utils.multiplatform.Date
 import net.dankito.utils.multiplatform.ObjectReference
@@ -36,6 +37,7 @@ open class FinTsJobExecutor(
     protected open val messageBuilder: MessageBuilder = MessageBuilder(),
     protected open val mt940Parser: IAccountTransactionsParser = Mt940AccountTransactionsParser(),
     protected open val modelMapper: ModelMapper = ModelMapper(messageBuilder),
+    protected open val tanMethodSelector: TanMethodSelector = TanMethodSelector(),
     protected open val product: ProductData = ProductData("15E53C26816138699C7B6A3E8", "1.0.0") // TODO: get version dynamically
 ) {
 
@@ -680,14 +682,15 @@ open class FinTsJobExecutor(
             done(true)
         }
         else {
-            findPreferredTanMethod(bank, preferredTanMethods)?.let {
+            tanMethodSelector.findPreferredTanMethod(bank.tanMethodsAvailableForUser, preferredTanMethods)?.let {
                 bank.selectedTanMethod = it
                 done(true)
                 return
             }
 
             // we know user's supported tan methods, now ask user which one to select
-            callback.askUserForTanMethod(bank.tanMethodsAvailableForUser, selectSuggestedTanMethod(bank)) { selectedTanMethod ->
+            val suggestedTanMethod = tanMethodSelector.getSuggestedTanMethod(bank.tanMethodsAvailableForUser)
+            callback.askUserForTanMethod(bank.tanMethodsAvailableForUser, suggestedTanMethod) { selectedTanMethod ->
                 if (selectedTanMethod != null) {
                     bank.selectedTanMethod = selectedTanMethod
                     done(true)
@@ -697,23 +700,6 @@ open class FinTsJobExecutor(
                 }
             }
         }
-    }
-
-    private fun findPreferredTanMethod(bank: BankData, preferredTanMethods: List<TanMethodType>?): TanMethod? {
-        preferredTanMethods?.forEach { preferredTanMethodType ->
-            bank.tanMethodsAvailableForUser.firstOrNull { it.type == preferredTanMethodType }?.let {
-                return it
-            }
-        }
-
-        return null
-    }
-
-    protected open fun selectSuggestedTanMethod(bank: BankData): TanMethod? {
-        return bank.tanMethodsAvailableForUser.firstOrNull { it.type != TanMethodType.ChipTanUsb && it.type != TanMethodType.SmsTan && it.type != TanMethodType.ChipTanManuell }
-            ?: bank.tanMethodsAvailableForUser.firstOrNull { it.type != TanMethodType.ChipTanUsb && it.type != TanMethodType.SmsTan }
-            ?: bank.tanMethodsAvailableForUser.firstOrNull { it.type != TanMethodType.ChipTanUsb }
-            ?: bank.tanMethodsAvailableForUser.firstOrNull()
     }
 
 
