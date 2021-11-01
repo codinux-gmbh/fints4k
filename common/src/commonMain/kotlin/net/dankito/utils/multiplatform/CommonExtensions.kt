@@ -22,6 +22,27 @@ fun Date.isBeforeOrEquals(other: Date): Boolean {
 }
 
 
+fun Throwable.getAllExceptionMessagesJoined(maxDepth: Int = 5): String {
+    return getAllExceptionMessages(maxDepth).joinToString("\n")
+}
+
+fun Throwable.getAllExceptionMessages(maxDepth: Int = 5): List<String> {
+    val exceptionMessages = mutableSetOf<String>()
+    var innerException: Throwable? = this
+    var depth = 0
+
+    do {
+        innerException?.message?.let { message ->
+            exceptionMessages.add("${innerException!!::class.simpleName}: $message")
+        }
+
+        innerException = innerException?.cause
+        depth++
+    } while (innerException != null && depth < maxDepth)
+
+    return exceptionMessages.toList()
+}
+
 fun Throwable.getInnerExceptionMessage(maxDepth: Int = 3): String {
     return this.getInnerException(maxDepth).message ?: ""
 }

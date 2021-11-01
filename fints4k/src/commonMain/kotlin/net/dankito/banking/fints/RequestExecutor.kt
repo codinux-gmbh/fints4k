@@ -13,7 +13,7 @@ import net.dankito.banking.fints.util.PureKotlinBase64Service
 import net.dankito.banking.fints.webclient.IWebClient
 import net.dankito.banking.fints.webclient.KtorWebClient
 import net.dankito.banking.fints.webclient.WebClientResponse
-import net.dankito.utils.multiplatform.getInnerExceptionMessage
+import net.dankito.utils.multiplatform.getAllExceptionMessagesJoined
 import net.dankito.utils.multiplatform.log.Logger
 import net.dankito.utils.multiplatform.log.LoggerFactory
 
@@ -130,7 +130,7 @@ open class RequestExecutor(
             } catch (e: Exception) {
                 logError("Could not decode responseBody:\r\n'$responseBody'", dialogContext, e)
 
-                return BankResponse(false, internalError = e.getInnerExceptionMessage())
+                return BankResponse(false, internalError = e.getAllExceptionMessagesJoined())
             }
         }
         else {
@@ -138,7 +138,7 @@ open class RequestExecutor(
             logError("Request to $bank (${bank.finTs3ServerAddress}) failed", dialogContext, webResponse.error)
         }
 
-        return BankResponse(false, internalError = webResponse.error?.getInnerExceptionMessage())
+        return BankResponse(false, internalError = webResponse.error?.getAllExceptionMessagesJoined())
     }
 
     protected open fun decodeBase64Response(responseBody: String): String {

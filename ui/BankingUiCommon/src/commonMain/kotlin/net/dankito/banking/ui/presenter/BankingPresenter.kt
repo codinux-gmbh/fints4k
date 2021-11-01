@@ -35,7 +35,6 @@ import net.dankito.banking.util.extraction.NoOpTextExtractorRegistry
 import net.codinux.banking.tools.epcqrcode.*
 import net.dankito.banking.service.testaccess.TestAccessBankingClientCreator
 import net.dankito.utils.multiplatform.*
-import net.dankito.utils.multiplatform.getInnerExceptionMessage
 import net.dankito.utils.multiplatform.log.LoggerFactory
 import net.dankito.utils.multiplatform.os.DeviceInfo
 import net.dankito.utils.multiplatform.os.DeviceInfoRetriever
@@ -864,7 +863,7 @@ open class BankingPresenter(
 
                 log.info("Response: $response")
             } catch (e: Exception) {
-                log.error("Could not create ticket directly: ${e.getInnerExceptionMessage()}", e)
+                log.error("Could not create ticket directly: ${e.getAllExceptionMessagesJoined()}", e)
             }
         }
     }
