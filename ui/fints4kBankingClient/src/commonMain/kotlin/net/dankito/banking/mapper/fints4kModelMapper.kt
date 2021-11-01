@@ -388,7 +388,15 @@ open class fints4kModelMapper(protected val modelCreator: IModelCreator) {
     }
 
 
-    open fun mapTanMethod(tanMethod: TanMethod): net.dankito.banking.fints.model.TanMethod {
+    open fun mapTanMethod(tanMethod: TanMethod, bank: BankData): net.dankito.banking.fints.model.TanMethod {
+        bank.tanMethodsAvailableForUser.firstOrNull { equals(it, tanMethod) }?.let {
+            return it
+        }
+
+        bank.tanMethodsSupportedByBank.firstOrNull { equals(it, tanMethod) }?.let {
+            return it
+        }
+
         return net.dankito.banking.fints.model.TanMethod(
             tanMethod.displayName,
             Sicherheitsfunktion.values().first { it.code == tanMethod.bankInternalMethodCode },
@@ -396,6 +404,7 @@ open class fints4kModelMapper(protected val modelCreator: IModelCreator) {
             null, // TODO: where to get HDD Version from?
             tanMethod.maxTanInputLength,
             mapAllowedTanFormat(tanMethod.allowedTanFormat)
+            // TODO: also nameOfTanMediumRequired is missing - which is required for some banks like Postbank
         )
     }
 
@@ -422,9 +431,14 @@ open class fints4kModelMapper(protected val modelCreator: IModelCreator) {
         }
     }
 
+    private fun equals(tanMethod: net.dankito.banking.fints.model.TanMethod, uiTanMethod: TanMethod): Boolean {
+        return tanMethod.displayName == uiTanMethod.displayName && tanMethod.securityFunction.code == uiTanMethod.bankInternalMethodCode
+    }
+
+
     open fun mapEnterTanResult(result: EnterTanResult, bank: BankData): net.dankito.banking.fints.model.EnterTanResult {
         result.changeTanMethodTo?.let { changeTanMethodTo ->
-            return net.dankito.banking.fints.model.EnterTanResult.userAsksToChangeTanMethod(mapTanMethod(changeTanMethodTo))
+            return net.dankito.banking.fints.model.EnterTanResult.userAsksToChangeTanMethod(mapTanMethod(changeTanMethodTo, bank))
         }
 
         result.changeTanMediumTo?.let { changeTanMediumTo ->
