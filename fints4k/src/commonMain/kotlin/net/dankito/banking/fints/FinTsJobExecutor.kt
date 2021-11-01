@@ -629,13 +629,12 @@ open class FinTsJobExecutor(
     protected open fun ensureBasicBankDataRetrieved(bank: BankData, callback: (BankResponse) -> Unit) {
         if (bank.tanMethodSupportedByBank.isEmpty() || bank.supportedJobs.isEmpty()) {
             retrieveBasicDataLikeUsersTanMethods(bank) { getBankInfoResponse ->
-                if (getBankInfoResponse.successful == false || bank.tanMethodSupportedByBank.isEmpty()
-                    || bank.supportedJobs.isEmpty()) {
-
+                if (getBankInfoResponse.successful == false) {
+                    callback(getBankInfoResponse)
+                } else if (bank.tanMethodSupportedByBank.isEmpty() || bank.supportedJobs.isEmpty()) {
                     callback(BankResponse(false, errorMessage =
                     "Could not retrieve basic bank data like supported tan methods or supported jobs")) // TODO: translate // TODO: add as messageToShowToUser
-                }
-                else {
+                } else {
                     callback(BankResponse(true))
                 }
             }
