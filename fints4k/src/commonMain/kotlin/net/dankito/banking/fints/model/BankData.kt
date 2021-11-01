@@ -28,6 +28,7 @@ open class BankData(
     open var tanMethodsAvailableForUser: List<TanMethod> = listOf(),
     open var selectedTanMethod: TanMethod = TanMethodNotSelected,
     open var tanMedia: List<TanMedium> = listOf(),
+    open var selectedTanMedium: TanMedium? = null,
     open var changeTanMediumParameters: ChangeTanMediaParameters? = null,
     open var pinInfo: PinInfo? = null,
 

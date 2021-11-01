@@ -332,6 +332,9 @@ open class FinTsJobExecutor(
 
         tanMediaList?.let {
             bank.tanMedia = it.tanMedia
+
+            bank.selectedTanMedium = bank.selectedTanMedium?.let { selected -> bank.tanMedia.firstOrNull { it.mediumName == selected.mediumName } } // try to find selectedTanMedium in new TanMedia instances
+                ?: bank.tanMedia.firstOrNull { it.mediumName != null }
         }
 
         callback(GetTanMediaListResponse(response, tanMediaList))

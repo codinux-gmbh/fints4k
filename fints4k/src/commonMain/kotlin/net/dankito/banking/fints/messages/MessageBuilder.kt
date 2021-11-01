@@ -525,7 +525,7 @@ open class MessageBuilder(protected val generator: ISegmentNumberGenerator = Seg
         val bank = dialogContext.bank
 
         if (bank.isTanMethodSelected && bank.selectedTanMethod.nameOfTanMediumRequired) {
-            return bank.tanMedia.firstOrNull { it.mediumName != null }?.mediumName
+            return bank.selectedTanMedium?.mediumName
         }
 
         return null
