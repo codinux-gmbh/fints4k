@@ -82,6 +82,12 @@ open class BankResponse(
 
     open val segmentFeedbacks: List<SegmentFeedback>
         get() = getSegmentsById(InstituteSegmentId.SegmentFeedback)
+
+    open val warningSegmentFeedbacks: List<SegmentFeedback>
+        get() = segmentFeedbacks.filter { it.isWarning }
+
+    open val errorSegmentFeedbacks: List<SegmentFeedback>
+        get() = segmentFeedbacks.filter { it.isError }
     
     open val aufsetzpunkt: String? // TODO: what to do if there are multiple Aufsetzpunkte?
         get() = segmentFeedbacks.flatMap { it.feedbacks }.filterIsInstance<AufsetzpunktFeedback>().firstOrNull()?.aufsetzpunkt
