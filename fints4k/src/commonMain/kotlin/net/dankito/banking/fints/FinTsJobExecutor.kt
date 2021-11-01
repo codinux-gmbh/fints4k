@@ -156,15 +156,11 @@ open class FinTsJobExecutor(
         getAnonymousBankInfo(bank) { anonymousBankInfoResponse ->
             if (anonymousBankInfoResponse.successful == false) {
                 callback(anonymousBankInfoResponse)
-            }
-            else if (bank.tanMethodSupportedByBank.isEmpty()) { // should only be a theoretical error
-                callback(
-                    BankResponse(true,
-                    errorMessage = "Die TAN Verfahren der Bank konnten nicht ermittelt werden")
-                ) // TODO: translate
-            }
-            else {
+            } else if (bank.tanMethodSupportedByBank.isEmpty()) { // should only be a theoretical error
+                callback(BankResponse(true, errorMessage = "Die TAN Verfahren der Bank konnten nicht ermittelt werden")) // TODO: translate
+            } else {
                 bank.tanMethodsAvailableForUser = bank.tanMethodSupportedByBank
+
                 getUsersTanMethod(bank) { didSelectTanMethod ->
                     if (didSelectTanMethod) {
                         val dialogContext = DialogContext(bank, product)
@@ -174,9 +170,8 @@ open class FinTsJobExecutor(
 
                             callback(initDialogResponse)
                         }
-                    }
-                    else {
-                        callback(BankResponse(false))
+                    } else {
+                        callback(createNoTanMethodSelectedResponse(bank))
                     }
                 }
             }
@@ -198,7 +193,7 @@ open class FinTsJobExecutor(
             callback(response)
         }
     }
-    
+
 
     open fun getTransactionsAsync(parameter: GetTransactionsParameter, bank: BankData, callback: (GetTransactionsResponse) -> Unit) {
 
@@ -653,13 +648,20 @@ open class FinTsJobExecutor(
             }
             else {
                 getUsersTanMethod(bank) {
-                    callback(BankResponse(bank.isTanMethodSelected, noTanMethodSelected = !!!bank.isTanMethodSelected))
+                    callback(createNoTanMethodSelectedResponse(bank))
                 }
             }
         }
         else {
-            callback(BankResponse(bank.isTanMethodSelected, noTanMethodSelected = !!!bank.isTanMethodSelected))
+            callback(createNoTanMethodSelectedResponse(bank))
         }
+    }
+
+    private fun createNoTanMethodSelectedResponse(bank: BankData): BankResponse {
+        val noTanMethodSelected = !!!bank.isTanMethodSelected
+        val errorMessage = if (noTanMethodSelected) "User did not select a TAN method" else null // TODO: translate
+
+        return BankResponse(true, noTanMethodSelected = noTanMethodSelected, errorMessage = errorMessage)
     }
 
     open fun getUsersTanMethod(bank: BankData, done: (Boolean) -> Unit) {
