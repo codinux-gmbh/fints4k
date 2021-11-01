@@ -18,7 +18,7 @@ open class BankIconFinder : IBankIconFinder {
 
     companion object {
 
-        const val SearchBankWebsiteBaseUrlQwant = "https://lite.qwant.com/?l=de&t=mobile&q="
+        const val SearchBankWebsiteBaseUrlQwant = "https://lite.qwant.com/?l=de&q="
 
         const val SearchBankWebsiteBaseUrlEcosia = "https://www.ecosia.org/search?q="
 
