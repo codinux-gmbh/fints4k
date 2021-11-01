@@ -112,11 +112,11 @@ open class FinTsJobExecutor(
 
             handleGetUsersTanMethodsResponse(response, dialogContext) { getTanMethodsResponse ->
                 if (bank.tanMethodsAvailableForUser.isEmpty()) { // could not retrieve supported tan methods for user
-                    callback(BankResponse(false, noTanMethodSelected = true))
+                    callback(getTanMethodsResponse)
                 } else {
                     getUsersTanMethod(bank) {
                         if (bank.isTanMethodSelected == false) {
-                            callback(BankResponse(false, noTanMethodSelected = true))
+                            callback(getTanMethodsResponse)
                         } else if (bank.tanMedia.isEmpty() && isJobSupported(bank, CustomerSegmentId.TanMediaList)) { // tan media not retrieved yet
                             getTanMediaList(bank, TanMedienArtVersion.Alle, TanMediumKlasse.AlleMedien) {
                                 callback(getTanMethodsResponse) // TODO: judge if bank requires selecting TAN media and if though evaluate getTanMediaListResponse
