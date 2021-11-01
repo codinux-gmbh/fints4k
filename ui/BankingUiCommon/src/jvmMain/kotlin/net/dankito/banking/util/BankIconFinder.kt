@@ -214,7 +214,9 @@ open class BankIconFinder : IBankIconFinder {
             val candidateUri = URI.create(urlCandidate.replace("onlinebanking-", ""))
             val candidateHost = candidateUri.host
 
-            return bankNameParts.filter { part -> candidateHost.contains(part, true) }.size
+            if (candidateHost != null) {
+                return bankNameParts.filter { part -> candidateHost.contains(part, true) }.size
+            }
         } catch (e: Exception) {
             log.warn("Could not find host of url '$urlCandidate' in bank name $bankNameParts'", e)
         }
