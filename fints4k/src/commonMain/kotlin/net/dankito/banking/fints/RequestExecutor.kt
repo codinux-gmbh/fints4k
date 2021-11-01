@@ -48,7 +48,7 @@ open class RequestExecutor(
         if (message.createdMessage == null) {
             log.error("Could not create FinTS message to be sent to bank. isJobAllowed ${message.isJobAllowed}, isJobVersionSupported = ${message.isJobVersionSupported}," +
               "allowedVersions = ${message.allowedVersions}, supportedVersions = ${message.supportedVersions}.")
-            callback(BankResponse(false, messageThatCouldNotBeCreated = message, errorMessage = "Could not create FinTS message to be sent to bank")) // TODO: translate
+            callback(BankResponse(false, messageThatCouldNotBeCreated = message, internalError = "Could not create FinTS message to be sent to bank")) // TODO: translate
         }
         else {
             getAndHandleResponseForMessage(message.createdMessage, dialogContext) { response ->
@@ -130,7 +130,7 @@ open class RequestExecutor(
             } catch (e: Exception) {
                 logError("Could not decode responseBody:\r\n'$responseBody'", dialogContext, e)
 
-                return BankResponse(false, errorMessage = e.getInnerExceptionMessage())
+                return BankResponse(false, internalError = e.getInnerExceptionMessage())
             }
         }
         else {
@@ -138,7 +138,7 @@ open class RequestExecutor(
             logError("Request to $bank (${bank.finTs3ServerAddress}) failed", dialogContext, webResponse.error)
         }
 
-        return BankResponse(false, errorMessage = webResponse.error?.getInnerExceptionMessage())
+        return BankResponse(false, internalError = webResponse.error?.getInnerExceptionMessage())
     }
 
     protected open fun decodeBase64Response(responseBody: String): String {

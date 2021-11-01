@@ -56,7 +56,7 @@ open class ResponseParser(
         } catch (e: Exception) {
             logError("Could not parse response '$response'", e)
 
-            return BankResponse(true, response, errorMessage = e.getInnerExceptionMessage())
+            return BankResponse(true, response, internalError = e.getInnerExceptionMessage())
         }
     }
 

@@ -1302,7 +1302,7 @@ class ResponseParserTest : FinTsTestBase() {
     private fun assertCouldParseResponse(result: BankResponse) {
         expect(result.successful).isTrue()
         expect(result.responseContainsErrors).isFalse()
-        expect(result.errorMessage).toBe(null)
+        expect(result.internalError).toBe(null)
         expect(result.errorsToShowToUser).isEmpty()
         expect(result.receivedResponse).notToBeNull()
     }

@@ -24,18 +24,18 @@ open class fints4kModelMapper(protected val modelCreator: IModelCreator) {
 
 
     open fun mapResponse(response: FinTsClientResponse): BankingClientResponse {
-        return BankingClientResponse(response.successful, mapErrorToShowToUser(response), response.wrongCredentialsEntered, response.userCancelledAction)
+        return BankingClientResponse(response.successful, response.errorMessage, response.didBankReturnError, response.wrongCredentialsEntered, response.userCancelledAction)
     }
 
     open fun mapResponse(bank: TypedBankData, response: net.dankito.banking.fints.response.client.AddAccountResponse): AddAccountResponse {
 
-        return AddAccountResponse(bank, map(bank, response.retrievedData), mapErrorToShowToUser(response), response.wrongCredentialsEntered, response.userCancelledAction)
+        return AddAccountResponse(bank, map(bank, response.retrievedData), response.errorMessage, response.didBankReturnError, response.wrongCredentialsEntered, response.userCancelledAction)
     }
 
     open fun mapResponse(account: TypedBankAccount, response: net.dankito.banking.fints.response.client.GetTransactionsResponse): GetTransactionsResponse {
 
         return GetTransactionsResponse(map(account.bank as TypedBankData, response.retrievedData),
-            mapErrorToShowToUser(response), response.wrongCredentialsEntered, response.userCancelledAction, response.tanRequiredButWeWereToldToAbortIfSo)
+            response.errorMessage, response.didBankReturnError, response.wrongCredentialsEntered, response.userCancelledAction, response.tanRequiredButWeWereToldToAbortIfSo)
     }
 
     open fun map(bank: TypedBankData, retrievedData: List<net.dankito.banking.fints.model.RetrievedAccountData>): List<RetrievedAccountData> {
@@ -59,13 +59,6 @@ open class fints4kModelMapper(protected val modelCreator: IModelCreator) {
             retrievedData.retrievedTransactionsFrom,
             retrievedData.retrievedTransactionsTo
         )
-    }
-
-    open fun mapErrorToShowToUser(response: FinTsClientResponse): String? {
-        val errorMessage = response.errorMessage
-
-        return errorMessage ?:
-        if (response.errorsToShowToUser.isEmpty()) null else response.errorsToShowToUser.joinToString("\n") // TODO: find a better way to choose which of these error messages to show
     }
 
 

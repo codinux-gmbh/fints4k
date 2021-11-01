@@ -7,10 +7,11 @@ import net.dankito.banking.ui.model.TypedBankAccount
 open class GetTransactionsResponse(
     open val retrievedData: List<RetrievedAccountData>,
     errorToShowToUser: String?,
+    didBankReturnError: Boolean = false,
     wrongCredentialsEntered: Boolean = false,
     userCancelledAction: Boolean = false,
     open val tanRequiredButWeWereToldToAbortIfSo: Boolean = false
-) : BankingClientResponse(true /* any value */, errorToShowToUser, wrongCredentialsEntered, userCancelledAction) {
+) : BankingClientResponse(true /* any value */, errorToShowToUser, didBankReturnError, wrongCredentialsEntered, userCancelledAction) {
 
     constructor(account: TypedBankAccount, errorToShowToUser: String) : this(RetrievedAccountData.unsuccessfulList(account), errorToShowToUser)
 

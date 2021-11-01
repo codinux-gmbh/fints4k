@@ -157,7 +157,7 @@ open class FinTsJobExecutor(
             if (anonymousBankInfoResponse.successful == false) {
                 callback(anonymousBankInfoResponse)
             } else if (bank.tanMethodSupportedByBank.isEmpty()) { // should only be a theoretical error
-                callback(BankResponse(true, errorMessage = "Die TAN Verfahren der Bank konnten nicht ermittelt werden")) // TODO: translate
+                callback(BankResponse(true, internalError = "Die TAN Verfahren der Bank konnten nicht ermittelt werden")) // TODO: translate
             } else {
                 bank.tanMethodsAvailableForUser = bank.tanMethodSupportedByBank
 
@@ -263,7 +263,7 @@ open class FinTsJobExecutor(
             val fromDate = parameter.fromDate
                 ?: parameter.account.countDaysForWhichTransactionsAreKept?.let { Date.today.addDays(it * -1) }
                 ?: bookedTransactions.map { it.valueDate }.sortedBy { it.millisSinceEpoch }.firstOrNull()
-            val retrievedData = RetrievedAccountData(parameter.account, successful, balance, bookedTransactions, unbookedTransactions, fromDate, parameter.toDate ?: Date.today, response.errorMessage)
+            val retrievedData = RetrievedAccountData(parameter.account, successful, balance, bookedTransactions, unbookedTransactions, fromDate, parameter.toDate ?: Date.today, response.internalError)
 
             callback(
                 GetTransactionsResponse(response, listOf(retrievedData),
@@ -344,7 +344,7 @@ open class FinTsJobExecutor(
             this.callback.enterTanGeneratorAtc(bank, newActiveTanMedium) { enteredAtc ->
                 if (enteredAtc.hasAtcBeenEntered == false) {
                     val message = "Bank requires to enter ATC and TAN in order to change TAN medium." // TODO: translate
-                    callback(BankResponse(false, errorMessage = message))
+                    callback(BankResponse(false, internalError = message))
                 }
                 else {
                     sendChangeTanMediumMessage(bank, newActiveTanMedium, enteredAtc, callback)
@@ -526,7 +526,7 @@ open class FinTsJobExecutor(
         }
         else {
             val errorMessage = "There's no last action (like retrieve account transactions, transfer money, ...) to re-send with new TAN method. Probably an internal programming error." // TODO: translate
-            callback(BankResponse(false, errorMessage = errorMessage)) // should never come to this
+            callback(BankResponse(false, internalError = errorMessage)) // should never come to this
         }
     }
 
@@ -627,7 +627,7 @@ open class FinTsJobExecutor(
                 if (getBankInfoResponse.successful == false) {
                     callback(getBankInfoResponse)
                 } else if (bank.tanMethodSupportedByBank.isEmpty() || bank.supportedJobs.isEmpty()) {
-                    callback(BankResponse(false, errorMessage =
+                    callback(BankResponse(false, internalError =
                     "Could not retrieve basic bank data like supported tan methods or supported jobs")) // TODO: translate // TODO: add as messageToShowToUser
                 } else {
                     callback(BankResponse(true))
@@ -661,7 +661,7 @@ open class FinTsJobExecutor(
         val noTanMethodSelected = !!!bank.isTanMethodSelected
         val errorMessage = if (noTanMethodSelected) "User did not select a TAN method" else null // TODO: translate
 
-        return BankResponse(true, noTanMethodSelected = noTanMethodSelected, errorMessage = errorMessage)
+        return BankResponse(true, noTanMethodSelected = noTanMethodSelected, internalError = errorMessage)
     }
 
     open fun getUsersTanMethod(bank: BankData, done: (Boolean) -> Unit) {

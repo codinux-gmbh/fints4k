@@ -4,7 +4,6 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import net.dankito.banking.fints.callback.FinTsClientCallback
 import net.dankito.banking.fints.messages.datenelemente.implementierte.tan.*
-import net.dankito.banking.fints.messages.segmente.id.CustomerSegmentId
 import net.dankito.banking.fints.model.*
 import net.dankito.banking.fints.response.BankResponse
 import net.dankito.banking.fints.response.client.*
@@ -122,7 +121,7 @@ open class FinTsClient(
             tryGetTransactionsOfLast90DaysWithoutTan(bank, account) { response ->
                 retrievedAccountData.put(account, response.retrievedData.first())
 
-                if (response.errorMessage != null) {
+                if (response.internalError != null) {
                     //getAccountsResponse.errorMessage = response.errorMessage
                 }
 

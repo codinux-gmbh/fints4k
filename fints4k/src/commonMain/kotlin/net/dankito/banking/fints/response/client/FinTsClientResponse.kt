@@ -13,12 +13,12 @@ open class FinTsClientResponse(
     open val isStrongAuthenticationRequired: Boolean,
     open val tanRequired: TanResponse? = null,
 
-    open val errorsToShowToUser: List<String> = listOf(),
-
     /**
-     * When a serious error occurred during web request or response parsing.
+     * A fints4k internal error like an error occurred during web request or response parsing.
      */
-    open val errorMessage: String? = null,
+    open val internalError: String? = null,
+
+    open val errorMessagesFromBank: List<String> = listOf(),
 
     open val wrongCredentialsEntered: Boolean = false,
 
@@ -35,13 +35,22 @@ open class FinTsClientResponse(
 
 
     constructor(response: BankResponse) : this(response.successful, response.noTanMethodSelected,
-        response.isStrongAuthenticationRequired, response.tanResponse, response.errorsToShowToUser,
-        response.errorMessage, response.wrongCredentialsEntered,
+        response.isStrongAuthenticationRequired, response.tanResponse, response.internalError,
+        response.errorsToShowToUser, response.wrongCredentialsEntered,
         response.tanRequiredButUserDidNotEnterOne, response.tanRequiredButWeWereToldToAbortIfSo,
         response.messageThatCouldNotBeCreated?.isJobAllowed ?: true,
         response.messageThatCouldNotBeCreated?.isJobVersionSupported ?: true,
         response.messageThatCouldNotBeCreated?.allowedVersions ?: listOf(),
         response.messageThatCouldNotBeCreated?.supportedVersions ?: listOf())
+
+
+    open val errorMessage: String?
+        get() = internalError
+            ?: if (errorMessagesFromBank.isNotEmpty()) errorMessagesFromBank.joinToString("\n")
+                else null
+
+    open val didBankReturnError: Boolean
+        get() = internalError == null && errorMessagesFromBank.isNotEmpty()
 
 
     override fun toString(): String {

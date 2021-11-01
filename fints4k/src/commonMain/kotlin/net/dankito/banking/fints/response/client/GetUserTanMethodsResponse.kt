@@ -6,7 +6,7 @@ import net.dankito.banking.fints.response.ResponseParser
 
 open class GetUserTanMethodsResponse(bankResponse: BankResponse)
     : BankResponse(bankResponse.didReceiveResponse, bankResponse.receivedResponse, bankResponse.receivedSegments,
-    bankResponse.errorMessage, bankResponse.noTanMethodSelected, bankResponse.messageThatCouldNotBeCreated) {
+    bankResponse.internalError, bankResponse.noTanMethodSelected, bankResponse.messageThatCouldNotBeCreated) {
 
     /**
      * comdirect sends "9955::Unzulässiges TAN-Verfahren." even though '999' is a valid TAN method

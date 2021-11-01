@@ -14,9 +14,9 @@ open class BankResponse(
     val receivedSegments: List<ReceivedSegment> = listOf(),
 
     /**
-     * When a serious error occurred during web request or response parsing.
+     * A fints4k internal error like an error occurred during web request or response parsing.
      */
-    val errorMessage: String? = null,
+    val internalError: String? = null,
     val noTanMethodSelected: Boolean = false,
     val messageThatCouldNotBeCreated: MessageBuilderResult? = null // i think that can be removed
 ) {
@@ -25,7 +25,7 @@ open class BankResponse(
         get() = messageThatCouldNotBeCreated == null
 
     open val responseContainsErrors: Boolean
-        get() = errorMessage == null &&
+        get() = internalError == null &&
                 (messageFeedback?.isError == true || isPinLocked)
 
     open val isPinLocked: Boolean
@@ -59,7 +59,8 @@ open class BankResponse(
     open var tanRequiredButWeWereToldToAbortIfSo = false
 
     open val successful: Boolean
-        get() = noTanMethodSelected == false && couldCreateMessage && didReceiveResponse
+        get() = internalError == null &&
+                noTanMethodSelected == false && couldCreateMessage && didReceiveResponse
                 && responseContainsErrors == false && wrongCredentialsEntered == false
                 && tanRequiredButUserDidNotEnterOne == false && tanRequiredButWeWereToldToAbortIfSo == false
 
@@ -157,7 +158,7 @@ open class BankResponse(
             return formattedResponse
         }
 
-        return "Error: $errorMessage\n$formattedResponse"
+        return "Error: $internalError\n$formattedResponse"
     }
 
 }
