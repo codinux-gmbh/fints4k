@@ -66,7 +66,7 @@ open class FinTsClient(
 
         /*      First dialog: Get user's basic data like BPD, customer system ID and her TAN methods     */
 
-        jobExecutor.retrieveBasicDataLikeUsersTanMethods(bank) { newUserInfoResponse ->
+        jobExecutor.retrieveBasicDataLikeUsersTanMethods(bank, parameter.preferredTanMethods, parameter.preferredTanMedium) { newUserInfoResponse ->
 
             if (newUserInfoResponse.successful == false) { // bank parameter (FinTS server address, ...) already seem to be wrong
                 callback(AddAccountResponse(newUserInfoResponse, bank))

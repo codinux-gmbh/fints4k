@@ -89,7 +89,8 @@ open class FinTsJobExecutor(
      *
      * Be aware this method resets BPD, UPD and selected TAN method!
      */
-    open fun retrieveBasicDataLikeUsersTanMethods(bank: BankData, closeDialog: Boolean = false, callback: (BankResponse) -> Unit) {
+    open fun retrieveBasicDataLikeUsersTanMethods(bank: BankData, preferredTanMethods: List<TanMethodType>? = null, preferredTanMedium: String? = null,
+                                                  closeDialog: Boolean = false, callback: (BankResponse) -> Unit) {
         // just to ensure settings are in its initial state and that bank sends us bank parameter (BPD),
         // user parameter (UPD) and allowed tan methods for user (therefore the resetSelectedTanMethod())
         bank.resetBpdVersion()
@@ -114,11 +115,11 @@ open class FinTsJobExecutor(
                 if (bank.tanMethodsAvailableForUser.isEmpty()) { // could not retrieve supported tan methods for user
                     callback(getTanMethodsResponse)
                 } else {
-                    getUsersTanMethod(bank) {
+                    getUsersTanMethod(bank, preferredTanMethods) {
                         if (bank.isTanMethodSelected == false) {
                             callback(getTanMethodsResponse)
                         } else if (bank.tanMedia.isEmpty() && isJobSupported(bank, CustomerSegmentId.TanMediaList)) { // tan media not retrieved yet
-                            getTanMediaList(bank, TanMedienArtVersion.Alle, TanMediumKlasse.AlleMedien) {
+                            getTanMediaList(bank, TanMedienArtVersion.Alle, TanMediumKlasse.AlleMedien, preferredTanMedium) {
                                 callback(getTanMethodsResponse) // TODO: judge if bank requires selecting TAN media and if though evaluate getTanMediaListResponse
                             }
                         } else {
@@ -315,17 +316,22 @@ open class FinTsJobExecutor(
     }
 
 
-    open fun getTanMediaList(bank: BankData, tanMediaKind: TanMedienArtVersion = TanMedienArtVersion.Alle,
-                             tanMediumClass: TanMediumKlasse = TanMediumKlasse.AlleMedien, callback: (GetTanMediaListResponse) -> Unit) {
+    open fun getTanMediaList(bank: BankData, tanMediaKind: TanMedienArtVersion = TanMedienArtVersion.Alle, tanMediumClass: TanMediumKlasse = TanMediumKlasse.AlleMedien,
+                             callback: (GetTanMediaListResponse) -> Unit) {
+        getTanMediaList(bank, tanMediaKind, tanMediumClass, null, callback)
+    }
+
+    protected open fun getTanMediaList(bank: BankData, tanMediaKind: TanMedienArtVersion = TanMedienArtVersion.Alle, tanMediumClass: TanMediumKlasse = TanMediumKlasse.AlleMedien,
+                             preferredTanMedium: String? = null, callback: (GetTanMediaListResponse) -> Unit) {
 
         sendMessageAndHandleResponse(bank, CustomerSegmentId.TanMediaList, false, { dialogContext ->
             messageBuilder.createGetTanMediaListMessage(dialogContext, tanMediaKind, tanMediumClass)
         }) { response ->
-            handleGetTanMediaListResponse(response, bank, callback)
+            handleGetTanMediaListResponse(response, bank, preferredTanMedium, callback)
         }
     }
 
-    protected open fun handleGetTanMediaListResponse(response: BankResponse, bank: BankData, callback: (GetTanMediaListResponse) -> Unit) {
+    protected open fun handleGetTanMediaListResponse(response: BankResponse, bank: BankData, preferredTanMedium: String? = null, callback: (GetTanMediaListResponse) -> Unit) {
         // TAN media list (= TAN generator list) is only returned for users with chipTAN TAN methods
         val tanMediaList = if (response.successful == false) null
         else response.getFirstSegmentById<TanMediaList>(InstituteSegmentId.TanMediaList)
@@ -333,7 +339,8 @@ open class FinTsJobExecutor(
         tanMediaList?.let {
             bank.tanMedia = it.tanMedia
 
-            bank.selectedTanMedium = bank.selectedTanMedium?.let { selected -> bank.tanMedia.firstOrNull { it.mediumName == selected.mediumName } } // try to find selectedTanMedium in new TanMedia instances
+            bank.selectedTanMedium = preferredTanMedium?.let { bank.tanMedia.firstOrNull { it.mediumName == preferredTanMedium } }
+                ?: bank.selectedTanMedium?.let { selected -> bank.tanMedia.firstOrNull { it.mediumName == selected.mediumName } } // try to find selectedTanMedium in new TanMedia instances
                 ?: bank.tanMedia.firstOrNull { it.mediumName != null }
         }
 
@@ -667,12 +674,18 @@ open class FinTsJobExecutor(
         return BankResponse(true, noTanMethodSelected = noTanMethodSelected, internalError = errorMessage)
     }
 
-    open fun getUsersTanMethod(bank: BankData, done: (Boolean) -> Unit) {
+    open fun getUsersTanMethod(bank: BankData, preferredTanMethods: List<TanMethodType>? = null, done: (Boolean) -> Unit) {
         if (bank.tanMethodsAvailableForUser.size == 1) { // user has only one TAN method -> set it and we're done
             bank.selectedTanMethod = bank.tanMethodsAvailableForUser.first()
             done(true)
         }
         else {
+            findPreferredTanMethod(bank, preferredTanMethods)?.let {
+                bank.selectedTanMethod = it
+                done(true)
+                return
+            }
+
             // we know user's supported tan methods, now ask user which one to select
             callback.askUserForTanMethod(bank.tanMethodsAvailableForUser, selectSuggestedTanMethod(bank)) { selectedTanMethod ->
                 if (selectedTanMethod != null) {
@@ -684,6 +697,16 @@ open class FinTsJobExecutor(
                 }
             }
         }
+    }
+
+    private fun findPreferredTanMethod(bank: BankData, preferredTanMethods: List<TanMethodType>?): TanMethod? {
+        preferredTanMethods?.forEach { preferredTanMethodType ->
+            bank.tanMethodsAvailableForUser.firstOrNull { it.type == preferredTanMethodType }?.let {
+                return it
+            }
+        }
+
+        return null
     }
 
     protected open fun selectSuggestedTanMethod(bank: BankData): TanMethod? {
