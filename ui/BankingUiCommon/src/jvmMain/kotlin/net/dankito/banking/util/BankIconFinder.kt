@@ -4,6 +4,8 @@ import net.dankito.utils.favicon.FaviconComparator
 import net.dankito.utils.favicon.FaviconFinder
 import net.dankito.utils.favicon.web.UrlConnectionWebClient
 import net.dankito.utils.os.OsHelper
+import net.dankito.utils.web.client.OkHttpWebClient
+import net.dankito.utils.web.client.RequestParameters
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.slf4j.LoggerFactory
@@ -31,11 +33,13 @@ open class BankIconFinder : IBankIconFinder {
     }
 
 
-    protected val webClient = UrlConnectionWebClient()
+    protected val webClient = OkHttpWebClient()
 
-    protected val faviconFinder = FaviconFinder(webClient)
+    protected val faviconWebClient = UrlConnectionWebClient()
 
-    protected val faviconComparator = FaviconComparator(webClient)
+    protected val faviconFinder = FaviconFinder(faviconWebClient)
+
+    protected val faviconComparator = FaviconComparator(faviconWebClient)
 
 
     override fun findIconForBankAsync(bankName: String, prefSize: Int, result: (String?) -> Unit) {
@@ -46,7 +50,7 @@ open class BankIconFinder : IBankIconFinder {
 
     override fun findIconForBank(bankName: String, prefSize: Int): String? {
         findBankWebsite(bankName)?.let { bankUrl ->
-            webClient.get(bankUrl).body?.let { bankHomepageResponse ->
+            faviconWebClient.get(bankUrl).body?.let { bankHomepageResponse ->
                 val favicons = faviconFinder.extractFavicons(Jsoup.parse(bankHomepageResponse), bankUrl)
 
                 val fileTypesToExclude = if (OsHelper().isRunningOnAndroid) listOf() else listOf(".ico") // JavaFX cannot display .ico files
@@ -141,7 +145,8 @@ open class BankIconFinder : IBankIconFinder {
     }
 
     protected open fun getSearchResultForBank(searchUrl: String): Document? {
-        val response = webClient.get(searchUrl)
+        val response = webClient.get(RequestParameters(searchUrl, userAgent = "User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:93.0) Gecko/20100101 Firefox/93.0",
+            headers = mapOf("Accept" to "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8")))
 
         response.body?.let { responseBody ->
             return Jsoup.parse(responseBody)
