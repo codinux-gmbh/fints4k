@@ -46,7 +46,7 @@ open class RequestExecutor(
     open fun getAndHandleResponseForMessage(message: MessageBuilderResult, dialogContext: DialogContext,
                                             tanRequiredCallback: (TanResponse, BankResponse, callback: (BankResponse) -> Unit) -> Unit, callback: (BankResponse) -> Unit) {
         if (message.createdMessage == null) {
-            callback(BankResponse(false, messageCreationError = message))
+            callback(BankResponse(false, messageCreationError = message, errorMessage = "Could not create FinTS message to be sent to bank")) // TODO: translate
         }
         else {
             getAndHandleResponseForMessage(message.createdMessage, dialogContext) { response ->
