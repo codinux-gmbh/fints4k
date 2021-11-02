@@ -22,8 +22,8 @@ open class TanMethod(
     internal constructor() : this("", TanMethodType.EnterTan, "") // for object deserializers
 
 
-    @Transient
-    open val isNumericTan: Boolean = allowedTanFormat == AllowedTanFormat.Numeric
+    open val isNumericTan: Boolean
+        get() = allowedTanFormat == AllowedTanFormat.Numeric
 
 
     open var technicalId: String = UUID.random()
