@@ -50,6 +50,8 @@ open class AuthenticationService(
 
 
     init {
+        log.info("Initializing AuthenticationService (at the end database must get opened) ...")
+
         val settings = loadAuthenticationSettings()
 
         if (settings == null) { // first app run -> create a default password
@@ -151,7 +153,11 @@ open class AuthenticationService(
     }
 
     protected open fun openDatabase(password: CharArray): Boolean {
-        return persistence.decryptData(password)
+        val result = persistence.decryptData(password)
+
+        log.info("Did decrypting data / opening database succeed? $result")
+
+        return result
     }
 
 

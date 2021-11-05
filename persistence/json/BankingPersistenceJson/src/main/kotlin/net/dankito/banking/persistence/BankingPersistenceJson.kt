@@ -93,4 +93,9 @@ open class BankingPersistenceJson(
         }
     }
 
+
+    override fun addInitializedListener(listener: () -> Unit) {
+        listener()
+    }
+
 }

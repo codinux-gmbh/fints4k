@@ -5,6 +5,7 @@ import BankingUiSwift
 import EncryptedCoreData
 
 
+// TODO: implement addInitializedListener()
 class CoreDataBankingPersistence: IBankingPersistence, ITransactionPartySearcher {
     
     private let mapper = Mapper()
@@ -287,6 +288,10 @@ class CoreDataBankingPersistence: IBankingPersistence, ITransactionPartySearcher
         } catch {
             NSLog("Could not delete all banks: \(error)")
         }
+    }
+
+    func addInitializedListener(listener: () -> Unit) {
+        listener()
     }
     
 }

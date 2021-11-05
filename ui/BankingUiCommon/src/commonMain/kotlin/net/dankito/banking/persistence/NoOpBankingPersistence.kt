@@ -46,4 +46,9 @@ open class NoOpBankingPersistence : IBankingPersistence {
 
     }
 
+
+    override fun addInitializedListener(listener: () -> Unit) {
+        listener()
+    }
+
 }

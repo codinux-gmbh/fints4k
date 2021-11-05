@@ -18,6 +18,7 @@ import net.dankito.utils.multiplatform.asString
 import net.sqlcipher.database.SQLiteDatabase
 import net.sqlcipher.database.SupportFactory
 import org.slf4j.LoggerFactory
+import java.util.concurrent.CopyOnWriteArraySet
 
 
 open class RoomBankingPersistence(protected open val applicationContext: Context) : IBankingPersistence, ITransactionPartySearcher {
@@ -37,9 +38,19 @@ open class RoomBankingPersistence(protected open val applicationContext: Context
 
     protected lateinit var database: BankingDatabase
 
+    protected open var isInitialized = false
+
+    protected open val initializedListeners = CopyOnWriteArraySet<() -> Unit>()
+
 
     override fun decryptData(password: CharArray): Boolean {
-        return openDatabase(password)
+        val result = openDatabase(password)
+
+        if (result) {
+            callInitializedListeners()
+        }
+
+        return result
     }
 
     override fun changePassword(newPassword: CharArray): Boolean {
@@ -247,6 +258,29 @@ open class RoomBankingPersistence(protected open val applicationContext: Context
             .toSet() // don't display same transaction party multiple times
             .filterNot { it.bankCode.isNullOrBlank() || it.accountId.isNullOrBlank() }
             .map { TransactionParty(it.name, it.accountId, it.bankCode) }
+    }
+
+
+    override fun addInitializedListener(listener: () -> Unit) {
+        if (isInitialized) {
+            listener()
+        } else {
+            initializedListeners.add(listener)
+        }
+    }
+
+    protected open fun callInitializedListeners() {
+        isInitialized = true
+        val copy = ArrayList(initializedListeners)
+        initializedListeners.clear()
+
+        copy.forEach { listener -> {
+            try {
+                    listener()
+            } catch (e: Exception) {
+                log.error("Could not call listener $listener", e)
+            }
+        } }
     }
 
 }

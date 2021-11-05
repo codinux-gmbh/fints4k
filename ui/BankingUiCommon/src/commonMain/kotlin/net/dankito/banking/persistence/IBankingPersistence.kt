@@ -28,4 +28,7 @@ interface IBankingPersistence {
 
     fun saveBankIcon(bank: TypedBankData, iconUrl: String, fileExtension: String?)
 
+
+    fun addInitializedListener(listener: () -> Unit)
+
 }

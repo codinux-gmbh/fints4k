@@ -154,12 +154,14 @@ open class BankingPresenter(
 
 
     init {
-        asyncRunner.runAsync {
-            readAppSettings()
-            readPersistedBanks()
+        persister.addInitializedListener {
+            asyncRunner.runAsync {
+                readAppSettings()
+                readPersistedBanks()
 
-            if (appSettings.automaticallyUpdateAccountsAfterMinutes != null) { // TODO: check if time has elapsed
-                doAutomaticAccountsUpdate()
+                if (appSettings.automaticallyUpdateAccountsAfterMinutes != null) { // TODO: check if time has elapsed
+                    //doAutomaticAccountsUpdate()
+                }
             }
         }
 
