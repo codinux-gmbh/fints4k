@@ -24,6 +24,8 @@ open class CryptographyManager {
         const val AndroidKeyStore = "AndroidKeyStore"
 
         private const val KeySize: Int = 256
+        private const val IterationCount = 4096
+        private const val PbeCipher = "AES/GCM/NoPadding"
         private const val EncryptionBlockMode = KeyProperties.BLOCK_MODE_GCM
         private const val EncryptionPadding = KeyProperties.ENCRYPTION_PADDING_NONE
         private const val EncryptionAlgorithm = KeyProperties.KEY_ALGORITHM_AES
@@ -89,7 +91,7 @@ open class CryptographyManager {
     open fun encryptDataWithPbe(plaintext: CharArray, password: String, salt: ByteArray): Pair<ByteArray, ByteArray> {
         val secret: SecretKey = generatePbeSecretKey(password, salt)
 
-        val cipher: Cipher = Cipher.getInstance("AES/GCM/NoPadding")
+        val cipher: Cipher = Cipher.getInstance(PbeCipher)
         cipher.init(Cipher.ENCRYPT_MODE, secret)
         val initializationVector = cipher.iv
 
@@ -98,7 +100,7 @@ open class CryptographyManager {
 
     open fun decryptDataWithPbe(cipherText: ByteArray, password: String, initializationVector: ByteArray, salt: ByteArray): CharArray {
         val secret: SecretKey = generatePbeSecretKey(password, salt)
-        val cipher = Cipher.getInstance("AES/GCM/NoPadding")
+        val cipher = Cipher.getInstance(PbeCipher)
         cipher.init(Cipher.DECRYPT_MODE, secret, IvParameterSpec(initializationVector))
 
         val plainTextBytes = cipher.doFinal(cipherText)
@@ -108,7 +110,7 @@ open class CryptographyManager {
     protected open fun generatePbeSecretKey(userPassword: String, salt: ByteArray): SecretKey {
         // Initialize PBE with password
         val factory = SecretKeyFactory.getInstance(findBestPbeAlgorithm()!!)
-        val spec = PBEKeySpec(userPassword.toCharArray(), salt, 4096, 256)
+        val spec = PBEKeySpec(userPassword.toCharArray(), salt, IterationCount, KeySize)
         val key = factory.generateSecret(spec)
 
         return SecretKeySpec(key.encoded, "AES")
