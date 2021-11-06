@@ -133,7 +133,7 @@ open class MainMenuBar(protected val presenter: BankingPresenter) : View() {
                 destinationFile = File(destinationFile.absolutePath + ".csv")
             }
 
-            val transactions = presenter.allTransactions.map { mapTransaction(it) }
+            val transactions = presenter.allTransactionsSorted.map { mapTransaction(it) }
 
             CsvAccountTransactionsExporter().export(destinationFile, transactions)
         }

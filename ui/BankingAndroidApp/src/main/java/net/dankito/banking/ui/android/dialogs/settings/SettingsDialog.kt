@@ -139,7 +139,7 @@ open class SettingsDialog : SettingsDialogBase() {
             val config = FileChooserDialogConfig(initialDirectory = initialDirectory, suggestedFilenameForSaveFileDialog = suggestedFilename)
             FileChooserDialog().showSaveFileInFullscreenDialog(activity, permissionsService, config) { _, selectedFile ->
                 selectedFile?.let {
-                    val transactions = presenter.allTransactions.map { mapTransaction(it) }
+                    val transactions = presenter.allTransactionsSorted.map { mapTransaction(it) }
 
                     CsvAccountTransactionsExporter().export(selectedFile, transactions)
 

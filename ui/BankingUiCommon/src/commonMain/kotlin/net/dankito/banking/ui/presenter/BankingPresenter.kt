@@ -48,8 +48,6 @@ import io.ktor.http.cio.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import net.dankito.banking.ui.model.issues.CreateTicketRequestDto
-import net.dankito.banking.ui.model.issues.IssueDescriptionFormat
 
 
 open class BankingPresenter(
@@ -796,11 +794,14 @@ open class BankingPresenter(
     open fun searchAccountTransactions(query: String, transactions: List<IAccountTransaction>): List<IAccountTransaction> {
         val queryLowercase = query.trim().toLowerCase()
 
+        // get transactions sorted by date
+        val transactionsSorted = transactions.toSet().sortedByDate()
+
         if (queryLowercase.isEmpty()) {
-            return transactions
+            return transactionsSorted
         }
 
-        return transactions.filter {
+        return transactionsSorted.filter {
             it.otherPartyName?.toLowerCase()?.contains(queryLowercase) == true
                     || it.reference.toLowerCase().contains(queryLowercase)
                     || it.bookingText?.toLowerCase()?.contains(queryLowercase) == true
@@ -989,6 +990,9 @@ open class BankingPresenter(
     open val allTransactions: List<IAccountTransaction>
         get() = getTransactionsForAccounts(allAccounts)
 
+    open val allTransactionsSorted: List<IAccountTransaction>
+        get() = getTransactionsForAccountsSorted(allAccounts)
+
     open val balanceOfAllAccounts: BigDecimal
         get() = getBalanceForBanks(allBanks)
 
@@ -1042,6 +1046,11 @@ open class BankingPresenter(
     protected open fun getTransactionsForAccounts(accounts: Collection<TypedBankAccount>): List<IAccountTransaction> {
         return accounts.flatMap { it.bookedTransactions }.sortedByDescending { it.valueDate.millisSinceEpoch } // TODO: someday add unbooked transactions
     }
+
+    protected open fun getTransactionsForAccountsSorted(accounts: Collection<TypedBankAccount>): List<IAccountTransaction> {
+        return getTransactionsForAccounts(accounts).sortedByDate()
+    }
+
     open fun currencyIsoCodeOfAccounts(accounts: List<TypedBankAccount>): String {
         // TODO: this is of course not right, it assumes that all accounts have the same currency. But we don't support e.g. calculating the balance of accounts with different currencies anyway
         // at start up list with selectedAccounts is empty

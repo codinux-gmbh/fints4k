@@ -1,5 +1,6 @@
 package net.dankito.banking.util
 
+import net.dankito.banking.ui.model.IAccountTransaction
 import net.dankito.banking.ui.model.OrderedDisplayable
 
 
@@ -37,4 +38,9 @@ fun <T : OrderedDisplayable> List<T>.sortedByDisplayIndex(): List<T> {
 
 fun <T : OrderedDisplayable> Collection<T>.sortedByDisplayIndex(): Collection<T> {
     return this.sortedBy { it.displayIndex }
+}
+
+
+fun <T : IAccountTransaction> Iterable<T>.sortedByDate(): List<T> {
+    return this.sortedByDescending { it.valueDate.millisSinceEpoch }
 }
