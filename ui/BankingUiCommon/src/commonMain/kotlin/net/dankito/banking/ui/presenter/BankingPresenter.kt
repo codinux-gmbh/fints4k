@@ -392,8 +392,7 @@ open class BankingPresenter(
 
         if (accountsToUpdate.isNotEmpty()) {
             updateAccountsTransactionsAsync(accountsToUpdate, true, callback)
-        }
-        else if (allAccounts.isNotEmpty()) {
+        } else { // so that UI can reset its state
             callback?.invoke(null)
         }
     }
@@ -407,8 +406,7 @@ open class BankingPresenter(
 
         if (accountsToUpdate.isNotEmpty()) {
             updateAccountsTransactionsAsync(accountsToUpdate, false, done)
-        }
-        else if (allAccounts.isNotEmpty()) {
+        } else { // so that UI can reset its state
             done?.invoke(null)
         }
     }
