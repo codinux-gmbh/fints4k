@@ -388,7 +388,7 @@ open class BankingPresenter(
     }
 
     open fun updateAllAccountsTransactionsAsync(callback: ((GetTransactionsResponse?) -> Unit)? = null) {
-        val accountsToUpdate = allAccounts.filter { considerAccountInAutomaticUpdates(it) }
+        val accountsToUpdate = allVisibleAccounts.filter { considerAccountInAutomaticUpdates(it) }
 
         if (accountsToUpdate.isNotEmpty()) {
             updateAccountsTransactionsAsync(accountsToUpdate, true, callback)
@@ -641,7 +641,7 @@ open class BankingPresenter(
                 // TODO: show originatorInformation to user
 
                 val transferMoneyData = TransferMoneyData(
-                    allAccounts.first(),
+                    allVisibleAccounts.first(),
                     epcQrCode.receiverName,
                     epcQrCode.iban,
                     epcQrCode.bic ?: "",
@@ -671,7 +671,7 @@ open class BankingPresenter(
 
                 if (invoiceData.potentialTotalAmount != null || invoiceData.potentialIban != null) { // if at least an amount or IBAN could get extracted
                     val transferMoneyData = TransferMoneyData(
-                        allAccounts.first(), "",
+                        allVisibleAccounts.first(), "",
                         invoiceData.potentialIban ?: "",
                         invoiceData.potentialBic ?: "",
                         invoiceData.potentialTotalAmount ?: BigDecimal.Zero, "")
@@ -954,7 +954,7 @@ open class BankingPresenter(
     open fun selectedAllAccounts() {
         selectedAccountType = SelectedAccountType.AllAccounts
 
-        setSelectedAccounts(allAccounts)
+        setSelectedAccounts(allVisibleAccounts)
     }
 
     open fun selectedBank(bank: TypedBankData) {
@@ -970,7 +970,7 @@ open class BankingPresenter(
     }
 
     protected open fun setSelectedAccounts(accounts: List<TypedBankAccount>) {
-        this._selectedAccounts = ArrayList(accounts.filter { it.hideAccount == false }) // make a copy
+        this._selectedAccounts = ArrayList(accounts.withoutHiddenOnes()) // make a copy
 
         callSelectedAccountsChangedListeners(_selectedAccounts)
     }
@@ -982,24 +982,24 @@ open class BankingPresenter(
     open val allBanksSortedByDisplayIndex: List<TypedBankData>
         get() = allBanks.sortedByDisplayIndex()
 
-    open val allAccounts: List<TypedBankAccount>
-        get() = allBanks.flatMap { it.accounts }
+    open val allVisibleAccounts: List<TypedBankAccount>
+        get() = allBanks.flatMap { it.accounts }.withoutHiddenOnes()
 
     open val allTransactions: List<IAccountTransaction>
-        get() = getTransactionsForAccounts(allAccounts)
+        get() = getTransactionsForAccounts(allVisibleAccounts)
 
     open val allTransactionsSorted: List<IAccountTransaction>
-        get() = getTransactionsForAccountsSorted(allAccounts)
+        get() = getTransactionsForAccountsSorted(allVisibleAccounts)
 
     open val balanceOfAllAccounts: BigDecimal
         get() = getBalanceForBanks(allBanks)
 
 
     open val accountsSupportingRetrievingAccountTransactions: List<TypedBankAccount>
-        get() = allAccounts.filter { it.supportsRetrievingAccountTransactions }
+        get() = allVisibleAccounts.filter { it.supportsRetrievingAccountTransactions }
 
     open val hasAccountsSupportingRetrievingTransactions: Boolean
-        get() = doAccountsSupportRetrievingTransactions(allAccounts)
+        get() = doAccountsSupportRetrievingTransactions(allVisibleAccounts)
 
     open val doSelectedAccountsSupportRetrievingTransactions: Boolean
         get() = doAccountsSupportRetrievingTransactions(selectedAccounts)
@@ -1010,10 +1010,10 @@ open class BankingPresenter(
 
 
     open val accountsSupportingRetrievingBalance: List<TypedBankAccount>
-        get() = allAccounts.filter { it.supportsRetrievingBalance }
+        get() = allVisibleAccounts.filter { it.supportsRetrievingBalance }
 
     open val hasAccountsSupportingRetrievingBalance: Boolean
-        get() = doAccountsSupportRetrievingBalance(allAccounts)
+        get() = doAccountsSupportRetrievingBalance(allVisibleAccounts)
 
     open val doSelectedAccountsSupportRetrievingBalance: Boolean
         get() = doAccountsSupportRetrievingBalance(selectedAccounts)
@@ -1024,14 +1024,14 @@ open class BankingPresenter(
 
 
     open val accountsSupportingTransferringMoney: List<TypedBankAccount>
-        get() = allAccounts.filter { it.supportsTransferringMoney }
+        get() = allVisibleAccounts.filter { it.supportsTransferringMoney }
 
     open val accountsSupportingTransferringMoneySortedByDisplayIndex: List<TypedBankAccount>
         get() = accountsSupportingTransferringMoney
             .sortedWith(BankAccountComparator())
 
     open val hasAccountsSupportTransferringMoney: Boolean
-        get() = doAccountsSupportTransferringMoney(allAccounts)
+        get() = doAccountsSupportTransferringMoney(allVisibleAccounts)
 
     open val doSelectedAccountsSupportTransferringMoney: Boolean
         get() = doAccountsSupportTransferringMoney(selectedAccounts)

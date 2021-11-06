@@ -1,7 +1,9 @@
 package net.dankito.banking.util
 
 import net.dankito.banking.ui.model.IAccountTransaction
+import net.dankito.banking.ui.model.IBankAccount
 import net.dankito.banking.ui.model.OrderedDisplayable
+import net.dankito.banking.ui.model.TypedBankAccount
 
 
 fun String.ofMaxLength(maxLength: Int): String {
@@ -43,4 +45,8 @@ fun <T : OrderedDisplayable> Collection<T>.sortedByDisplayIndex(): Collection<T>
 
 fun <T : IAccountTransaction> Iterable<T>.sortedByDate(): List<T> {
     return this.sortedByDescending { it.valueDate.millisSinceEpoch }
+}
+
+fun <T : TypedBankAccount> Iterable<T>.withoutHiddenOnes(): List<T> {
+    return this.filter { it.hideAccount == false }
 }
