@@ -794,14 +794,14 @@ open class BankingPresenter(
     open fun searchAccountTransactions(query: String, transactions: List<IAccountTransaction>): List<IAccountTransaction> {
         val queryLowercase = query.trim().toLowerCase()
 
-        // get transactions sorted by date
-        val transactionsSorted = transactions.toSet().sortedByDate()
+        // get unique transactions sorted by date
+        val uniqueTransactionsSorted = transactions.toSet().sortedByDate()
 
         if (queryLowercase.isEmpty()) {
-            return transactionsSorted
+            return uniqueTransactionsSorted
         }
 
-        return transactionsSorted.filter {
+        return uniqueTransactionsSorted.filter {
             it.otherPartyName?.toLowerCase()?.contains(queryLowercase) == true
                     || it.reference.toLowerCase().contains(queryLowercase)
                     || it.bookingText?.toLowerCase()?.contains(queryLowercase) == true
