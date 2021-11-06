@@ -398,11 +398,8 @@ open class BankingPresenter(
     }
 
     open fun updateSelectedAccountsTransactionsAsync(done: ((GetTransactionsResponse?) -> Unit)? = null) {
-        var accountsToUpdate = selectedAccounts.filter { considerAccountInAutomaticUpdates(it) }
-        if (accountsToUpdate.isEmpty() && (selectedAccountType == SelectedAccountType.SingleAccount
-                    || (selectedAccountType == SelectedAccountType.SingleBank && selectedAccounts.size == 1))) {
-            accountsToUpdate = selectedAccounts
-        }
+        // user explicitly pressed update transactions, so ignore includeInAutomaticAccountsUpdate; hidden accounts are already removed in selectedAccounts
+        val accountsToUpdate = selectedAccounts // TODO: may remove accounts with wrongCredentialsEntered
 
         if (accountsToUpdate.isNotEmpty()) {
             updateAccountsTransactionsAsync(accountsToUpdate, false, done)
