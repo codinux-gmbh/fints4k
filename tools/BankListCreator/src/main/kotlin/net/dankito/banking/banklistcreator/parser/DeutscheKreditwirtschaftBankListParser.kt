@@ -118,7 +118,7 @@ open class DeutscheKreditwirtschaftBankListParser {
         val pinTanAddressColumnIndex = headerNames.indexOf("PIN/TAN-Zugang URL")
         val pinTanVersionColumnIndex = headerNames.indexOf("Version")
 
-        for (row in workSheetData.row.subList(1, workSheetData.row.size)) {
+        for (row in workSheetData.row.subList(1, workSheetData.row.size)) { // removes header row
             parseToServerAddressesListEntry(row, formatter, bankNameColumnIndex, bankCodeColumnIndex, bicColumnIndex,
                 cityColumnIndex, pinTanAddressColumnIndex, pinTanVersionColumnIndex)?.let { entry ->
                 entries.add(entry)
@@ -134,6 +134,10 @@ open class DeutscheKreditwirtschaftBankListParser {
             ServerAddressesListEntry? {
 
         try {
+            if (row.c.size < pinTanVersionColumnIndex) { // a row with only the index number in first column, doesn't contain enough information for us to parse it to an ServerAddressesListEntry
+                return null
+            }
+
             val bankCode = getCellText(row, bankCodeColumnIndex, formatter)
 
             if (bankCode.isNotEmpty()) { // filter out empty rows
