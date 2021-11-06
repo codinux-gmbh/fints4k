@@ -47,6 +47,6 @@ fun <T : IAccountTransaction> Iterable<T>.sortedByDate(): List<T> {
     return this.sortedByDescending { it.valueDate.millisSinceEpoch }
 }
 
-fun <T : TypedBankAccount> Iterable<T>.withoutHiddenOnes(): List<T> {
+fun <T : IBankAccount<*>> Iterable<T>.withoutHiddenOnes(): List<T> {
     return this.filter { it.hideAccount == false }
 }

@@ -115,10 +115,11 @@ open class BankAccountSettingsDialog : SettingsDialogBase() {
     override fun saveChanges() {
         account.userSetDisplayName = edtxtBankAccountName.text
 
+        val didHideAccountChange = account.hideAccount != swtchHideAccount.isChecked
         account.hideAccount = swtchHideAccount.isChecked
         account.includeInAutomaticAccountsUpdate = swtchIncludeInAutomaticAccountsUpdate.isChecked
 
-        presenter.accountUpdated(account)
+        presenter.accountUpdated(account, didHideAccountChange)
     }
 
 }

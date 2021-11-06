@@ -157,11 +157,12 @@ struct BankAccountSettingsDialog: View {
     private func donePressed() {
         if hasUnsavedData {
             account.userSetDisplayName = displayName
-            
+
+            let didHideAccountChange = account.hideAccount != hideAccount
             account.hideAccount = hideAccount
             account.includeInAutomaticAccountsUpdate = includeInAutomaticAccountsUpdate
             
-            presenter.accountUpdated(account: account)
+            presenter.accountUpdated(account: account, didHideAccountChange: didHideAccountChange)
         }
         
         closeDialog()

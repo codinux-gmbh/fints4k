@@ -117,8 +117,8 @@ open class BankSettingsDialog : SettingsDialogBase() {
         oldItem.displayIndex = oldPosition
         newItem.displayIndex = newPosition
 
-        presenter.accountUpdated(oldItem)
-        presenter.accountUpdated(newItem)
+        presenter.accountUpdated(oldItem, false)
+        presenter.accountUpdated(newItem, false)
     }
 
 

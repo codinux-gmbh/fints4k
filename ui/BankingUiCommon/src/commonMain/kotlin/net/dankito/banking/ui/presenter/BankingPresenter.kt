@@ -578,7 +578,11 @@ open class BankingPresenter(
         }
     }
 
-    open fun accountUpdated(account: TypedBankAccount) {
+    open fun accountUpdated(account: TypedBankAccount, didHideAccountChange: Boolean) {
+        if (didHideAccountChange) {
+            updateSelectedAccounts(account)
+        }
+
         persistBankAsync(account.bank)
 
         callBanksChangedListeners()
@@ -967,6 +971,21 @@ open class BankingPresenter(
         selectedAccountType = SelectedAccountType.SingleAccount
 
         setSelectedAccounts(listOf(account))
+    }
+
+    private fun updateSelectedAccounts(changedAccount: TypedBankAccount) {
+        if (areAllAccountSelected) {
+            selectedAllAccounts()
+        } else if (isSingleSelectedBank(changedAccount.bank as TypedBankData)) {
+            selectedBank(changedAccount.bank as TypedBankData)
+        } else if (isSingleSelectedAccount(changedAccount) && changedAccount.hideAccount) {
+            // if bank of this account has other non hidden accounts, then select this bank
+            if (changedAccount.bank.accounts.withoutHiddenOnes().isNotEmpty()) {
+                selectedBank(changedAccount.bank as TypedBankData)
+            } else { // otherwise select all accounts
+                selectedAllAccounts()
+            }
+        }
     }
 
     protected open fun setSelectedAccounts(accounts: List<TypedBankAccount>) {
