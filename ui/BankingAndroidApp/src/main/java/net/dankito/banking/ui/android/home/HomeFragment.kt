@@ -106,6 +106,14 @@ class HomeFragment : Fragment() {
         return rootView
     }
 
+    override fun onResume() {
+        super.onResume()
+
+        if (this::mnitmSearchTransactions.isInitialized) { // restore displayed transactions after onStop()
+            updateMenuItemsStateAndTransactionsToDisplay()
+        }
+    }
+
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
