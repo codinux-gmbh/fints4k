@@ -199,7 +199,7 @@ open class AuthenticationService(
             settings.salt = encodeToBase64(salt)
 
             if (newUserPassword != null) {
-                settings.hashedUserPassword = BCrypt.withDefaults().hashToString(12, newUserPassword)
+                settings.hashedUserPassword = BCrypt.withDefaults().hashToString(6, newUserPassword)
                 newDatabasePassword = concatPasswords(newUserPassword, newDefaultPassword)
             }
         }
