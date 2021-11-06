@@ -158,7 +158,7 @@ open class BankingPresenter(
                 readPersistedBanks()
 
                 if (appSettings.automaticallyUpdateAccountsAfterMinutes != null) { // TODO: check if time has elapsed
-                    //doAutomaticAccountsUpdate()
+                    doAutomaticAccountsUpdate()
                 }
             }
         }
