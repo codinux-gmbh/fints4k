@@ -42,7 +42,7 @@ open class FinTsUtils {
     }
 
 
-    protected fun convertToInt(string: String): Int {
+    protected open fun convertToInt(string: String): Int {
         return string.toInt()
     }
 
