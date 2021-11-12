@@ -18,8 +18,7 @@ import net.dankito.utils.multiplatform.log.LoggerFactory
 open class RequestExecutor(
     protected open val messageBuilder: MessageBuilder = MessageBuilder(),
     protected open val webClient: IWebClient = KtorWebClient(),
-    protected open val base64Service: IBase64Service = PureKotlinBase64Service(),
-    protected open val responseParser: ResponseParser = ResponseParser()
+    protected open val base64Service: IBase64Service = PureKotlinBase64Service()
 ) {
 
     companion object {
@@ -111,7 +110,7 @@ open class RequestExecutor(
 
                 addMessageLog(context, MessageLogEntryType.Received, decodedResponse)
 
-                return responseParser.parse(decodedResponse)
+                return context.responseParser.parse(decodedResponse)
             } catch (e: Exception) {
                 logError(context, "Could not decode responseBody:\r\n'$responseBody'", e)
 

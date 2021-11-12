@@ -6,6 +6,7 @@ import net.dankito.banking.fints.log.MessageContext
 import net.dankito.banking.fints.log.MessageLogCollector
 import net.dankito.banking.fints.messages.datenelemente.implementierte.signatur.VersionDesSicherheitsverfahrens
 import net.dankito.banking.fints.response.BankResponse
+import net.dankito.banking.fints.response.ResponseParser
 import net.dankito.banking.fints.transactions.IAccountTransactionsParser
 import net.dankito.banking.fints.transactions.Mt940AccountTransactionsParser
 import net.dankito.banking.fints.transactions.mt940.Mt940Parser
@@ -32,6 +33,8 @@ open class JobContext(
     protected open val _dialogs = mutableListOf<DialogContext>()
 
     open val mt940Parser: IAccountTransactionsParser = Mt940AccountTransactionsParser(Mt940Parser(this), this)
+
+    open val responseParser: ResponseParser = ResponseParser(logAppender = this)
 
     open val messageLogWithoutSensitiveData: List<MessageLogEntry>
         get() = messageLogCollector.messageLogWithoutSensitiveData

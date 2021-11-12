@@ -684,7 +684,7 @@ open class ResponseParser(
         if (dataElements.size > dateIndex + 1) {
             try {
                 time = parseTime(dataElements[dateIndex + 1])
-            } catch (e: Exception) { log.error("Could not parse balance time '${dataElementGroup[dateIndex + 1]}' of data element group: $dataElementGroup") }
+            } catch (e: Exception) { logError("Could not parse balance time '${dataElementGroup[dateIndex + 1]}' of data element group: $dataElementGroup", e) }
         }
 
         return Balance(parseAmount(dataElements[1], isCredit), currency, date, time)
