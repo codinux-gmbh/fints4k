@@ -29,16 +29,16 @@ open class MessageLogCollector {
         get() = messageLog.map { MessageLogEntry(safelyRemoveSensitiveDataFromMessage(it.message, it.bank), it.type, it.time, it.bank) }
 
 
-    protected val stackTraceHelper = StackTraceHelper()
+    protected open val stackTraceHelper = StackTraceHelper()
 
 
     open fun addMessageLog(message: String, type: MessageLogEntryType, bank: BankData) {
         val timeStamp = Date()
         val prettyPrintMessage = prettyPrintHbciMessage(message)
 
-        log.debug { "${if (type == MessageLogEntryType.Sent) "[${bank.bankCode}-${bank.customerId}] Sending" else "Received"} message:\r\n" + prettyPrintMessage }
-
         messageLog.add(MessageLogEntry(prettyPrintMessage, type, timeStamp, bank))
+
+        log.debug { "${if (type == MessageLogEntryType.Sent) "[${bank.bankCode}-${bank.customerId}] Sending" else "Received"} message:\r\n" + prettyPrintMessage }
     }
 
     protected open fun prettyPrintHbciMessage(message: String): String {
@@ -47,20 +47,18 @@ open class MessageLogCollector {
 
 
     open fun logError(message: String, e: Exception? = null, logger: Logger? = null, bank: BankData?) {
-        val prettyPrintMessage = prettyPrintHbciMessage(message)
-
         val loggerToUse = logger ?: log
+
         if (e != null) {
-            loggerToUse.error(e) { prettyPrintMessage }
-        }
-        else {
-            loggerToUse.error(prettyPrintMessage)
+            loggerToUse.error(e) { message }
+        } else {
+            loggerToUse.error(message)
         }
 
         val errorStackTrace = if (e != null) "\r\n" + getStackTrace(e) else ""
 
         // TODO: what to do when bank is not set?
-        messageLog.add(MessageLogEntry(prettyPrintMessage + errorStackTrace, MessageLogEntryType.Error, Date(), bank))
+        messageLog.add(MessageLogEntry(message + errorStackTrace, MessageLogEntryType.Error, Date(), bank))
     }
 
 
