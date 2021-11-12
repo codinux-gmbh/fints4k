@@ -64,15 +64,16 @@ open class MessageLogCollector {
     protected open fun createMessageTraceString(type: MessageLogEntryType, context: MessageContext): String {
         return "${twoDigits(context.jobNumber)}_${twoDigits(context.dialogNumber)}_${twoDigits(context.messageNumber)}_" +
                 "${context.bank.bankCode}_${context.bank.customerId}" +
-                "${ context.account?.let { "_${it.accountIdentifier}" } ?: "" } " +
-                "${getTypeString(type)}:"
+                "${ context.account?.let { "_${it.accountIdentifier}" } ?: "" }_" +
+                "${context.jobType.name}_${context.dialogType.name} " +
+                "${getMessageTypeString(type)}:"
     }
 
     protected open fun twoDigits(number: Int): String {
         return StringHelper.format("%02d", number)
     }
 
-    protected open fun getTypeString(type: MessageLogEntryType): String {
+    protected open fun getMessageTypeString(type: MessageLogEntryType): String {
         return when (type) {
             MessageLogEntryType.Sent -> "Sending message"
             MessageLogEntryType.Received -> "Received message"

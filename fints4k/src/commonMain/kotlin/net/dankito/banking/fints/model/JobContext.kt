@@ -79,7 +79,7 @@ open class JobContext(
     }
 
     protected open fun createMessageContext(): MessageContext {
-        return MessageContext(jobNumber, dialog.messageNumber, bank, account)
+        return MessageContext(type, dialog.messageType, jobNumber, dialogNumber, dialog.messageNumber, bank, account)
     }
 
 }

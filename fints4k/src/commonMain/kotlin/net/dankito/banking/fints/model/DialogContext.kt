@@ -1,7 +1,6 @@
 package net.dankito.banking.fints.model
 
 import net.dankito.banking.fints.messages.MessageBuilderResult
-import net.dankito.banking.fints.messages.datenelemente.implementierte.signatur.VersionDesSicherheitsverfahrens
 import net.dankito.banking.fints.response.BankResponse
 
 
@@ -16,6 +15,10 @@ open class DialogContext(
 
         const val InitialMessageNumber = 0
     }
+
+
+    open var messageType: MessageType = MessageType.AnonymousDialogInit
+        protected set
 
     open var currentMessage: MessageBuilderResult? = null
         protected set
@@ -37,7 +40,9 @@ open class DialogContext(
         messageNumber++
     }
 
-    open fun setNextMessage(message: MessageBuilderResult) {
+    open fun setNextMessage(type: MessageType, message: MessageBuilderResult) {
+        this.messageType = type
+
         this.previousMessageInDialog = this.currentMessage
 
         this.currentMessage = message

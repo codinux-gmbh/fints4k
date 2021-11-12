@@ -17,8 +17,6 @@ import net.dankito.banking.fints.response.client.GetUserTanMethodsResponse
 import net.dankito.banking.fints.response.segments.*
 import net.dankito.banking.fints.tan.FlickerCodeDecoder
 import net.dankito.banking.fints.tan.TanImageDecoder
-import net.dankito.banking.fints.transactions.IAccountTransactionsParser
-import net.dankito.banking.fints.transactions.Mt940AccountTransactionsParser
 import net.dankito.banking.fints.util.TanMethodSelector
 import net.dankito.utils.multiplatform.log.LoggerFactory
 import net.dankito.utils.multiplatform.Date
