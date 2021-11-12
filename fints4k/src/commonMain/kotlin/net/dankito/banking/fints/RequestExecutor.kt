@@ -43,7 +43,7 @@ open class RequestExecutor(
     }
 
 
-    open fun getAndHandleResponseForMessage(message: MessageBuilderResult, dialogContext: DialogContext,
+    open fun getAndHandleResponseForMessage(message: MessageBuilderResult, context: JobContext,
                                             tanRequiredCallback: (TanResponse, BankResponse, callback: (BankResponse) -> Unit) -> Unit, callback: (BankResponse) -> Unit) {
         if (message.createdMessage == null) {
             log.error("Could not create FinTS message to be sent to bank. isJobAllowed ${message.isJobAllowed}, isJobVersionSupported = ${message.isJobVersionSupported}," +
@@ -51,16 +51,16 @@ open class RequestExecutor(
             callback(BankResponse(false, messageThatCouldNotBeCreated = message, internalError = "Could not create FinTS message to be sent to bank")) // TODO: translate
         }
         else {
-            getAndHandleResponseForMessage(message.createdMessage, dialogContext) { response ->
-                handleMayRequiresTan(response, dialogContext, tanRequiredCallback) { handledResponse ->
+            getAndHandleResponseForMessage(context, message.createdMessage) { response ->
+                handleMayRequiresTan(context, response, tanRequiredCallback) { handledResponse ->
                     // if there's a Aufsetzpunkt (continuationId) set, then response is not complete yet, there's more information to fetch by sending this Aufsetzpunkt
                     handledResponse.aufsetzpunkt?.let { continuationId ->
                         if (handledResponse.followUpResponse == null) { // for re-sent messages followUpResponse is already set and dialog already closed -> would be overwritten with an error response that dialog is closed
                             if (message.isSendEnteredTanMessage() == false) { // for sending TAN no follow up message can be created -> filter out, otherwise chunkedResponseHandler would get called twice for same response
-                                dialogContext.chunkedResponseHandler?.invoke(handledResponse)
+                                context.dialog.chunkedResponseHandler?.invoke(handledResponse)
                             }
 
-                            getFollowUpMessageForContinuationId(handledResponse, continuationId, message, dialogContext, tanRequiredCallback) { followUpResponse ->
+                            getFollowUpMessageForContinuationId(context, handledResponse, continuationId, message, tanRequiredCallback) { followUpResponse ->
                                 handledResponse.followUpResponse = followUpResponse
                                 handledResponse.hasFollowUpMessageButCouldNotReceiveIt = handledResponse.followUpResponse == null
 
@@ -75,7 +75,7 @@ open class RequestExecutor(
                         // e.g. response = enter TAN response, but handledResponse is then response after entering TAN, e.g. account transactions
                         // -> chunkedResponseHandler would get called for same handledResponse multiple times
                         if (response == handledResponse) {
-                            dialogContext.chunkedResponseHandler?.invoke(handledResponse)
+                            context.dialog.chunkedResponseHandler?.invoke(handledResponse)
                         }
 
                         callback(handledResponse)
@@ -85,16 +85,17 @@ open class RequestExecutor(
         }
     }
 
-    protected open fun getAndHandleResponseForMessage(requestBody: String, dialogContext: DialogContext, callback: (BankResponse) -> Unit) {
-        addMessageLog(requestBody, MessageLogEntryType.Sent, dialogContext)
+    protected open fun getAndHandleResponseForMessage(context: JobContext, requestBody: String, callback: (BankResponse) -> Unit) {
+        addMessageLog(context, MessageLogEntryType.Sent, requestBody)
 
-        getResponseForMessage(requestBody, dialogContext.bank.finTs3ServerAddress) { webResponse ->
-            val response = handleResponse(webResponse, dialogContext)
+        getResponseForMessage(requestBody, context.bank.finTs3ServerAddress) { webResponse ->
+            val response = handleResponse(context, webResponse)
 
-            dialogContext.response = response
+            val dialog = context.dialog
+            dialog.response = response
 
-            response.messageHeader?.let { header -> dialogContext.dialogId = header.dialogId }
-            dialogContext.didBankCloseDialog = response.didBankCloseDialog
+            response.messageHeader?.let { header -> dialog.dialogId = header.dialogId }
+            dialog.didBankCloseDialog = response.didBankCloseDialog
 
             callback(response)
         }
@@ -106,17 +107,17 @@ open class RequestExecutor(
         webClient.post(finTs3ServerAddress, encodedRequestBody, "application/octet-stream", IWebClient.DefaultUserAgent, callback)
     }
 
-    open fun fireAndForgetMessage(message: MessageBuilderResult, dialogContext: DialogContext) {
+    open fun fireAndForgetMessage(context: JobContext, message: MessageBuilderResult) {
         message.createdMessage?.let { requestBody ->
-            addMessageLog(requestBody, MessageLogEntryType.Sent, dialogContext)
+            addMessageLog(context, MessageLogEntryType.Sent, requestBody)
 
-            getResponseForMessage(requestBody, dialogContext.bank.finTs3ServerAddress) { }
+            getResponseForMessage(requestBody, context.bank.finTs3ServerAddress) { }
 
             // if really needed add received response to message log here
         }
     }
 
-    protected open fun handleResponse(webResponse: WebClientResponse, dialogContext: DialogContext): BankResponse {
+    protected open fun handleResponse(context: JobContext, webResponse: WebClientResponse): BankResponse {
         val responseBody = webResponse.body
 
         if (webResponse.successful && responseBody != null) {
@@ -124,18 +125,18 @@ open class RequestExecutor(
             try {
                 val decodedResponse = decodeBase64Response(responseBody)
 
-                addMessageLog(decodedResponse, MessageLogEntryType.Received, dialogContext)
+                addMessageLog(context, MessageLogEntryType.Received, decodedResponse)
 
                 return responseParser.parse(decodedResponse)
             } catch (e: Exception) {
-                logError("Could not decode responseBody:\r\n'$responseBody'", dialogContext, e)
+                logError(context, "Could not decode responseBody:\r\n'$responseBody'", e)
 
                 return BankResponse(false, internalError = e.getAllExceptionMessagesJoined())
             }
         }
         else {
-            val bank = dialogContext.bank
-            logError("Request to $bank (${bank.finTs3ServerAddress}) failed", dialogContext, webResponse.error)
+            val bank = context.bank
+            logError(context, "Request to $bank (${bank.finTs3ServerAddress}) failed", webResponse.error)
         }
 
         return BankResponse(false, internalError = webResponse.error?.getAllExceptionMessagesJoined())
@@ -146,23 +147,23 @@ open class RequestExecutor(
     }
 
 
-    protected open fun getFollowUpMessageForContinuationId(response: BankResponse, continuationId: String, message: MessageBuilderResult, dialogContext: DialogContext,
+    protected open fun getFollowUpMessageForContinuationId(context: JobContext, response: BankResponse, continuationId: String, message: MessageBuilderResult,
                                                            tanRequiredCallback: (TanResponse, BankResponse, callback: (BankResponse) -> Unit) -> Unit,
                                                            callback: (BankResponse?) -> Unit) {
 
-        messageBuilder.rebuildMessageWithContinuationId(message, continuationId, dialogContext)?.let { followUpMessage ->
-            getAndHandleResponseForMessage(followUpMessage, dialogContext, tanRequiredCallback, callback)
+        messageBuilder.rebuildMessageWithContinuationId(context, message, continuationId)?.let { followUpMessage ->
+            getAndHandleResponseForMessage(followUpMessage, context, tanRequiredCallback, callback)
         }
         ?: run { callback(null) }
     }
 
 
-    protected open fun handleMayRequiresTan(response: BankResponse, dialogContext: DialogContext,
+    protected open fun handleMayRequiresTan(context: JobContext, response: BankResponse,
                                             tanRequiredCallback: (TanResponse, BankResponse, callback: (BankResponse) -> Unit) -> Unit,
                                             callback: (BankResponse) -> Unit) { // TODO: use response from DialogContext
 
         if (response.isStrongAuthenticationRequired) {
-            if (dialogContext.abortIfTanIsRequired) {
+            if (context.dialog.abortIfTanIsRequired) {
                 response.tanRequiredButWeWereToldToAbortIfSo = true
 
                 callback(response)
@@ -188,12 +189,12 @@ open class RequestExecutor(
     }
 
 
-    protected open fun addMessageLog(message: String, type: MessageLogEntryType, dialogContext: DialogContext) {
-        messageLogCollector.addMessageLog(message, type, dialogContext.bank)
+    protected open fun addMessageLog(context: JobContext, type: MessageLogEntryType, message: String) {
+        messageLogCollector.addMessageLog(message, type, context.bank)
     }
 
-    protected open fun logError(message: String, dialogContext: DialogContext, e: Exception?) {
-        messageLogAppender.logError(message, e, log, dialogContext.bank)
+    protected open fun logError(context: JobContext, message: String, e: Exception?) {
+        messageLogAppender.logError(message, e, log, context.bank)
     }
 
 }

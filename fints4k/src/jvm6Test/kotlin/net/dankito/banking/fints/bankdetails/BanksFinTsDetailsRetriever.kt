@@ -13,6 +13,7 @@ import net.dankito.banking.fints.messages.datenelemente.implementierte.tan.SmsAb
 import net.dankito.banking.fints.model.*
 import net.dankito.banking.bankfinder.BankInfo
 import net.dankito.banking.fints.FinTsJobExecutor
+import net.dankito.banking.fints.callback.SimpleFinTsClientCallback
 import net.dankito.banking.fints.model.mapper.ModelMapper
 import net.dankito.banking.fints.response.BankResponse
 import net.dankito.banking.fints.response.segments.SepaAccountInfoParameters
@@ -57,10 +58,10 @@ class BanksFinTsDetailsRetriever {
 
     }
 
-    private val jobExecutor = object : FinTsJobExecutor(NoOpFinTsClientCallback(), modelMapper = modelMapper) {
+    private val jobExecutor = object : FinTsJobExecutor(modelMapper = modelMapper) {
 
-        fun getAndHandleResponseForMessagePublic(message: MessageBuilderResult, dialogContext: DialogContext, callback: (BankResponse) -> Unit) {
-            getAndHandleResponseForMessage(message, dialogContext, callback)
+        fun getAndHandleResponseForMessagePublic(context: JobContext, message: MessageBuilderResult, callback: (BankResponse) -> Unit) {
+            getAndHandleResponseForMessage(context, message, callback)
         }
     }
 
@@ -127,12 +128,15 @@ class BanksFinTsDetailsRetriever {
 
     private fun getAnonymousBankInfo(bank: BankData): BankResponse {
         val dialogContext = DialogContext(bank, product)
-        val requestBody = messageBuilder.createAnonymousDialogInitMessage(dialogContext)
+        val context = JobContext(JobContextType.AnonymousBankInfo, SimpleFinTsClientCallback(), bank)
+        context.startNewDialog(dialogContext)
+
+        val requestBody = messageBuilder.createAnonymousDialogInitMessage(context)
 
         val anonymousBankInfoResponse = AtomicReference<BankResponse>()
         val countDownLatch = CountDownLatch(1)
 
-        jobExecutor.getAndHandleResponseForMessagePublic(requestBody, dialogContext) {
+        jobExecutor.getAndHandleResponseForMessagePublic(context, requestBody) {
             anonymousBankInfoResponse.set(it)
             countDownLatch.countDown()
         }

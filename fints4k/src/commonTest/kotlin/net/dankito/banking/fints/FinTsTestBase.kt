@@ -1,5 +1,6 @@
 package net.dankito.banking.fints
 
+import net.dankito.banking.fints.callback.SimpleFinTsClientCallback
 import net.dankito.banking.fints.messages.datenelemente.abgeleiteteformate.Datum
 import net.dankito.banking.fints.messages.datenelemente.abgeleiteteformate.Laenderkennzeichen
 import net.dankito.banking.fints.messages.datenelemente.implementierte.Dialogsprache
@@ -60,6 +61,15 @@ abstract class FinTsTestBase {
         }
     }
 
+
+    protected open fun createContext(dialogId: String = DialogContext.InitialDialogId): JobContext {
+        val dialogContext = DialogContext(Bank, Product, dialogId = dialogId)
+
+        val context = JobContext(JobContextType.AnonymousBankInfo, SimpleFinTsClientCallback(), Bank)
+        context.startNewDialog(dialogContext)
+
+        return context
+    }
 
     protected open fun createDialogId(): String {
         return UUID.random().replace("-", "")

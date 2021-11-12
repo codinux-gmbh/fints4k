@@ -58,24 +58,24 @@ open class MessageBuilder(protected val generator: ISegmentNumberGenerator = Seg
     übermittelt werden, wenn das Kreditinstitut dies unterstützt.
      (PinTan S. 35)
      */
-    open fun createAnonymousDialogInitMessage(dialogContext: DialogContext): MessageBuilderResult {
+    open fun createAnonymousDialogInitMessage(context: JobContext): MessageBuilderResult {
 
-        return createUnsignedMessageBuilderResult(dialogContext, listOf(
-            IdentifikationsSegment(generator.resetSegmentNumber(1), dialogContext),
-            Verarbeitungsvorbereitung(generator.getNextSegmentNumber(), dialogContext)
+        return createUnsignedMessageBuilderResult(context.dialog, listOf(
+            IdentifikationsSegment(generator.resetSegmentNumber(1), context.dialog),
+            Verarbeitungsvorbereitung(generator.getNextSegmentNumber(), context.dialog)
         ))
     }
 
-    open fun createAnonymousDialogEndMessage(dialogContext: DialogContext): MessageBuilderResult {
+    open fun createAnonymousDialogEndMessage(context: JobContext): MessageBuilderResult {
 
-        return createUnsignedMessageBuilderResult(dialogContext, listOf(
-            Dialogende(generator.resetSegmentNumber(1), dialogContext)
+        return createUnsignedMessageBuilderResult(context.dialog, listOf(
+            Dialogende(generator.resetSegmentNumber(1), context.dialog)
         ))
     }
 
 
-    open fun createInitDialogMessage(dialogContext: DialogContext): MessageBuilderResult {
-        return createInitDialogMessage(dialogContext, null)
+    open fun createInitDialogMessage(context: JobContext): MessageBuilderResult {
+        return createInitDialogMessage(context, null)
     }
 
     /**
@@ -112,61 +112,63 @@ open class MessageBuilder(protected val generator: ISegmentNumberGenerator = Seg
 
     (PinTan S. 37/38)
      */
-    open fun createInitDialogMessageWithoutStrongCustomerAuthentication(dialogContext: DialogContext, segmentIdForTwoStepTanProcess: CustomerSegmentId?): MessageBuilderResult {
-        return createInitDialogMessage(dialogContext, segmentIdForTwoStepTanProcess)
+    open fun createInitDialogMessageWithoutStrongCustomerAuthentication(context: JobContext, segmentIdForTwoStepTanProcess: CustomerSegmentId?): MessageBuilderResult {
+        return createInitDialogMessage(context, segmentIdForTwoStepTanProcess)
     }
 
-    protected open fun createInitDialogMessage(dialogContext: DialogContext, segmentIdForTwoStepTanProcess: CustomerSegmentId?): MessageBuilderResult {
+    protected open fun createInitDialogMessage(context: JobContext, segmentIdForTwoStepTanProcess: CustomerSegmentId?): MessageBuilderResult {
+        val dialog = context.dialog
 
         val segments = mutableListOf(
-            IdentifikationsSegment(generator.resetSegmentNumber(2), dialogContext),
-            Verarbeitungsvorbereitung(generator.getNextSegmentNumber(), dialogContext)
+            IdentifikationsSegment(generator.resetSegmentNumber(2), dialog),
+            Verarbeitungsvorbereitung(generator.getNextSegmentNumber(), dialog)
         )
 
         if (segmentIdForTwoStepTanProcess != null) {
-            segments.add(createTwoStepTanSegment(segmentIdForTwoStepTanProcess, dialogContext))
+            segments.add(createTwoStepTanSegment(segmentIdForTwoStepTanProcess, dialog))
         }
-        else if (dialogContext.bank.isTanMethodSelected) {
-            segments.add(createTwoStepTanSegment(CustomerSegmentId.Identification, dialogContext))
+        else if (context.bank.isTanMethodSelected) {
+            segments.add(createTwoStepTanSegment(CustomerSegmentId.Identification, dialog))
         }
 
-        if (dialogContext.bank.customerSystemId == KundensystemID.Anonymous) {
+        if (context.bank.customerSystemId == KundensystemID.Anonymous) {
             segments.add(Synchronisierung(generator.getNextSegmentNumber(), Synchronisierungsmodus.NeueKundensystemIdZurueckmelden))
         }
 
-        return createSignedMessageBuilderResult(dialogContext, segments)
+        return createSignedMessageBuilderResult(dialog, segments)
     }
 
-    open fun createSynchronizeCustomerSystemIdMessage(dialogContext: DialogContext): MessageBuilderResult {
+    open fun createSynchronizeCustomerSystemIdMessage(context: JobContext): MessageBuilderResult {
+        val dialog = context.dialog
 
-        return createSignedMessageBuilderResult(dialogContext, listOf(
-            IdentifikationsSegment(generator.resetSegmentNumber(2), dialogContext),
-            Verarbeitungsvorbereitung(generator.getNextSegmentNumber(), dialogContext),
-            createTwoStepTanSegment(CustomerSegmentId.Identification, dialogContext),
+        return createSignedMessageBuilderResult(dialog, listOf(
+            IdentifikationsSegment(generator.resetSegmentNumber(2), dialog),
+            Verarbeitungsvorbereitung(generator.getNextSegmentNumber(), dialog),
+            createTwoStepTanSegment(CustomerSegmentId.Identification, dialog),
             Synchronisierung(generator.getNextSegmentNumber(), Synchronisierungsmodus.NeueKundensystemIdZurueckmelden)
         ))
     }
 
-    open fun createDialogEndMessage(dialogContext: DialogContext): MessageBuilderResult {
+    open fun createDialogEndMessage(context: JobContext): MessageBuilderResult {
 
-        return createSignedMessageBuilderResult(dialogContext, listOf(
-            Dialogende(generator.resetSegmentNumber(2), dialogContext)
+        return createSignedMessageBuilderResult(context.dialog, listOf(
+            Dialogende(generator.resetSegmentNumber(2), context.dialog)
         ))
     }
 
 
-    open fun createGetTransactionsMessage(parameter: GetTransactionsParameter, dialogContext: DialogContext): MessageBuilderResult {
+    open fun createGetTransactionsMessage(context: JobContext, parameter: GetTransactionsParameter): MessageBuilderResult {
 
         val result = supportsGetTransactionsMt940(parameter.account)
 
         if (result.isJobVersionSupported) {
-            return createGetTransactionsMessageMt940(result, parameter, dialogContext)
+            return createGetTransactionsMessageMt940(result, parameter, context.dialog)
         }
 
         val creditCardResult = supportsGetCreditCardTransactions(parameter.account)
 
         if (creditCardResult.isJobVersionSupported) {
-            return createGetCreditCardTransactionsMessage(result, parameter, dialogContext)
+            return createGetCreditCardTransactionsMessage(result, parameter, context.dialog)
         }
 
         return result
@@ -220,19 +222,19 @@ open class MessageBuilder(protected val generator: ISegmentNumberGenerator = Seg
     }
 
 
-    open fun createGetBalanceMessage(account: AccountData, dialogContext: DialogContext): MessageBuilderResult {
+    open fun createGetBalanceMessage(context: JobContext, account: AccountData): MessageBuilderResult {
 
         val result = supportsGetBalanceMessage(account)
 
         if (result.isJobVersionSupported) {
             val balanceJob = if (result.isAllowed(5)) SaldenabfrageVersion5(generator.resetSegmentNumber(2), account)
-            else SaldenabfrageVersion7(generator.resetSegmentNumber(2), account, dialogContext.bank)
+            else SaldenabfrageVersion7(generator.resetSegmentNumber(2), account, context.bank)
 
             val segments = mutableListOf<Segment>(balanceJob)
 
-            addTanSegmentIfRequired(CustomerSegmentId.Balance, dialogContext, segments)
+            addTanSegmentIfRequired(CustomerSegmentId.Balance, context.dialog, segments)
 
-            return createSignedMessageBuilderResult(dialogContext, segments)
+            return createSignedMessageBuilderResult(context.dialog, segments)
         }
 
         return result
@@ -247,11 +249,11 @@ open class MessageBuilder(protected val generator: ISegmentNumberGenerator = Seg
     }
 
 
-    open fun createGetTanMediaListMessage(dialogContext: DialogContext,
+    open fun createGetTanMediaListMessage(context: JobContext,
                                           tanMediaKind: TanMedienArtVersion = TanMedienArtVersion.Alle,
                                           tanMediumClass: TanMediumKlasse = TanMediumKlasse.AlleMedien): MessageBuilderResult {
 
-        val result = getSupportedVersionsOfJobForBank(CustomerSegmentId.TanMediaList, dialogContext.bank, listOf(2, 3, 4, 5))
+        val result = getSupportedVersionsOfJobForBank(CustomerSegmentId.TanMediaList, context.bank, listOf(2, 3, 4, 5))
 
         if (result.isJobVersionSupported) {
             val segments = listOf(
@@ -259,31 +261,31 @@ open class MessageBuilder(protected val generator: ISegmentNumberGenerator = Seg
                     generator.resetSegmentNumber(2), tanMediaKind, tanMediumClass)
             )
 
-            return createSignedMessageBuilderResult(dialogContext, segments)
+            return createSignedMessageBuilderResult(context.dialog, segments)
         }
 
         return result
     }
 
     // TODO: no HKTAN needed?
-    open fun createChangeTanMediumMessage(newActiveTanMedium: TanGeneratorTanMedium, dialogContext: DialogContext,
+    open fun createChangeTanMediumMessage(context: JobContext, newActiveTanMedium: TanGeneratorTanMedium,
                                           tan: String? = null, atc: Int? = null): MessageBuilderResult {
 
-        val result = getSupportedVersionsOfJobForBank(CustomerSegmentId.ChangeTanMedium, dialogContext.bank, listOf(1, 2, 3))
+        val result = getSupportedVersionsOfJobForBank(CustomerSegmentId.ChangeTanMedium, context.bank, listOf(1, 2, 3))
 
         if (result.isJobVersionSupported) {
             val segments = listOf(
                 TanGeneratorTanMediumAnOderUmmelden(result.getHighestAllowedVersion!!, generator.resetSegmentNumber(2),
-                    dialogContext.bank, newActiveTanMedium, tan, atc)
+                    context.bank, newActiveTanMedium, tan, atc)
             )
 
-            return createSignedMessageBuilderResult(dialogContext, segments)
+            return createSignedMessageBuilderResult(context.dialog, segments)
         }
 
         return result
     }
 
-    open fun createSendEnteredTanMessage(enteredTan: String, tanResponse: TanResponse, dialogContext: DialogContext): MessageBuilderResult {
+    open fun createSendEnteredTanMessage(context: JobContext, enteredTan: String, tanResponse: TanResponse): MessageBuilderResult {
 
         val tanProcess = if (tanResponse.tanProcess == TanProcess.TanProcess1) TanProcess.TanProcess1 else TanProcess.TanProcess2
 
@@ -292,23 +294,23 @@ open class MessageBuilder(protected val generator: ISegmentNumberGenerator = Seg
                 tanResponse.jobHashValue, tanResponse.jobReference, false, null, tanResponse.tanMediaIdentifier)
         )
 
-        return createSignedMessageBuilderResult(createSignedMessage(dialogContext, enteredTan, segments), dialogContext, segments)
+        return createSignedMessageBuilderResult(createSignedMessage(context.dialog, enteredTan, segments), context.dialog, segments)
     }
 
 
-    open fun createBankTransferMessage(data: BankTransferData, account: AccountData, dialogContext: DialogContext): MessageBuilderResult {
+    open fun createBankTransferMessage(context: JobContext, data: BankTransferData, account: AccountData): MessageBuilderResult {
 
         val segmentId = if (data.realTimeTransfer) CustomerSegmentId.SepaRealTimeTransfer else CustomerSegmentId.SepaBankTransfer
 
-        val (result, urn) = supportsBankTransferAndSepaVersion(dialogContext.bank, account, segmentId)
+        val (result, urn) = supportsBankTransferAndSepaVersion(context.bank, account, segmentId)
 
         if (result.isJobVersionSupported && urn != null) {
             val segments = mutableListOf<Segment>(SepaBankTransferBase(segmentId, generator.resetSegmentNumber(2),
-                urn, dialogContext.bank.customerName, account, dialogContext.bank.bic, data))
+                urn, context.bank.customerName, account, context.bank.bic, data))
 
-            addTanSegmentIfRequired(segmentId, dialogContext, segments)
+            addTanSegmentIfRequired(segmentId, context.dialog, segments)
 
-            return createSignedMessageBuilderResult(dialogContext, segments)
+            return createSignedMessageBuilderResult(context.dialog, segments)
         }
 
         return result
@@ -342,7 +344,7 @@ open class MessageBuilder(protected val generator: ISegmentNumberGenerator = Seg
     }
 
 
-    open fun rebuildMessageWithContinuationId(message: MessageBuilderResult, continuationId: String, dialogContext: DialogContext): MessageBuilderResult? {
+    open fun rebuildMessageWithContinuationId(context: JobContext, message: MessageBuilderResult, continuationId: String): MessageBuilderResult? {
 
 //        val copiedSegments = message.messageBodySegments.map {  }
         val aufsetzpunkte = message.messageBodySegments.flatMap { it.dataElementsAndGroups }.filterIsInstance<Aufsetzpunkt>()
@@ -354,12 +356,12 @@ open class MessageBuilder(protected val generator: ISegmentNumberGenerator = Seg
 
         aufsetzpunkte.forEach { it.resetContinuationId(continuationId) }
 
-        return rebuildMessage(message, dialogContext)
+        return rebuildMessage(context, message)
     }
 
-    open fun rebuildMessage(message: MessageBuilderResult, dialogContext: DialogContext): MessageBuilderResult {
+    open fun rebuildMessage(context: JobContext, message: MessageBuilderResult): MessageBuilderResult {
 
-        return createSignedMessageBuilderResult(dialogContext, message.messageBodySegments)
+        return createSignedMessageBuilderResult(context.dialog, message.messageBodySegments)
     }
 
     protected open fun createSignedMessageBuilderResult(dialogContext: DialogContext, segments: List<Segment>): MessageBuilderResult {
@@ -518,7 +520,8 @@ open class MessageBuilder(protected val generator: ISegmentNumberGenerator = Seg
     }
 
     protected open fun createTwoStepTanSegment(segmentId: CustomerSegmentId, dialogContext: DialogContext): ZweiSchrittTanEinreichung {
-        return ZweiSchrittTanEinreichung(generator.getNextSegmentNumber(), TanProcess.TanProcess4, segmentId, tanMediaIdentifier = getTanMediaIdentifierIfRequired(dialogContext))
+        return ZweiSchrittTanEinreichung(generator.getNextSegmentNumber(), TanProcess.TanProcess4, segmentId,
+            tanMediaIdentifier = getTanMediaIdentifierIfRequired(dialogContext))
     }
 
     protected open fun getTanMediaIdentifierIfRequired(dialogContext: DialogContext): String? {

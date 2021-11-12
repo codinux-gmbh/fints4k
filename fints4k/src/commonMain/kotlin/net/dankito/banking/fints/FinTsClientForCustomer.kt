@@ -32,14 +32,14 @@ open class FinTsClientForCustomer(
             : this(bank, callback, RequestExecutor(MessageBuilder(), webClient, base64Service))
 
 
-    protected val client = FinTsClient(FinTsJobExecutor(callback, requestExecutor, messageBuilder, mt940Parser, modelMapper, tanMethodSelector, product))
+    protected val client = FinTsClient(callback, FinTsJobExecutor(requestExecutor, messageBuilder, mt940Parser, modelMapper, tanMethodSelector, product))
 
 
     open val messageLogWithoutSensitiveData: List<MessageLogEntry>
         get() = client.messageLogWithoutSensitiveData
 
     open fun setCallback(callback: FinTsClientCallback) {
-        client.setCallback(callback)
+        client.callback = callback
     }
 
 

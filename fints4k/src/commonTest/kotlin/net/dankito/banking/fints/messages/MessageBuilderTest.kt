@@ -47,10 +47,10 @@ class MessageBuilderTest : FinTsTestBase() {
     fun createAnonymousDialogInitMessage() {
 
         // given
-        val dialogContext = DialogContext(Bank, Product)
+        val context = createContext()
 
         // when
-        val result = underTest.createAnonymousDialogInitMessage(dialogContext).createdMessage
+        val result = underTest.createAnonymousDialogInitMessage(context).createdMessage
 
         // then
         expect(result).toBe(
@@ -66,10 +66,10 @@ class MessageBuilderTest : FinTsTestBase() {
 
         // given
         val dialogId = createDialogId()
-        val dialogContext = DialogContext(Bank, Product, dialogId = dialogId)
+        val context = createContext(dialogId)
 
         // when
-        val result = underTest.createAnonymousDialogEndMessage(dialogContext).createdMessage ?: ""
+        val result = underTest.createAnonymousDialogEndMessage(context).createdMessage ?: ""
 
         // then
         expect(normalizeBinaryData(result)).toBe(normalizeBinaryData(
@@ -84,10 +84,10 @@ class MessageBuilderTest : FinTsTestBase() {
     fun createDialogInitMessage() {
 
         // given
-        val dialogContext = DialogContext(Bank, Product)
+        val context = createContext()
 
         // when
-        val result = underTest.createSynchronizeCustomerSystemIdMessage(dialogContext).createdMessage ?: ""
+        val result = underTest.createSynchronizeCustomerSystemIdMessage(context).createdMessage ?: ""
 
         // then
         expect(normalizeBinaryData(result)).toBe(normalizeBinaryData(
@@ -108,10 +108,10 @@ class MessageBuilderTest : FinTsTestBase() {
 
         // given
         val dialogId = createDialogId()
-        val dialogContext = DialogContext(Bank, Product, dialogId = dialogId)
+        val context = createContext(dialogId)
 
         // when
-        val result = underTest.createDialogEndMessage(dialogContext).createdMessage ?: ""
+        val result = underTest.createDialogEndMessage(context).createdMessage ?: ""
 
         // then
         expect(normalizeBinaryData(result)).toBe(normalizeBinaryData(
@@ -129,10 +129,10 @@ class MessageBuilderTest : FinTsTestBase() {
     fun createGetTransactionsMessage_JobIsNotAllowed() {
 
         // given
-        val dialogContext = DialogContext(Bank, Product)
+        val context = createContext()
 
         // when
-        val result = underTest.createGetTransactionsMessage(GetTransactionsParameter(Account), dialogContext)
+        val result = underTest.createGetTransactionsMessage(context, GetTransactionsParameter(Account))
 
         // then
         expect(result.isJobAllowed).toBe(false)
@@ -147,10 +147,11 @@ class MessageBuilderTest : FinTsTestBase() {
         Bank.supportedJobs = listOf(getTransactionsJob)
         val account = AccountData(CustomerId, null, BankCountryCode, BankCode, null, CustomerId, AccountType.Girokonto, "EUR", "", null, null, listOf(getTransactionsJob.jobName), listOf(getTransactionsJobWithPreviousVersion))
         Bank.addAccount(account)
-        val dialogContext = DialogContext(Bank, Product)
+
+        val context = createContext()
 
         // when
-        val result = underTest.createGetTransactionsMessage(GetTransactionsParameter(account), dialogContext)
+        val result = underTest.createGetTransactionsMessage(context, GetTransactionsParameter(account))
 
         // then
         expect(result.isJobAllowed).toBe(true)
@@ -166,14 +167,15 @@ class MessageBuilderTest : FinTsTestBase() {
         Bank.pinInfo = PinInfo(getTransactionsJob, null, null, null, null, null, listOf(JobTanConfiguration(CustomerSegmentId.AccountTransactionsMt940.id, true)))
         val account = AccountData(CustomerId, null, BankCountryCode, BankCode, null, CustomerId, AccountType.Girokonto, "EUR", "", null, null, listOf(getTransactionsJob.jobName), listOf(getTransactionsJob))
         Bank.addAccount(account)
-        val dialogContext = DialogContext(Bank, Product)
+
+        val context = createContext()
 
         val fromDate = Date(2019, Month.August, 6)
         val toDate = Date(2019, Month.October, 21)
         val maxCountEntries = 99
 
         // when
-        val result = underTest.createGetTransactionsMessage(GetTransactionsParameter(account, false, fromDate, toDate, maxCountEntries), dialogContext)
+        val result = underTest.createGetTransactionsMessage(context, GetTransactionsParameter(account, false, fromDate, toDate, maxCountEntries))
 
         // then
         expect(result.createdMessage).notToBeNull()
@@ -198,7 +200,8 @@ class MessageBuilderTest : FinTsTestBase() {
         Bank.pinInfo = PinInfo(getTransactionsJob, null, null, null, null, null, listOf(JobTanConfiguration(CustomerSegmentId.AccountTransactionsMt940.id, true)))
         val account = AccountData(CustomerId, null, BankCountryCode, BankCode, null, CustomerId, AccountType.Girokonto, "EUR", "", null, null, listOf(getTransactionsJob.jobName), listOf(getTransactionsJob))
         Bank.addAccount(account)
-        val dialogContext = DialogContext(Bank, Product)
+
+        val context = createContext()
 
         val fromDate = Date(2019, Month.August, 6)
         val toDate = Date(2019, Month.October, 21)
@@ -206,7 +209,8 @@ class MessageBuilderTest : FinTsTestBase() {
         val continuationId = "9345-10-26-11.52.15.693455"
 
         // when
-        val result = underTest.createGetTransactionsMessage(GetTransactionsParameter(account, false, fromDate, toDate, maxCountEntries, false), dialogContext) // TODO: test Aufsetzpunkt / continuationId
+        val result = underTest.createGetTransactionsMessage(context, // TODO: test Aufsetzpunkt / continuationId
+            GetTransactionsParameter(account, false, fromDate, toDate, maxCountEntries, false))
 
         // then
         expect(result.createdMessage).notToBeNull()
