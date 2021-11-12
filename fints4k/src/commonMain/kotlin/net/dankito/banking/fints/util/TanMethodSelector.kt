@@ -7,7 +7,11 @@ import net.dankito.banking.fints.model.TanMethodType
 open class TanMethodSelector {
 
   companion object {
+
     val NonVisual = listOf(TanMethodType.AppTan, TanMethodType.SmsTan, TanMethodType.ChipTanManuell, TanMethodType.EnterTan)
+
+    val ImageBased = listOf(TanMethodType.QrCode, TanMethodType.ChipTanQrCode, TanMethodType.photoTan, TanMethodType.ChipTanPhotoTanMatrixCode)
+
   }
 
 
@@ -15,7 +19,7 @@ open class TanMethodSelector {
     return tanMethods.firstOrNull { it.type != TanMethodType.ChipTanUsb && it.type != TanMethodType.SmsTan && it.type != TanMethodType.ChipTanManuell }
       ?: tanMethods.firstOrNull { it.type != TanMethodType.ChipTanUsb && it.type != TanMethodType.SmsTan }
       ?: tanMethods.firstOrNull { it.type != TanMethodType.ChipTanUsb }
-      ?: tanMethods.firstOrNull()
+      ?: first(tanMethods)
   }
 
   open fun findPreferredTanMethod(tanMethods: List<TanMethod>, preferredTanMethods: List<TanMethodType>?): TanMethod? {
@@ -28,10 +32,36 @@ open class TanMethodSelector {
     return null
   }
 
-  open fun selectNonVisual(tanMethods: List<TanMethod>): TanMethod? {
+
+  open fun nonVisual(tanMethods: List<TanMethod>): TanMethod? {
     return findPreferredTanMethod(tanMethods, NonVisual)
       ?: tanMethods.firstOrNull { it.displayName.contains("manuell", true) }
-      ?: tanMethods.firstOrNull()
+  }
+
+  open fun nonVisualOrFirst(tanMethods: List<TanMethod>): TanMethod? {
+    return nonVisual(tanMethods)
+      ?: first(tanMethods)
+  }
+
+
+  open fun imageBased(tanMethods: List<TanMethod>): TanMethod? {
+    return findPreferredTanMethod(tanMethods, ImageBased)
+  }
+
+  open fun imageBasedOrFirst(tanMethods: List<TanMethod>): TanMethod? {
+    return imageBased(tanMethods)
+      ?: first(tanMethods)
+  }
+
+
+  open fun nonVisualOrImageBasedOrFirst(tanMethods: List<TanMethod>): TanMethod? {
+    return nonVisual(tanMethods)
+      ?: imageBased(tanMethods)
+      ?: first(tanMethods)
+  }
+
+  open fun first(tanMethods: List<TanMethod>): TanMethod? {
+    return tanMethods.firstOrNull()
   }
 
 }
