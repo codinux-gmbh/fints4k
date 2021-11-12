@@ -7,6 +7,7 @@ import net.dankito.utils.multiplatform.log.Logger
 import net.dankito.utils.multiplatform.log.LoggerFactory
 import net.dankito.utils.multiplatform.Date
 import net.dankito.utils.multiplatform.StackTraceHelper
+import net.dankito.utils.multiplatform.StringHelper
 import net.dankito.utils.multiplatform.getInnerException
 import kotlin.reflect.KClass
 
@@ -27,37 +28,60 @@ open class MessageLogCollector {
 
     // in either case remove sensitive data after response is parsed as otherwise some information like account holder name and accounts may is not set yet on BankData
     open val messageLogWithoutSensitiveData: List<MessageLogEntry>
-        get() = messageLog.map { MessageLogEntry(safelyRemoveSensitiveDataFromMessage(it.message, it.bank), it.type, it.time, it.bank) }
+        get() = messageLog.map { MessageLogEntry(it.type, safelyRemoveSensitiveDataFromMessage(it.message, it.context.bank), it.time, it.context) }
 
 
     protected open val stackTraceHelper = StackTraceHelper()
 
 
-    open fun addMessageLog(bank: BankData, type: MessageLogEntryType, message: String) {
+    open fun addMessageLog(type: MessageLogEntryType, message: String, context: MessageContext) {
         val timeStamp = Date()
         val prettyPrintMessage = prettyPrintHbciMessage(message)
 
-        messageLog.add(MessageLogEntry(prettyPrintMessage, type, timeStamp, bank))
+        messageLog.add(MessageLogEntry(type, prettyPrintMessage, timeStamp, context))
 
-        log.debug { "${if (type == MessageLogEntryType.Sent) "[${bank.bankCode}-${bank.customerId}] Sending" else "Received"} message:\r\n" + prettyPrintMessage }
-    }
-
-    protected open fun prettyPrintHbciMessage(message: String): String {
-        return message.replace("'", "'\r\n")
+        val messageTrace = createMessageTraceString(type, context)
+        log.debug { "$messageTrace\r\n$prettyPrintMessage" }
     }
 
 
-    open fun logError(loggingClass: KClass<*>, bank: BankData, message: String, e: Exception? = null) {
+    open fun logError(loggingClass: KClass<*>, message: String, context: MessageContext, e: Exception? = null) {
+        val type = MessageLogEntryType.Error
+        val messageTrace = createMessageTraceString(type, context) + " "
+
         if (e != null) {
-            getLogger(loggingClass).error(e) { message }
+            getLogger(loggingClass).error(e) { messageTrace + message }
         } else {
-            getLogger(loggingClass).error(message)
+            getLogger(loggingClass).error(messageTrace + message)
         }
 
         val errorStackTrace = if (e != null) "\r\n" + getStackTrace(e) else ""
 
-        // TODO: what to do when bank is not set?
-        messageLog.add(MessageLogEntry(message + errorStackTrace, MessageLogEntryType.Error, Date(), bank))
+        messageLog.add(MessageLogEntry(type, message + errorStackTrace, Date(), context))
+    }
+
+
+    protected open fun createMessageTraceString(type: MessageLogEntryType, context: MessageContext): String {
+        return "${twoDigits(context.jobNumber)}_${twoDigits(context.dialogNumber)}_" +
+                "${context.bank.bankCode}_${context.bank.customerId}" +
+                "${ context.account?.let { "_${it.accountIdentifier}" } ?: "" } " +
+                "${getTypeString(type)}:"
+    }
+
+    protected open fun twoDigits(number: Int): String {
+        return StringHelper.format("%02d", number)
+    }
+
+    protected open fun getTypeString(type: MessageLogEntryType): String {
+        return when (type) {
+            MessageLogEntryType.Sent -> "Sending message"
+            MessageLogEntryType.Received -> "Received message"
+            MessageLogEntryType.Error -> "Error"
+        }
+    }
+
+    protected open fun prettyPrintHbciMessage(message: String): String {
+        return message.replace("'", "'\r\n")
     }
 
 

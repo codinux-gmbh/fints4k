@@ -6,14 +6,9 @@ import net.dankito.banking.fints.response.BankResponse
 
 
 open class DialogContext(
-    val closeDialog: Boolean = true,
-    var abortIfTanIsRequired: Boolean = false,
-    var currentMessage: MessageBuilderResult? = null,
-    var dialogId: String = InitialDialogId,
-    var response: BankResponse? = null,
-    var didBankCloseDialog: Boolean = false,
-    var previousMessageInDialog: MessageBuilderResult? = null, // for PinTan almost always the case except for getting a user's TAN methods
-    var chunkedResponseHandler: ((BankResponse) -> Unit)? = null
+    open val closeDialog: Boolean = true,
+    open var dialogId: String = InitialDialogId,
+    open var chunkedResponseHandler: ((BankResponse) -> Unit)? = null
 ) {
 
     companion object {
@@ -22,8 +17,21 @@ open class DialogContext(
         const val InitialMessageNumber = 0
     }
 
+    open var currentMessage: MessageBuilderResult? = null
+        protected set
+
+    open var previousMessageInDialog: MessageBuilderResult? = null
+        protected set
+
     open var messageNumber: Int = InitialMessageNumber
         protected set
+
+    open var abortIfTanIsRequired: Boolean = false
+
+    open var response: BankResponse? = null
+
+    open var didBankCloseDialog: Boolean = false
+
 
     open fun increaseMessageNumber() {
         messageNumber++

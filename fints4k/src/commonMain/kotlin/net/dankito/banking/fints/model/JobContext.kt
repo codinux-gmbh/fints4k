@@ -2,6 +2,7 @@ package net.dankito.banking.fints.model
 
 import net.dankito.banking.fints.callback.FinTsClientCallback
 import net.dankito.banking.fints.log.IMessageLogAppender
+import net.dankito.banking.fints.log.MessageContext
 import net.dankito.banking.fints.log.MessageLogCollector
 import net.dankito.banking.fints.messages.datenelemente.implementierte.signatur.VersionDesSicherheitsverfahrens
 import net.dankito.banking.fints.response.BankResponse
@@ -23,6 +24,10 @@ open class JobContext(
     protected open val messageLogCollector: MessageLogCollector = MessageLogCollector()
 ) : MessageBaseData(bank, product), IMessageLogAppender {
 
+    companion object {
+        private var JobCount = 0 // this is not thread safe so job number may not be 100 % accurate
+    }
+
 
     protected open val _dialogs = mutableListOf<DialogContext>()
 
@@ -39,10 +44,14 @@ open class JobContext(
         get() = ArrayList(_dialogs) // create a copy
 
 
+    protected open val jobNumber: Int = ++JobCount
+
+
     open fun startNewDialog(closeDialog: Boolean = true, dialogId: String = DialogContext.InitialDialogId,
                        versionOfSecurityProcedure: VersionDesSicherheitsverfahrens = VersionDesSicherheitsverfahrens.Version_2,
                        chunkedResponseHandler: ((BankResponse) -> Unit)? = null) : DialogContext {
-        val newDialogContext = DialogContext(closeDialog, dialogId = dialogId, chunkedResponseHandler = chunkedResponseHandler)
+
+        val newDialogContext = DialogContext(closeDialog, dialogId, chunkedResponseHandler)
 
         this.versionOfSecurityProcedure = versionOfSecurityProcedure
 
@@ -55,11 +64,15 @@ open class JobContext(
 
 
     open fun addMessageLog(type: MessageLogEntryType, message: String) {
-        messageLogCollector.addMessageLog(bank, type, message)
+        messageLogCollector.addMessageLog(type, message, createMessageContext())
     }
 
     override fun logError(loggingClass: KClass<*>, message: String, e: Exception?) {
-        messageLogCollector.logError(loggingClass, bank, message, e)
+        messageLogCollector.logError(loggingClass, message, createMessageContext(), e)
+    }
+
+    protected open fun createMessageContext(): MessageContext {
+        return MessageContext(jobNumber, dialog.messageNumber, bank, account)
     }
 
 }

@@ -215,7 +215,8 @@ open class fints4kBankingClient(
     protected open fun saveData(response: FinTsClientResponse) {
         try {
             _messageLogWithoutSensitiveData.addAll(response.messageLogWithoutSensitiveData
-                .map { MessageLogEntry(it.message, map(it.type), it.time, bank) })
+                .map { MessageLogEntry(it.message, map(it.type), it.time, it.context.jobNumber,
+                    it.context.dialogNumber, bank, it.context.account?.let { mapper.findMatchingAccount(bank, it) } ) })
 
             // TODO: fix that real (child) class get serialized and re-enable again
 //            val clientDataFile = getFints4kClientDataFile(fintsBank.bankCode, fintsBank.customerId)

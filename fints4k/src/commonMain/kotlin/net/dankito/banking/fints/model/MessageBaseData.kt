@@ -8,7 +8,7 @@ open class MessageBaseData(
     open val product: ProductData
 ) {
 
-    open var versionOfSecurityProcedure: VersionDesSicherheitsverfahrens = VersionDesSicherheitsverfahrens.PinTanDefaultVersion
+    open var versionOfSecurityProcedure: VersionDesSicherheitsverfahrens = VersionDesSicherheitsverfahrens.PinTanDefaultVersion  // for PinTan almost always the case except for getting a user's TAN methods
         protected set
 
 }
