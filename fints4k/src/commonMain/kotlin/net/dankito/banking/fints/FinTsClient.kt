@@ -18,7 +18,8 @@ import kotlin.jvm.JvmOverloads
  */
 open class FinTsClient @JvmOverloads constructor(
     open var callback: FinTsClientCallback,
-    protected open val jobExecutor: FinTsJobExecutor = FinTsJobExecutor()
+    protected open val jobExecutor: FinTsJobExecutor = FinTsJobExecutor(),
+    protected open val product: ProductData = ProductData("15E53C26816138699C7B6A3E8", "1.0.0") // TODO: get version dynamically
 ) {
 
     companion object {
@@ -50,7 +51,7 @@ open class FinTsClient @JvmOverloads constructor(
      * On success [bank] parameter is updated afterwards.
      */
     open fun getAnonymousBankInfo(bank: BankData, callback: (FinTsClientResponse) -> Unit) {
-        jobExecutor.getAnonymousBankInfo(JobContext(JobContextType.AnonymousBankInfo, this.callback, bank)) { response ->
+        jobExecutor.getAnonymousBankInfo(JobContext(JobContextType.AnonymousBankInfo, this.callback, product, bank)) { response ->
             callback(FinTsClientResponse(response))
         }
     }
@@ -58,7 +59,7 @@ open class FinTsClient @JvmOverloads constructor(
 
     open fun addAccountAsync(parameter: AddAccountParameter, callback: (AddAccountResponse) -> Unit) {
         val bank = parameter.bank
-        val context = JobContext(JobContextType.AddAccount, this.callback, bank)
+        val context = JobContext(JobContextType.AddAccount, this.callback, product, bank)
 
         /*      First dialog: Get user's basic data like BPD, customer system ID and her TAN methods     */
 
@@ -155,7 +156,7 @@ open class FinTsClient @JvmOverloads constructor(
 
     open fun getTransactionsAsync(parameter: GetTransactionsParameter, bank: BankData, callback: (GetTransactionsResponse) -> Unit) {
 
-        val context = JobContext(JobContextType.GetTransactions, this.callback, bank, parameter.account)
+        val context = JobContext(JobContextType.GetTransactions, this.callback, product, bank, parameter.account)
 
         jobExecutor.getTransactionsAsync(context, parameter, callback)
     }
@@ -164,14 +165,14 @@ open class FinTsClient @JvmOverloads constructor(
     open fun getTanMediaList(bank: BankData, tanMediaKind: TanMedienArtVersion = TanMedienArtVersion.Alle,
                              tanMediumClass: TanMediumKlasse = TanMediumKlasse.AlleMedien, callback: (GetTanMediaListResponse) -> Unit) {
 
-        val context = JobContext(JobContextType.GetTanMedia, this.callback, bank)
+        val context = JobContext(JobContextType.GetTanMedia, this.callback, product, bank)
 
         jobExecutor.getTanMediaList(context, tanMediaKind, tanMediumClass, callback)
     }
 
 
     open fun changeTanMedium(newActiveTanMedium: TanGeneratorTanMedium, bank: BankData, callback: (FinTsClientResponse) -> Unit) {
-        val context = JobContext(JobContextType.ChangeTanMedium, this.callback, bank)
+        val context = JobContext(JobContextType.ChangeTanMedium, this.callback, product, bank)
 
         jobExecutor.changeTanMedium(context, newActiveTanMedium) { response ->
             callback(FinTsClientResponse(response))
@@ -180,7 +181,7 @@ open class FinTsClient @JvmOverloads constructor(
 
 
     open fun doBankTransferAsync(bankTransferData: BankTransferData, bank: BankData, account: AccountData, callback: (FinTsClientResponse) -> Unit) {
-        val context = JobContext(JobContextType.TransferMoney, this.callback, bank, account)
+        val context = JobContext(JobContextType.TransferMoney, this.callback, product, bank, account)
 
         jobExecutor.doBankTransferAsync(context, bankTransferData, callback)
     }

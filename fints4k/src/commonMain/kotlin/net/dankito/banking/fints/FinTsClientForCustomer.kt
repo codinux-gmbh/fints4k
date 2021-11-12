@@ -32,7 +32,7 @@ open class FinTsClientForCustomer(
             : this(bank, callback, RequestExecutor(MessageBuilder(), webClient, base64Service))
 
 
-    protected val client = FinTsClient(callback, FinTsJobExecutor(requestExecutor, messageBuilder, mt940Parser, modelMapper, tanMethodSelector, product))
+    protected val client = FinTsClient(callback, FinTsJobExecutor(requestExecutor, messageBuilder, mt940Parser, modelMapper, tanMethodSelector), product)
 
 
     open val messageLogWithoutSensitiveData: List<MessageLogEntry>

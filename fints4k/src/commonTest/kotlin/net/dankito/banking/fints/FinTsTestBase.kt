@@ -63,10 +63,8 @@ abstract class FinTsTestBase {
 
 
     protected open fun createContext(dialogId: String = DialogContext.InitialDialogId): JobContext {
-        val dialogContext = DialogContext(Bank, Product, dialogId = dialogId)
-
-        val context = JobContext(JobContextType.AnonymousBankInfo, SimpleFinTsClientCallback(), Bank)
-        context.startNewDialog(dialogContext)
+        val context = JobContext(JobContextType.AnonymousBankInfo, SimpleFinTsClientCallback(), Product, Bank)
+        context.startNewDialog(dialogId = dialogId)
 
         return context
     }

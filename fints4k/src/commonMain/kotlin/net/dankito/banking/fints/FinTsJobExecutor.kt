@@ -36,8 +36,7 @@ open class FinTsJobExecutor(
     protected open val messageBuilder: MessageBuilder = MessageBuilder(),
     protected open val mt940Parser: IAccountTransactionsParser = Mt940AccountTransactionsParser(),
     protected open val modelMapper: ModelMapper = ModelMapper(messageBuilder),
-    protected open val tanMethodSelector: TanMethodSelector = TanMethodSelector(),
-    protected open val product: ProductData = ProductData("15E53C26816138699C7B6A3E8", "1.0.0") // TODO: get version dynamically
+    protected open val tanMethodSelector: TanMethodSelector = TanMethodSelector()
 ) {
 
     companion object {
@@ -55,8 +54,7 @@ open class FinTsJobExecutor(
 
 
     open fun getAnonymousBankInfo(context: JobContext, callback: (BankResponse) -> Unit) {
-        val dialogContext = DialogContext(context.bank, product)
-        context.startNewDialog(dialogContext)
+        context.startNewDialog()
 
         val message = messageBuilder.createAnonymousDialogInitMessage(context)
 
@@ -106,8 +104,7 @@ open class FinTsJobExecutor(
         bank.resetSelectedTanMethod()
 
         // this is the only case where Einschritt-TAN-Verfahren is accepted: to get user's TAN methods
-        val dialogContext = DialogContext(bank, product, closeDialog, versionOfSecurityMethod = VersionDesSicherheitsverfahrens.Version_1)
-        context.startNewDialog(dialogContext)
+        context.startNewDialog(closeDialog, versionOfSecurityMethod = VersionDesSicherheitsverfahrens.Version_1)
 
         val message = messageBuilder.createInitDialogMessage(context)
 
@@ -166,8 +163,7 @@ open class FinTsJobExecutor(
 
                 getUsersTanMethod(context) { didSelectTanMethod ->
                     if (didSelectTanMethod) {
-                        val dialogContext = DialogContext(bank, product)
-                        context.startNewDialog(dialogContext)
+                        context.startNewDialog()
 
                         initDialogWithStrongCustomerAuthenticationAfterSuccessfulPreconditionChecks(context) { initDialogResponse ->
                             closeDialog(context)
@@ -185,8 +181,7 @@ open class FinTsJobExecutor(
 
     open fun getAccounts(context: JobContext, callback: (BankResponse) -> Unit) {
 
-        val dialogContext = DialogContext(context.bank, product, false)
-        context.startNewDialog(dialogContext)
+        context.startNewDialog(false)
 
         initDialogWithStrongCustomerAuthenticationAfterSuccessfulPreconditionChecks(context) { response ->
             closeDialog(context)
@@ -198,8 +193,7 @@ open class FinTsJobExecutor(
 
     open fun getTransactionsAsync(context: JobContext, parameter: GetTransactionsParameter, callback: (GetTransactionsResponse) -> Unit) {
 
-        val dialogContext = DialogContext(context.bank, product)
-        context.startNewDialog(dialogContext)
+        val dialogContext = context.startNewDialog()
 
         initDialogWithStrongCustomerAuthentication(context) { initDialogResponse ->
 
@@ -300,8 +294,7 @@ open class FinTsJobExecutor(
      */
     protected open fun synchronizeCustomerSystemId(context: JobContext, callback: (FinTsClientResponse) -> Unit) {
 
-        val dialogContext = DialogContext(context.bank, product)
-        context.startNewDialog(dialogContext)
+        context.startNewDialog()
 
         val message = messageBuilder.createSynchronizeCustomerSystemIdMessage(context)
 
@@ -522,9 +515,7 @@ open class FinTsJobExecutor(
     protected open fun resendMessageInNewDialog(context: JobContext, lastCreatedMessage: MessageBuilderResult?, callback: (BankResponse) -> Unit) {
 
         if (lastCreatedMessage != null) { // do not use previousDialogContext.currentMessage as this may is previous dialog's dialog close message
-            val previousDialog = context.dialog
-            val newDialogContext = DialogContext(context.bank, previousDialog.product, chunkedResponseHandler = previousDialog.chunkedResponseHandler)
-            context.startNewDialog(newDialogContext)
+            context.startNewDialog(chunkedResponseHandler = context.dialog.chunkedResponseHandler)
 
             initDialogWithStrongCustomerAuthentication(context) { initDialogResponse ->
                 if (initDialogResponse.successful == false) {
@@ -551,8 +542,7 @@ open class FinTsJobExecutor(
     protected open fun sendMessageAndHandleResponse(context: JobContext, segmentForNonStrongCustomerAuthenticationTwoStepTanProcess: CustomerSegmentId? = null,
                                                     closeDialog: Boolean = true, createMessage: () -> MessageBuilderResult, callback: (BankResponse) -> Unit) {
 
-        val dialogContext = DialogContext(context.bank, product, closeDialog)
-        context.startNewDialog(dialogContext)
+        context.startNewDialog(closeDialog)
 
         if (segmentForNonStrongCustomerAuthenticationTwoStepTanProcess == null) {
             initDialogWithStrongCustomerAuthentication(context) { initDialogResponse ->

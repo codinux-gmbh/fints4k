@@ -127,9 +127,8 @@ class BanksFinTsDetailsRetriever {
 
 
     private fun getAnonymousBankInfo(bank: BankData): BankResponse {
-        val dialogContext = DialogContext(bank, product)
-        val context = JobContext(JobContextType.AnonymousBankInfo, SimpleFinTsClientCallback(), bank)
-        context.startNewDialog(dialogContext)
+        val context = JobContext(JobContextType.AnonymousBankInfo, SimpleFinTsClientCallback(), product, bank)
+        context.startNewDialog()
 
         val requestBody = messageBuilder.createAnonymousDialogInitMessage(context)
 
