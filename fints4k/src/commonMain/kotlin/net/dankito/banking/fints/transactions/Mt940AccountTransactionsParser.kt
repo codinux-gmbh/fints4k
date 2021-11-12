@@ -23,8 +23,6 @@ open class Mt940AccountTransactionsParser(
 
 
     override fun parseTransactions(transactionsString: String, bank: BankData, account: AccountData): List<AccountTransaction> {
-        setLogAppender(bank)
-
         val accountStatements = mt940Parser.parseMt940String(transactionsString)
 
         return accountStatements.flatMap { mapToAccountTransactions(it, bank, account) }
@@ -115,19 +113,6 @@ open class Mt940AccountTransactionsParser(
         return positiveAmount
     }
 
-
-    protected open fun setLogAppender(bankDataOfCall: BankData) {
-        // TODO: this does not perfectly work as in parallel calls to Mt940AccountTransactionsParser for different account logAppender gets overwritten by the later call
-        mt940Parser.logAppender = logAppender?.let { logAppender ->
-            object : IMessageLogAppender {
-
-                override fun logError(loggingClass: KClass<*>, message: String, e: Exception?) {
-                    logAppender.logError(loggingClass, message, e)
-                }
-
-            }
-        }
-    }
 
     protected open fun logError(message: String, e: Exception?, bank: BankData) {
         logAppender?.let { logAppender ->
