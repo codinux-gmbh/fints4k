@@ -1,6 +1,5 @@
 package net.dankito.banking.fints
 
-import net.dankito.banking.fints.callback.FinTsClientCallback
 import net.dankito.banking.fints.messages.MessageBuilder
 import net.dankito.banking.fints.messages.MessageBuilderResult
 import net.dankito.banking.fints.messages.datenelemente.implementierte.signatur.VersionDesSicherheitsverfahrens
@@ -70,7 +69,7 @@ open class FinTsJobExecutor(
     protected open fun closeAnonymousDialog(context: JobContext, response: BankResponse) {
 
         // bank already closed dialog -> there's no need to send dialog end message
-        if (context.dialog.closeDialog == false || context.dialog.didBankCloseDialog) {
+        if (shouldNotCloseDialog(context)) {
             return
         }
 
@@ -104,7 +103,7 @@ open class FinTsJobExecutor(
         bank.resetSelectedTanMethod()
 
         // this is the only case where Einschritt-TAN-Verfahren is accepted: to get user's TAN methods
-        context.startNewDialog(closeDialog, versionOfSecurityMethod = VersionDesSicherheitsverfahrens.Version_1)
+        context.startNewDialog(closeDialog, versionOfSecurityProcedure = VersionDesSicherheitsverfahrens.Version_1)
 
         val message = messageBuilder.createInitDialogMessage(context)
 
@@ -612,13 +611,17 @@ open class FinTsJobExecutor(
     protected open fun closeDialog(context: JobContext) {
 
         // bank already closed dialog -> there's no need to send dialog end message
-        if (context.dialog.closeDialog == false || context.dialog.didBankCloseDialog) {
+        if (shouldNotCloseDialog(context)) {
             return
         }
 
         val dialogEndRequestBody = messageBuilder.createDialogEndMessage(context)
 
         fireAndForgetMessage(context, dialogEndRequestBody)
+    }
+
+    private fun shouldNotCloseDialog(context: JobContext): Boolean {
+        return context.dialog.closeDialog == false || context.dialog.didBankCloseDialog
     }
 
 

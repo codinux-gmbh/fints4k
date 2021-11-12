@@ -6,18 +6,15 @@ import net.dankito.banking.fints.response.BankResponse
 
 
 open class DialogContext(
-    bank: BankData,
-    product: ProductData,
     val closeDialog: Boolean = true,
     var abortIfTanIsRequired: Boolean = false,
     var currentMessage: MessageBuilderResult? = null,
     var dialogId: String = InitialDialogId,
     var response: BankResponse? = null,
     var didBankCloseDialog: Boolean = false,
-    versionOfSecurityMethod: VersionDesSicherheitsverfahrens = VersionDesSicherheitsverfahrens.Version_2,
     var previousMessageInDialog: MessageBuilderResult? = null, // for PinTan almost always the case except for getting a user's TAN methods
     var chunkedResponseHandler: ((BankResponse) -> Unit)? = null
-) : MessageBaseData(bank, product, versionOfSecurityMethod) {
+) {
 
     companion object {
         const val InitialDialogId = "0"
