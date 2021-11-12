@@ -381,7 +381,13 @@ open class FinTsJobExecutor(
 
     protected open fun getAndHandleResponseForMessage(message: MessageBuilderResult, dialogContext: DialogContext, callback: (BankResponse) -> Unit) {
         requestExecutor.getAndHandleResponseForMessage(message, dialogContext,
-            { tanResponse, bankResponse, tanRequiredCallback -> handleEnteringTanRequired(tanResponse, bankResponse, dialogContext, tanRequiredCallback) }) { response ->
+            { tanResponse, bankResponse, tanRequiredCallback ->
+                // if we receive a message that tells us a TAN is required below callback doesn't get called for that message -> update data here
+                // for Hypovereinsbank it's absolutely necessary to update bank data (more specific: PinInfo / HIPINS) after first strong authentication dialog init response
+                // as HIPINS differ in anonymous and in authenticated dialog. Anonymous dialog tells us for HKSAL and HKKAZ no TAN is needed
+                updateBankAndCustomerDataIfResponseSuccessful(dialogContext, bankResponse)
+                handleEnteringTanRequired(tanResponse, bankResponse, dialogContext, tanRequiredCallback)
+            }) { response ->
             // TODO: really update data only on complete successfully response? as it may contain useful information anyway  // TODO: extract method for this code part
             updateBankAndCustomerDataIfResponseSuccessful(dialogContext, response)
 
