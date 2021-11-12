@@ -29,4 +29,10 @@ open class DialogContext(
         messageNumber++
     }
 
+    open fun setNextMessage(message: MessageBuilderResult) {
+        this.previousMessageInDialog = this.currentMessage
+
+        this.currentMessage = message
+    }
+
 }

@@ -377,11 +377,7 @@ open class MessageBuilder(protected val generator: ISegmentNumberGenerator = Seg
     protected open fun createMessageBuilderResult(context: JobContext, createdMessage: String, segments: List<Segment>): MessageBuilderResult {
         val message = MessageBuilderResult(createdMessage, segments)
 
-        val dialog = context.dialog
-
-        dialog.previousMessageInDialog = dialog.currentMessage
-
-        dialog.currentMessage = message
+        context.dialog.setNextMessage(message)
 
         return message
     }
