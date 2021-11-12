@@ -21,7 +21,6 @@ open class FinTsClientForCustomer(
     callback: FinTsClientCallback,
     requestExecutor: RequestExecutor = RequestExecutor(),
     messageBuilder: MessageBuilder = MessageBuilder(),
-    mt940Parser: IAccountTransactionsParser = Mt940AccountTransactionsParser(),
     modelMapper: ModelMapper = ModelMapper(messageBuilder),
     protected open val tanMethodSelector: TanMethodSelector = TanMethodSelector(),
     product: ProductData = ProductData("15E53C26816138699C7B6A3E8", "1.0.0") // TODO: get version dynamically)
@@ -29,14 +28,13 @@ open class FinTsClientForCustomer(
 
     constructor(bank: BankData, callback: FinTsClientCallback, webClient: IWebClient = KtorWebClient(), base64Service: IBase64Service = PureKotlinBase64Service(),
                 product: ProductData = ProductData("15E53C26816138699C7B6A3E8", "1.0.0"))  // TODO: get version dynamically)
-            : this(bank, callback, RequestExecutor(MessageBuilder(), webClient, base64Service))
+            : this(bank, callback, RequestExecutor(MessageBuilder(), webClient, base64Service), product = product)
 
 
-    protected val client = FinTsClient(callback, FinTsJobExecutor(requestExecutor, messageBuilder, mt940Parser, modelMapper, tanMethodSelector), product)
+    protected val client = FinTsClient(callback, FinTsJobExecutor(requestExecutor, messageBuilder, modelMapper, tanMethodSelector), product)
 
 
-    open val messageLogWithoutSensitiveData: List<MessageLogEntry>
-        get() = client.messageLogWithoutSensitiveData
+    open val messageLogWithoutSensitiveData: List<MessageLogEntry> = mutableListOf()
 
     open fun setCallback(callback: FinTsClientCallback) {
         client.callback = callback

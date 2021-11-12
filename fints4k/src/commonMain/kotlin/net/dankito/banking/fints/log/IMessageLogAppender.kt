@@ -1,11 +1,10 @@
 package net.dankito.banking.fints.log
 
-import net.dankito.banking.fints.model.BankData
-import net.dankito.utils.multiplatform.log.Logger
+import kotlin.reflect.KClass
 
 
 interface IMessageLogAppender {
 
-    fun logError(message: String, e: Exception? = null, logger: Logger? = null, bank: BankData? = null)
+    fun logError(loggingClass: KClass<*>, message: String, e: Exception? = null)
 
 }

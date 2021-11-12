@@ -53,17 +53,11 @@ open class fints4kBankingClient(
 
     protected open val client = FinTsClientForCustomer(fintsBank, createFinTsClientCallback(callback), webClient, base64Service)
 
+    protected open val _messageLogWithoutSensitiveData: MutableList<MessageLogEntry> = mutableListOf()
+
 
     override val messageLogWithoutSensitiveData: List<MessageLogEntry>
-        get() = client.messageLogWithoutSensitiveData.map { MessageLogEntry(it.message, map(it.type), it.time, bank) }
-
-    protected open fun map(type: MessageLogEntryType): net.dankito.banking.ui.model.MessageLogEntryType {
-        return when (type) {
-            MessageLogEntryType.Sent -> net.dankito.banking.ui.model.MessageLogEntryType.Sent
-            MessageLogEntryType.Received -> net.dankito.banking.ui.model.MessageLogEntryType.Received
-            MessageLogEntryType.Error -> net.dankito.banking.ui.model.MessageLogEntryType.Error
-        }
-    }
+        get() = ArrayList(_messageLogWithoutSensitiveData)
 
 
     override fun addAccountAsync(callback: (AddAccountResponse) -> Unit) {
@@ -84,7 +78,7 @@ open class fints4kBankingClient(
 
         val mappedResponse = mapper.mapResponse(bank, response)
 
-        saveData()
+        saveData(response)
 
         callback(mappedResponse)
     }
@@ -124,7 +118,7 @@ open class fints4kBankingClient(
                                                      callback: (GetTransactionsResponse) -> Unit) {
         val mappedResponse = mapper.mapResponse(account, response)
 
-        saveData()
+        saveData(response)
 
         callback(mappedResponse)
     }
@@ -156,7 +150,7 @@ open class fints4kBankingClient(
     }
 
     protected open fun handleBankTransferResponse(callback: (BankingClientResponse) -> Unit, response: FinTsClientResponse) {
-        saveData()
+        saveData(response)
 
         callback(mapper.mapResponse(response))
     }
@@ -218,14 +212,25 @@ open class fints4kBankingClient(
         return null
     }
 
-    protected open fun saveData() {
+    protected open fun saveData(response: FinTsClientResponse) {
         try {
+            _messageLogWithoutSensitiveData.addAll(response.messageLogWithoutSensitiveData
+                .map { MessageLogEntry(it.message, map(it.type), it.time, bank) })
+
             // TODO: fix that real (child) class get serialized and re-enable again
 //            val clientDataFile = getFints4kClientDataFile(fintsBank.bankCode, fintsBank.customerId)
 //
 //            serializer.serializeObject(fintsBank, clientDataFile)
         } catch (e: Exception) {
             log.error(e) { "Could not save bank data for $fintsBank" }
+        }
+    }
+
+    protected open fun map(type: MessageLogEntryType): net.dankito.banking.ui.model.MessageLogEntryType {
+        return when (type) {
+            MessageLogEntryType.Sent -> net.dankito.banking.ui.model.MessageLogEntryType.Sent
+            MessageLogEntryType.Received -> net.dankito.banking.ui.model.MessageLogEntryType.Received
+            MessageLogEntryType.Error -> net.dankito.banking.ui.model.MessageLogEntryType.Error
         }
     }
 

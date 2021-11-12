@@ -1022,7 +1022,7 @@ open class ResponseParser(
 
     protected open fun logError(message: String, e: Exception?) {
         logAppender?.let { logAppender ->
-            logAppender.logError(message, e, log)
+            logAppender.logError(ResponseParser::class, message, e)
         }
         ?: run {
             log.error(e) { message }

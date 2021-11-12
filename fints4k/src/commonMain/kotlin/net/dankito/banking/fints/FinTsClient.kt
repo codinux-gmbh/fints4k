@@ -27,10 +27,6 @@ open class FinTsClient @JvmOverloads constructor(
     }
 
 
-    open val messageLogWithoutSensitiveData: List<MessageLogEntry>
-        get() = jobExecutor.messageLogWithoutSensitiveData
-
-
     /**
      * Retrieves information about bank (e.g. supported HBCI versions, FinTS server address,
      * supported jobs, ...).
@@ -51,8 +47,10 @@ open class FinTsClient @JvmOverloads constructor(
      * On success [bank] parameter is updated afterwards.
      */
     open fun getAnonymousBankInfo(bank: BankData, callback: (FinTsClientResponse) -> Unit) {
-        jobExecutor.getAnonymousBankInfo(JobContext(JobContextType.AnonymousBankInfo, this.callback, product, bank)) { response ->
-            callback(FinTsClientResponse(response))
+        val context = JobContext(JobContextType.AnonymousBankInfo, this.callback, product, bank)
+
+        jobExecutor.getAnonymousBankInfo(context) { response ->
+            callback(FinTsClientResponse(context, response))
         }
     }
 
@@ -66,7 +64,7 @@ open class FinTsClient @JvmOverloads constructor(
         jobExecutor.retrieveBasicDataLikeUsersTanMethods(context, parameter.preferredTanMethods, parameter.preferredTanMedium) { newUserInfoResponse ->
 
             if (newUserInfoResponse.successful == false) { // bank parameter (FinTS server address, ...) already seem to be wrong
-                callback(AddAccountResponse(newUserInfoResponse, bank))
+                callback(AddAccountResponse(context, newUserInfoResponse, bank))
                 return@retrieveBasicDataLikeUsersTanMethods
             }
 
@@ -84,7 +82,7 @@ open class FinTsClient @JvmOverloads constructor(
         jobExecutor.getAccounts(context) { getAccountsResponse ->
 
             if (getAccountsResponse.successful == false) {
-                callback(AddAccountResponse(getAccountsResponse, context.bank))
+                callback(AddAccountResponse(context, getAccountsResponse, context.bank))
                 return@getAccounts
             }
 
@@ -119,7 +117,7 @@ open class FinTsClient @JvmOverloads constructor(
             tryGetTransactionsOfLast90DaysWithoutTan(bank, account) { response ->
                 retrievedAccountData.put(account, response.retrievedData.first())
 
-                if (response.internalError != null) {
+                if (response.internalError != null) { // TODO: errors from response get lost! User then only sees "null" as error message
                     //getAccountsResponse.errorMessage = response.errorMessage
                 }
 
@@ -135,7 +133,7 @@ open class FinTsClient @JvmOverloads constructor(
                                       retrievedAccountData: Map<AccountData, RetrievedAccountData>,
                                       callback: (AddAccountResponse) -> Unit) {
 
-        callback(AddAccountResponse(getAccountsResponse, context.bank, retrievedAccountData.values.toList()))
+        callback(AddAccountResponse(context, getAccountsResponse, context.bank, retrievedAccountData.values.toList()))
     }
 
 
@@ -175,7 +173,7 @@ open class FinTsClient @JvmOverloads constructor(
         val context = JobContext(JobContextType.ChangeTanMedium, this.callback, product, bank)
 
         jobExecutor.changeTanMedium(context, newActiveTanMedium) { response ->
-            callback(FinTsClientResponse(response))
+            callback(FinTsClientResponse(context, response))
         }
     }
 

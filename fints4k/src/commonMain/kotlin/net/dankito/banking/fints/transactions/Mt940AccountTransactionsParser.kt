@@ -9,7 +9,7 @@ import net.dankito.banking.fints.transactions.mt940.model.Balance
 import net.dankito.banking.fints.transactions.mt940.model.Transaction
 import net.dankito.banking.fints.transactions.mt940.model.StatementLine
 import net.dankito.utils.multiplatform.log.LoggerFactory
-import net.dankito.utils.multiplatform.log.Logger
+import kotlin.reflect.KClass
 
 
 open class Mt940AccountTransactionsParser(
@@ -121,8 +121,8 @@ open class Mt940AccountTransactionsParser(
         mt940Parser.logAppender = logAppender?.let { logAppender ->
             object : IMessageLogAppender {
 
-                override fun logError(message: String, e: Exception?, logger: Logger?, bank: BankData?) {
-                    logAppender.logError(message, e, logger, bank ?: bankDataOfCall)
+                override fun logError(loggingClass: KClass<*>, message: String, e: Exception?) {
+                    logAppender.logError(loggingClass, message, e)
                 }
 
             }
@@ -131,7 +131,7 @@ open class Mt940AccountTransactionsParser(
 
     protected open fun logError(message: String, e: Exception?, bank: BankData) {
         logAppender?.let { logAppender ->
-            logAppender.logError(message, e, log, bank)
+            logAppender.logError(Mt940AccountTransactionsParser::class, message, e)
         }
         ?: run {
             log.error(e) { message }

@@ -1,7 +1,5 @@
 package net.dankito.banking.fints
 
-import net.dankito.banking.fints.log.IMessageLogAppender
-import net.dankito.banking.fints.log.MessageLogCollector
 import net.dankito.banking.fints.messages.MessageBuilder
 import net.dankito.banking.fints.messages.MessageBuilderResult
 import net.dankito.banking.fints.model.*
@@ -14,7 +12,6 @@ import net.dankito.banking.fints.webclient.IWebClient
 import net.dankito.banking.fints.webclient.KtorWebClient
 import net.dankito.banking.fints.webclient.WebClientResponse
 import net.dankito.utils.multiplatform.getAllExceptionMessagesJoined
-import net.dankito.utils.multiplatform.log.Logger
 import net.dankito.utils.multiplatform.log.LoggerFactory
 
 
@@ -22,24 +19,11 @@ open class RequestExecutor(
     protected open val messageBuilder: MessageBuilder = MessageBuilder(),
     protected open val webClient: IWebClient = KtorWebClient(),
     protected open val base64Service: IBase64Service = PureKotlinBase64Service(),
-    protected open val responseParser: ResponseParser = ResponseParser(),
-    protected open val messageLogCollector: MessageLogCollector = MessageLogCollector()
+    protected open val responseParser: ResponseParser = ResponseParser()
 ) {
 
     companion object {
         private val log = LoggerFactory.getLogger(FinTsJobExecutor::class)
-    }
-
-
-    open val messageLogWithoutSensitiveData: List<MessageLogEntry>
-        get() = messageLogCollector.messageLogWithoutSensitiveData
-
-    internal open val messageLogAppender: IMessageLogAppender = object : IMessageLogAppender {
-
-        override fun logError(message: String, e: Exception?, logger: Logger?, bank: BankData?) {
-            messageLogCollector.logError(message, e, logger, bank)
-        }
-
     }
 
 
@@ -190,11 +174,11 @@ open class RequestExecutor(
 
 
     protected open fun addMessageLog(context: JobContext, type: MessageLogEntryType, message: String) {
-        messageLogCollector.addMessageLog(message, type, context.bank)
+        context.addMessageLog(type, message)
     }
 
     protected open fun logError(context: JobContext, message: String, e: Exception?) {
-        messageLogAppender.logError(message, e, log, context.bank)
+        context.logError(RequestExecutor::class, message, e)
     }
 
 }

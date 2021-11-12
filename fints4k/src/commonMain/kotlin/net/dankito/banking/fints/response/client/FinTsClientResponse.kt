@@ -1,5 +1,7 @@
 package net.dankito.banking.fints.response.client
 
+import net.dankito.banking.fints.model.JobContext
+import net.dankito.banking.fints.model.MessageLogEntry
 import net.dankito.banking.fints.response.BankResponse
 import net.dankito.banking.fints.response.segments.TanResponse
 
@@ -12,6 +14,8 @@ open class FinTsClientResponse(
 
     open val isStrongAuthenticationRequired: Boolean,
     open val tanRequired: TanResponse? = null,
+
+    open val messageLogWithoutSensitiveData: List<MessageLogEntry>,
 
     /**
      * A fints4k internal error like an error occurred during web request or response parsing.
@@ -34,9 +38,9 @@ open class FinTsClientResponse(
 ) {
 
 
-    constructor(response: BankResponse) : this(response.successful, response.noTanMethodSelected,
-        response.isStrongAuthenticationRequired, response.tanResponse, response.internalError,
-        response.errorsToShowToUser, response.wrongCredentialsEntered,
+    constructor(context: JobContext, response: BankResponse) : this(response.successful, response.noTanMethodSelected,
+        response.isStrongAuthenticationRequired, response.tanResponse, context.messageLogWithoutSensitiveData,
+        response.internalError, response.errorsToShowToUser, response.wrongCredentialsEntered,
         response.tanRequiredButUserDidNotEnterOne, response.tanRequiredButWeWereToldToAbortIfSo,
         response.messageThatCouldNotBeCreated?.isJobAllowed ?: true,
         response.messageThatCouldNotBeCreated?.isJobVersionSupported ?: true,

@@ -23,7 +23,9 @@ user‐to‐user messages.
 Character ”‐” is not permitted as the first character of the line.
 None of lines include only Space.
  */
-open class Mt940Parser : IMt940Parser {
+open class Mt940Parser(
+    override var logAppender: IMessageLogAppender? = null
+) : IMt940Parser {
 
     companion object {
         val AccountStatementsSeparatorRegex = Regex("^\\s*-\\s*\$", RegexOption.MULTILINE) // a line only with '-' and may other white space characters
@@ -76,9 +78,6 @@ open class Mt940Parser : IMt940Parser {
 
         private val log = LoggerFactory.getLogger(Mt940Parser::class)
     }
-
-
-    override var logAppender: IMessageLogAppender? = null
 
 
     /**
@@ -496,7 +495,7 @@ open class Mt940Parser : IMt940Parser {
 
     protected open fun logError(message: String, e: Exception?) {
         logAppender?.let { logAppender ->
-            logAppender.logError(message, e, log)
+            logAppender.logError(Mt940Parser::class, message, e)
         }
         ?: run {
             log.error(e) { message }

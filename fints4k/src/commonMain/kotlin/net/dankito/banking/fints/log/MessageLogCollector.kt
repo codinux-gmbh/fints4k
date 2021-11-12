@@ -8,6 +8,7 @@ import net.dankito.utils.multiplatform.log.LoggerFactory
 import net.dankito.utils.multiplatform.Date
 import net.dankito.utils.multiplatform.StackTraceHelper
 import net.dankito.utils.multiplatform.getInnerException
+import kotlin.reflect.KClass
 
 
 open class MessageLogCollector {
@@ -32,7 +33,7 @@ open class MessageLogCollector {
     protected open val stackTraceHelper = StackTraceHelper()
 
 
-    open fun addMessageLog(message: String, type: MessageLogEntryType, bank: BankData) {
+    open fun addMessageLog(bank: BankData, type: MessageLogEntryType, message: String) {
         val timeStamp = Date()
         val prettyPrintMessage = prettyPrintHbciMessage(message)
 
@@ -46,13 +47,11 @@ open class MessageLogCollector {
     }
 
 
-    open fun logError(message: String, e: Exception? = null, logger: Logger? = null, bank: BankData?) {
-        val loggerToUse = logger ?: log
-
+    open fun logError(loggingClass: KClass<*>, bank: BankData, message: String, e: Exception? = null) {
         if (e != null) {
-            loggerToUse.error(e) { message }
+            getLogger(loggingClass).error(e) { message }
         } else {
-            loggerToUse.error(message)
+            getLogger(loggingClass).error(message)
         }
 
         val errorStackTrace = if (e != null) "\r\n" + getStackTrace(e) else ""
@@ -112,6 +111,10 @@ open class MessageLogCollector {
         val innerException = e.getInnerException()
 
         return stackTraceHelper.getStackTrace(innerException, MaxCountStackTraceElements)
+    }
+
+    protected open fun getLogger(loggingClass: KClass<*>): Logger {
+        return LoggerFactory.getLogger(loggingClass)
     }
 
 }

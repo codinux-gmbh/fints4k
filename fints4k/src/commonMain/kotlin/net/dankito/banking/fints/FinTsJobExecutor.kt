@@ -33,22 +33,12 @@ import net.dankito.utils.multiplatform.ObjectReference
 open class FinTsJobExecutor(
     protected open val requestExecutor: RequestExecutor = RequestExecutor(),
     protected open val messageBuilder: MessageBuilder = MessageBuilder(),
-    protected open val mt940Parser: IAccountTransactionsParser = Mt940AccountTransactionsParser(),
     protected open val modelMapper: ModelMapper = ModelMapper(messageBuilder),
     protected open val tanMethodSelector: TanMethodSelector = TanMethodSelector()
 ) {
 
     companion object {
         private val log = LoggerFactory.getLogger(FinTsJobExecutor::class)
-    }
-
-
-    open val messageLogWithoutSensitiveData: List<MessageLogEntry>
-        get() = requestExecutor.messageLogWithoutSensitiveData
-
-
-    init {
-        mt940Parser.logAppender = requestExecutor.messageLogAppender // TODO: find a better solution to append messages to MessageLog
     }
 
 
@@ -197,7 +187,7 @@ open class FinTsJobExecutor(
         initDialogWithStrongCustomerAuthentication(context) { initDialogResponse ->
 
             if (initDialogResponse.successful == false) {
-                callback(GetTransactionsResponse(initDialogResponse, RetrievedAccountData.unsuccessfulList(parameter.account)))
+                callback(GetTransactionsResponse(context, initDialogResponse, RetrievedAccountData.unsuccessfulList(parameter.account)))
             }
             else {
                 // we now retrieved the fresh account information from FinTS server, use that one
@@ -205,7 +195,7 @@ open class FinTsJobExecutor(
 
                 mayGetBalance(context, parameter) { balanceResponse ->
                     if (dialogContext.didBankCloseDialog) {
-                        callback(GetTransactionsResponse(balanceResponse ?: initDialogResponse, RetrievedAccountData.unsuccessfulList(parameter.account)))
+                        callback(GetTransactionsResponse(context, balanceResponse ?: initDialogResponse, RetrievedAccountData.unsuccessfulList(parameter.account)))
                     }
                     else {
                         getTransactionsAfterInitAndGetBalance(context, parameter, balanceResponse, callback)
@@ -235,7 +225,7 @@ open class FinTsJobExecutor(
 
         context.dialog.chunkedResponseHandler = { response ->
             response.getFirstSegmentById<ReceivedAccountTransactions>(InstituteSegmentId.AccountTransactionsMt940)?.let { transactionsSegment ->
-                val (chunkTransaction, remainder) = mt940Parser.parseTransactionsChunk(remainingMt940String + transactionsSegment.bookedTransactionsString,
+                val (chunkTransaction, remainder) = context.mt940Parser.parseTransactionsChunk(remainingMt940String + transactionsSegment.bookedTransactionsString,
                     context.bank, parameter.account)
 
                 bookedTransactions.addAll(chunkTransaction)
@@ -261,7 +251,7 @@ open class FinTsJobExecutor(
             val retrievedData = RetrievedAccountData(parameter.account, successful, balance, bookedTransactions, unbookedTransactions, fromDate, parameter.toDate ?: Date.today, response.internalError)
 
             callback(
-                GetTransactionsResponse(response, listOf(retrievedData),
+                GetTransactionsResponse(context, response, listOf(retrievedData),
                 if (parameter.maxCountEntries != null) parameter.isSettingMaxCountEntriesAllowedByBank else null
             )
             )
@@ -302,7 +292,7 @@ open class FinTsJobExecutor(
                 closeDialog(context)
             }
 
-            callback(FinTsClientResponse(response))
+            callback(FinTsClientResponse(context, response))
         }
     }
 
@@ -318,11 +308,13 @@ open class FinTsJobExecutor(
         sendMessageAndHandleResponse(context, CustomerSegmentId.TanMediaList, false, {
             messageBuilder.createGetTanMediaListMessage(context, tanMediaKind, tanMediumClass)
         }) { response ->
-            handleGetTanMediaListResponse(response, context.bank, preferredTanMedium, callback)
+            handleGetTanMediaListResponse(context, response, preferredTanMedium, callback)
         }
     }
 
-    protected open fun handleGetTanMediaListResponse(response: BankResponse, bank: BankData, preferredTanMedium: String? = null, callback: (GetTanMediaListResponse) -> Unit) {
+    protected open fun handleGetTanMediaListResponse(context: JobContext, response: BankResponse, preferredTanMedium: String? = null, callback: (GetTanMediaListResponse) -> Unit) {
+        val bank = context.bank
+
         // TAN media list (= TAN generator list) is only returned for users with chipTAN TAN methods
         val tanMediaList = if (response.successful == false) null
         else response.getFirstSegmentById<TanMediaList>(InstituteSegmentId.TanMediaList)
@@ -335,7 +327,7 @@ open class FinTsJobExecutor(
                 ?: bank.tanMedia.firstOrNull { it.mediumName != null }
         }
 
-        callback(GetTanMediaListResponse(response, tanMediaList))
+        callback(GetTanMediaListResponse(context, response, tanMediaList))
     }
 
 
@@ -373,7 +365,7 @@ open class FinTsJobExecutor(
             val updatedAccount = getUpdatedAccount(context, context.account!!)
             messageBuilder.createBankTransferMessage(context, bankTransferData, updatedAccount)
         }) { response ->
-            callback(FinTsClientResponse(response))
+            callback(FinTsClientResponse(context, response))
         }
     }
 
@@ -499,7 +491,7 @@ open class FinTsJobExecutor(
 
 
         changeTanMedium(context, changeTanMediumTo) { changeTanMediumResponse ->
-            changeTanMediumResultCallback?.invoke(FinTsClientResponse(changeTanMediumResponse))
+            changeTanMediumResultCallback?.invoke(FinTsClientResponse(context, changeTanMediumResponse))
 
             if (changeTanMediumResponse.successful == false || lastCreatedMessage == null) {
                 callback(changeTanMediumResponse)
