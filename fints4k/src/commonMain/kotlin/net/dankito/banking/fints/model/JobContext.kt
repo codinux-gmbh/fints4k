@@ -49,6 +49,8 @@ open class JobContext(
 
     protected open val jobNumber: Int = ++JobCount
 
+    protected open var dialogNumber: Int = 0
+
 
     open fun startNewDialog(closeDialog: Boolean = true, dialogId: String = DialogContext.InitialDialogId,
                        versionOfSecurityProcedure: VersionDesSicherheitsverfahrens = VersionDesSicherheitsverfahrens.Version_2,
@@ -61,6 +63,8 @@ open class JobContext(
         this.dialog = newDialogContext
 
         this._dialogs.add(newDialogContext)
+
+        this.dialogNumber++
 
         return newDialogContext
     }

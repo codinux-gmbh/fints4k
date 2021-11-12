@@ -62,7 +62,7 @@ open class MessageLogCollector {
 
 
     protected open fun createMessageTraceString(type: MessageLogEntryType, context: MessageContext): String {
-        return "${twoDigits(context.jobNumber)}_${twoDigits(context.dialogNumber)}_" +
+        return "${twoDigits(context.jobNumber)}_${twoDigits(context.dialogNumber)}_${twoDigits(context.messageNumber)}_" +
                 "${context.bank.bankCode}_${context.bank.customerId}" +
                 "${ context.account?.let { "_${it.accountIdentifier}" } ?: "" } " +
                 "${getTypeString(type)}:"

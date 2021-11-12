@@ -7,6 +7,7 @@ import net.dankito.banking.fints.model.BankData
 class MessageContext(
     val jobNumber: Int,
     val dialogNumber: Int,
+    val messageNumber: Int,
     val bank: BankData,
     val account: AccountData?
 )
