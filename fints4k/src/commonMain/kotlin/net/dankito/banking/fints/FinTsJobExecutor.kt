@@ -62,8 +62,6 @@ open class FinTsJobExecutor(
 
         getAndHandleResponseForMessage(message, dialogContext) { response ->
             if (response.successful) {
-                updateBankData(bank, response)
-
                 closeAnonymousDialog(dialogContext, response)
             }
 
@@ -136,9 +134,6 @@ open class FinTsJobExecutor(
     protected open fun handleGetUsersTanMethodsResponse(response: BankResponse, dialogContext: DialogContext, callback: (BankResponse) -> Unit) {
         val getUsersTanMethodsResponse = GetUserTanMethodsResponse(response)
 
-        // TODO: really update data only on complete successfully response? as it may contain useful information anyway  // TODO: extract method for this code part
-        updateBankAndCustomerDataIfResponseSuccessful(dialogContext, getUsersTanMethodsResponse)
-
         // even though it is required by specification some banks don't support retrieving user's TAN method by setting TAN method to '999'
         if (bankDoesNotSupportRetrievingUsersTanMethods(getUsersTanMethodsResponse)) {
             getBankDataForNewUserViaAnonymousDialog(dialogContext.bank, callback) // TODO: should not be necessary anymore
@@ -188,10 +183,6 @@ open class FinTsJobExecutor(
 
         initDialogWithStrongCustomerAuthenticationAfterSuccessfulPreconditionChecks(dialogContext) { response ->
             closeDialog(dialogContext)
-
-            if (response.successful) {
-                updateBankAndCustomerData(bank, response)
-            }
 
             callback(response)
         }
@@ -308,8 +299,6 @@ open class FinTsJobExecutor(
 
         getAndHandleResponseForMessage(message, dialogContext) { response ->
             if (response.successful) {
-                updateBankAndCustomerData(bank, response)
-
                 closeDialog(dialogContext)
             }
 
@@ -391,11 +380,13 @@ open class FinTsJobExecutor(
 
 
     protected open fun getAndHandleResponseForMessage(message: MessageBuilderResult, dialogContext: DialogContext, callback: (BankResponse) -> Unit) {
-        requestExecutor.getAndHandleResponseForMessage(
-            message,
-            dialogContext,
-            { tanResponse, bankResponse, tanRequiredCallback -> handleEnteringTanRequired(tanResponse, bankResponse, dialogContext, tanRequiredCallback) },
-            callback)
+        requestExecutor.getAndHandleResponseForMessage(message, dialogContext,
+            { tanResponse, bankResponse, tanRequiredCallback -> handleEnteringTanRequired(tanResponse, bankResponse, dialogContext, tanRequiredCallback) }) { response ->
+            // TODO: really update data only on complete successfully response? as it may contain useful information anyway  // TODO: extract method for this code part
+            updateBankAndCustomerDataIfResponseSuccessful(dialogContext, response)
+
+            callback(response)
+        }
     }
 
     protected open fun fireAndForgetMessage(message: MessageBuilderResult, dialogContext: DialogContext) {
@@ -601,11 +592,7 @@ open class FinTsJobExecutor(
 
         val message = messageBuilder.createInitDialogMessage(dialogContext)
 
-        getAndHandleResponseForMessage(message, dialogContext) { response ->
-            updateBankAndCustomerDataIfResponseSuccessful(dialogContext, response)
-
-            callback(response)
-        }
+        getAndHandleResponseForMessage(message, dialogContext, callback)
     }
 
     protected open fun initDialogMessageWithoutStrongCustomerAuthenticationAfterSuccessfulChecks(dialogContext: DialogContext, segmentIdForTwoStepTanProcess: CustomerSegmentId?,
@@ -613,11 +600,7 @@ open class FinTsJobExecutor(
 
         val message = messageBuilder.createInitDialogMessageWithoutStrongCustomerAuthentication(dialogContext, segmentIdForTwoStepTanProcess)
 
-        getAndHandleResponseForMessage(message, dialogContext) { response ->
-            updateBankAndCustomerDataIfResponseSuccessful(dialogContext, response)
-
-            callback(response)
-        }
+        getAndHandleResponseForMessage(message, dialogContext, callback)
     }
 
     protected open fun closeDialog(dialogContext: DialogContext) {
