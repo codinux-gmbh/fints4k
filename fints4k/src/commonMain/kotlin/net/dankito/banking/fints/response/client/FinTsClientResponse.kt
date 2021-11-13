@@ -24,6 +24,8 @@ open class FinTsClientResponse(
 
     open val errorMessagesFromBank: List<String> = listOf(),
 
+    open val isPinLocked: Boolean = false,
+
     open val wrongCredentialsEntered: Boolean = false,
 
     open val userCancelledAction: Boolean = false,
@@ -40,7 +42,7 @@ open class FinTsClientResponse(
 
     constructor(context: JobContext, response: BankResponse) : this(response.successful, response.noTanMethodSelected,
         response.isStrongAuthenticationRequired, response.tanResponse, context.messageLogWithoutSensitiveData,
-        response.internalError, response.errorsToShowToUser, response.wrongCredentialsEntered,
+        response.internalError, response.errorsToShowToUser, response.isPinLocked, response.wrongCredentialsEntered,
         response.tanRequiredButUserDidNotEnterOne, response.tanRequiredButWeWereToldToAbortIfSo,
         response.messageThatCouldNotBeCreated?.isJobAllowed ?: true,
         response.messageThatCouldNotBeCreated?.isJobVersionSupported ?: true,

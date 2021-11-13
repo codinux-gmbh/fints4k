@@ -61,7 +61,8 @@ open class BankResponse(
     open val successful: Boolean
         get() = internalError == null &&
                 noTanMethodSelected == false && couldCreateMessage && didReceiveResponse
-                && responseContainsErrors == false && wrongCredentialsEntered == false
+                && responseContainsErrors == false
+                && isPinLocked == false && wrongCredentialsEntered == false
                 && tanRequiredButUserDidNotEnterOne == false && tanRequiredButWeWereToldToAbortIfSo == false
 
     open val isStrongAuthenticationRequired: Boolean
