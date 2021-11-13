@@ -54,11 +54,17 @@ open class TanMethodSelector {
   }
 
 
+  open fun nonVisualOrImageBased(tanMethods: List<TanMethod>): TanMethod? {
+    return nonVisual(tanMethods)
+      ?: imageBased(tanMethods)
+  }
+
   open fun nonVisualOrImageBasedOrFirst(tanMethods: List<TanMethod>): TanMethod? {
     return nonVisual(tanMethods)
       ?: imageBased(tanMethods)
       ?: first(tanMethods)
   }
+
 
   open fun first(tanMethods: List<TanMethod>): TanMethod? {
     return tanMethods.firstOrNull()
