@@ -5,7 +5,7 @@ import kotlin.jvm.JvmOverloads
 
 
 open class GetTransactionsParameter @JvmOverloads constructor(
-    account: AccountData,
+    open val bank: BankData,
     open val alsoRetrieveBalance: Boolean = true,
     open val fromDate: Date? = null,
     open val toDate: Date? = null,
@@ -19,9 +19,6 @@ open class GetTransactionsParameter @JvmOverloads constructor(
     open val abortIfTanIsRequired: Boolean = false,
     open val retrievedChunkListener: ((Collection<AccountTransaction>) -> Unit)? = null
 ) {
-
-    open var account: AccountData = account
-        internal set
 
     internal open var isSettingMaxCountEntriesAllowedByBank = false
 

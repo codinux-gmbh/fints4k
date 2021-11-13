@@ -10,10 +10,7 @@ import net.dankito.banking.fints.model.*
 import net.dankito.banking.fints.model.mapper.ModelMapper
 import net.dankito.banking.fints.response.BankResponse
 import net.dankito.banking.fints.response.InstituteSegmentId
-import net.dankito.banking.fints.response.client.FinTsClientResponse
-import net.dankito.banking.fints.response.client.GetTanMediaListResponse
-import net.dankito.banking.fints.response.client.GetTransactionsResponse
-import net.dankito.banking.fints.response.client.GetUserTanMethodsResponse
+import net.dankito.banking.fints.response.client.*
 import net.dankito.banking.fints.response.segments.*
 import net.dankito.banking.fints.tan.FlickerCodeDecoder
 import net.dankito.banking.fints.tan.TanImageDecoder
@@ -178,14 +175,14 @@ open class FinTsJobExecutor(
     }
 
 
-    open fun getTransactionsAsync(context: JobContext, parameter: GetTransactionsParameter, callback: (GetTransactionsResponse) -> Unit) {
+    open fun getTransactionsAsync(context: JobContext, parameter: GetAccountTransactionsParameter, callback: (GetAccountTransactionsResponse) -> Unit) {
 
         val dialogContext = context.startNewDialog()
 
         initDialogWithStrongCustomerAuthentication(context) { initDialogResponse ->
 
             if (initDialogResponse.successful == false) {
-                callback(GetTransactionsResponse(context, initDialogResponse, RetrievedAccountData.unsuccessfulList(parameter.account)))
+                callback(GetAccountTransactionsResponse(context, initDialogResponse, RetrievedAccountData.unsuccessful(parameter.account)))
             }
             else {
                 // we now retrieved the fresh account information from FinTS server, use that one
@@ -193,7 +190,7 @@ open class FinTsJobExecutor(
 
                 mayGetBalance(context, parameter) { balanceResponse ->
                     if (dialogContext.didBankCloseDialog) {
-                        callback(GetTransactionsResponse(context, balanceResponse ?: initDialogResponse, RetrievedAccountData.unsuccessfulList(parameter.account)))
+                        callback(GetAccountTransactionsResponse(context, balanceResponse ?: initDialogResponse, RetrievedAccountData.unsuccessful(parameter.account)))
                     }
                     else {
                         getTransactionsAfterInitAndGetBalance(context, parameter, balanceResponse, callback)
@@ -207,8 +204,8 @@ open class FinTsJobExecutor(
         return context.bank.accounts.firstOrNull { it.accountIdentifier == account.accountIdentifier } ?: account
     }
 
-    protected open fun getTransactionsAfterInitAndGetBalance(context: JobContext, parameter: GetTransactionsParameter,
-                                                             balanceResponse: BankResponse?, callback: (GetTransactionsResponse) -> Unit) {
+    protected open fun getTransactionsAfterInitAndGetBalance(context: JobContext, parameter: GetAccountTransactionsParameter,
+                                                             balanceResponse: BankResponse?, callback: (GetAccountTransactionsResponse) -> Unit) {
         var balance: Money? = balanceResponse?.getFirstSegmentById<BalanceSegment>(InstituteSegmentId.Balance)?.let {
             Money(it.balance, it.currency)
         }
@@ -248,15 +245,12 @@ open class FinTsJobExecutor(
                 ?: bookedTransactions.map { it.valueDate }.sortedBy { it.millisSinceEpoch }.firstOrNull()
             val retrievedData = RetrievedAccountData(parameter.account, successful, balance, bookedTransactions, unbookedTransactions, fromDate, parameter.toDate ?: Date.today, response.internalError)
 
-            callback(
-                GetTransactionsResponse(context, response, listOf(retrievedData),
-                if (parameter.maxCountEntries != null) parameter.isSettingMaxCountEntriesAllowedByBank else null
-            )
-            )
+            callback(GetAccountTransactionsResponse(context, response, retrievedData,
+                if (parameter.maxCountEntries != null) parameter.isSettingMaxCountEntriesAllowedByBank else null))
         }
     }
 
-    protected open fun mayGetBalance(context: JobContext, parameter: GetTransactionsParameter, callback: (BankResponse?) -> Unit) {
+    protected open fun mayGetBalance(context: JobContext, parameter: GetAccountTransactionsParameter, callback: (BankResponse?) -> Unit) {
         if (parameter.alsoRetrieveBalance && parameter.account.supportsRetrievingBalance) {
             val message = messageBuilder.createGetBalanceMessage(context, parameter.account)
 

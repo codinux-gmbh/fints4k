@@ -6,9 +6,7 @@ import net.dankito.banking.fints.model.*
 import net.dankito.banking.fints.model.mapper.ModelMapper
 import net.dankito.banking.fints.response.client.AddAccountResponse
 import net.dankito.banking.fints.response.client.FinTsClientResponse
-import net.dankito.banking.fints.response.client.GetTransactionsResponse
-import net.dankito.banking.fints.transactions.IAccountTransactionsParser
-import net.dankito.banking.fints.transactions.Mt940AccountTransactionsParser
+import net.dankito.banking.fints.response.client.GetAccountTransactionsResponse
 import net.dankito.banking.fints.util.IBase64Service
 import net.dankito.banking.fints.util.PureKotlinBase64Service
 import net.dankito.banking.fints.util.TanMethodSelector
@@ -50,8 +48,8 @@ open class FinTsClientForCustomer(
     }
 
 
-    open fun getTransactionsAsync(parameter: GetTransactionsParameter, callback: (GetTransactionsResponse) -> Unit) {
-        client.getTransactionsAsync(parameter, bank, callback)
+    open fun getAccountTransactionsAsync(parameter: GetAccountTransactionsParameter, callback: (GetAccountTransactionsResponse) -> Unit) {
+        client.getAccountTransactionsAsync(parameter, callback)
     }
 
 

@@ -32,9 +32,9 @@ open class fints4kModelMapper(protected val modelCreator: IModelCreator) {
         return AddAccountResponse(bank, map(bank, response.retrievedData), response.errorMessage, response.didBankReturnError, response.wrongCredentialsEntered, response.userCancelledAction)
     }
 
-    open fun mapResponse(account: TypedBankAccount, response: net.dankito.banking.fints.response.client.GetTransactionsResponse): GetTransactionsResponse {
+    open fun mapResponse(account: TypedBankAccount, response: net.dankito.banking.fints.response.client.GetAccountTransactionsResponse): GetTransactionsResponse {
 
-        return GetTransactionsResponse(map(account.bank as TypedBankData, response.retrievedData),
+        return GetTransactionsResponse(response.retrievedData?.let { map(account.bank as TypedBankData, it)?.let { listOf(it) } } ?: listOf(),
             response.errorMessage, response.didBankReturnError, response.wrongCredentialsEntered, response.userCancelledAction, response.tanRequiredButWeWereToldToAbortIfSo)
     }
 

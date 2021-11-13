@@ -9,7 +9,7 @@ import net.dankito.banking.fints.messages.datenelementgruppen.Datenelementgruppe
 import net.dankito.banking.fints.messages.datenelementgruppen.implementierte.Segmentkopf
 import net.dankito.banking.fints.messages.segmente.Segment
 import net.dankito.banking.fints.messages.segmente.id.CustomerSegmentId
-import net.dankito.banking.fints.model.GetTransactionsParameter
+import net.dankito.banking.fints.model.GetAccountTransactionsParameter
 
 
 /**
@@ -26,7 +26,7 @@ abstract class KontoumsaetzeZeitraumMt940Base(
     segmentVersion: Int,
     segmentNumber: Int,
     account: Datenelementgruppe,
-    parameter: GetTransactionsParameter
+    parameter: GetAccountTransactionsParameter
 )
     : Segment(listOf(
         Segmentkopf(CustomerSegmentId.AccountTransactionsMt940, segmentVersion, segmentNumber),

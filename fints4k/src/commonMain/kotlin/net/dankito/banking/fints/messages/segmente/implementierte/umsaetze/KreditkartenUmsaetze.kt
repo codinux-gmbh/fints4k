@@ -9,12 +9,12 @@ import net.dankito.banking.fints.messages.datenelementgruppen.implementierte.Seg
 import net.dankito.banking.fints.messages.datenelementgruppen.implementierte.account.Kontoverbindung
 import net.dankito.banking.fints.messages.segmente.Segment
 import net.dankito.banking.fints.messages.segmente.id.CustomerSegmentId
-import net.dankito.banking.fints.model.GetTransactionsParameter
+import net.dankito.banking.fints.model.GetAccountTransactionsParameter
 
 
 open class KreditkartenUmsaetze(
     segmentNumber: Int,
-    parameter: GetTransactionsParameter
+    parameter: GetAccountTransactionsParameter
 ) : Segment(listOf(
     Segmentkopf(CustomerSegmentId.CreditCardTransactions, 2, segmentNumber),
     Kontoverbindung(parameter.account),

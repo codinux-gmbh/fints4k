@@ -155,7 +155,7 @@ open class MessageBuilder(protected val generator: ISegmentNumberGenerator = Seg
     }
 
 
-    open fun createGetTransactionsMessage(context: JobContext, parameter: GetTransactionsParameter): MessageBuilderResult {
+    open fun createGetTransactionsMessage(context: JobContext, parameter: GetAccountTransactionsParameter): MessageBuilderResult {
 
         val result = supportsGetTransactionsMt940(parameter.account)
 
@@ -173,7 +173,7 @@ open class MessageBuilder(protected val generator: ISegmentNumberGenerator = Seg
     }
 
     protected open fun createGetTransactionsMessageMt940(context: JobContext, result: MessageBuilderResult,
-                                                         parameter: GetTransactionsParameter): MessageBuilderResult {
+                                                         parameter: GetAccountTransactionsParameter): MessageBuilderResult {
 
         if (parameter.maxCountEntries != null) {
             parameter.isSettingMaxCountEntriesAllowedByBank = determineIsSettingMaxCountEntriesAllowed(context.bank, InstituteSegmentId.AccountTransactionsMt940Parameters, listOf(5, 6, 7))
@@ -197,7 +197,7 @@ open class MessageBuilder(protected val generator: ISegmentNumberGenerator = Seg
     }
 
     protected open fun createGetCreditCardTransactionsMessage(context: JobContext, result: MessageBuilderResult,
-                                                              parameter: GetTransactionsParameter): MessageBuilderResult {
+                                                              parameter: GetAccountTransactionsParameter): MessageBuilderResult {
 
         val segments = mutableListOf<Segment>(KreditkartenUmsaetze(generator.resetSegmentNumber(2), parameter))
 

@@ -15,10 +15,7 @@ import net.dankito.banking.fints.messages.datenelemente.implementierte.tan.TanMe
 import net.dankito.banking.fints.messages.datenelemente.implementierte.tan.TanMediumKlasse
 import net.dankito.banking.fints.messages.segmente.id.CustomerSegmentId
 import net.dankito.banking.fints.model.*
-import net.dankito.banking.fints.response.client.AddAccountResponse
-import net.dankito.banking.fints.response.client.FinTsClientResponse
-import net.dankito.banking.fints.response.client.GetTanMediaListResponse
-import net.dankito.banking.fints.response.client.GetTransactionsResponse
+import net.dankito.banking.fints.response.client.*
 import net.dankito.utils.multiplatform.Date
 import net.dankito.utils.multiplatform.DateFormatter
 import net.dankito.utils.multiplatform.UUID
@@ -144,7 +141,7 @@ open class FinTsClientTestBase {
     fun getTransactions() {
 
         // given
-        val response = AtomicReference<GetTransactionsResponse>()
+        val response = AtomicReference<GetAccountTransactionsResponse>()
         val countDownLatch = CountDownLatch(1)
 
         underTest.addAccountAsync(Bank.toAddAccountParameter(false)) { // retrieve basic data, e.g. accounts
@@ -154,7 +151,7 @@ open class FinTsClientTestBase {
             // when
 
             // some banks support retrieving account transactions of last 90 days without TAN
-            underTest.tryGetTransactionsOfLast90DaysWithoutTan(Bank, account!!) {
+            underTest.tryGetAccountTransactionsOfLast90DaysWithoutTan(Bank, account!!) {
                 response.set(it)
                 countDownLatch.countDown()
             }

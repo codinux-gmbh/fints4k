@@ -84,7 +84,8 @@ open class fints4kBankingClient(
     }
 
 
-    override fun getTransactionsAsync(parameter: GetTransactionsParameter, callback: (GetTransactionsResponse) -> Unit) {
+    // we currently leave the data model of the UI layer untouched as this may changes soon anyway
+    override fun getAccountTransactionsAsync(parameter: GetTransactionsParameter, callback: (GetTransactionsResponse) -> Unit) {
         val account = parameter.account
 
         findAccountForAccount(account) { accountData, response ->
@@ -97,25 +98,26 @@ open class fints4kBankingClient(
                 }
             }
             else {
-                val mappedParameter = GetTransactionsParameter(accountData, parameter.alsoRetrieveBalance, parameter.fromDate,
+                val mappedParameter = GetAccountTransactionsParameter(fintsBank, accountData, parameter.alsoRetrieveBalance, parameter.fromDate,
                     parameter.toDate, null, parameter.abortIfTanIsRequired) {
                         parameter.retrievedChunkListener?.invoke(mapper.mapTransactions(account, it))
                     }
 
-                doGetTransactionsAsync(mappedParameter, account, callback)
+                doGetAccountTransactionsAsync(mappedParameter, account, callback)
             }
         }
     }
 
-    protected open fun doGetTransactionsAsync(parameter: net.dankito.banking.fints.model.GetTransactionsParameter,
-                                              account: TypedBankAccount, callback: (GetTransactionsResponse) -> Unit) {
-        client.getTransactionsAsync(parameter) { response ->
+    protected open fun doGetAccountTransactionsAsync(parameter: net.dankito.banking.fints.model.GetAccountTransactionsParameter,
+                                                     account: TypedBankAccount, callback: (GetTransactionsResponse) -> Unit) {
+        client.getAccountTransactionsAsync(parameter) { response ->
             handleGetTransactionsResponse(account, response, callback)
         }
     }
 
-    protected open fun handleGetTransactionsResponse(account: TypedBankAccount, response: net.dankito.banking.fints.response.client.GetTransactionsResponse,
+    protected open fun handleGetTransactionsResponse(account: TypedBankAccount, response: net.dankito.banking.fints.response.client.GetAccountTransactionsResponse,
                                                      callback: (GetTransactionsResponse) -> Unit) {
+        // we currently leave the data model of the UI layer untouched as this may changes soon anyway
         val mappedResponse = mapper.mapResponse(account, response)
 
         saveData(response)

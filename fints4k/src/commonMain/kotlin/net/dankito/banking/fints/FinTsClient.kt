@@ -64,7 +64,7 @@ open class FinTsClient @JvmOverloads constructor(
         jobExecutor.retrieveBasicDataLikeUsersTanMethods(context, parameter.preferredTanMethods, parameter.preferredTanMedium) { newUserInfoResponse ->
 
             if (newUserInfoResponse.successful == false) { // bank parameter (FinTS server address, ...) already seem to be wrong
-                callback(AddAccountResponse(context, newUserInfoResponse, bank))
+                callback(AddAccountResponse(context, newUserInfoResponse))
                 return@retrieveBasicDataLikeUsersTanMethods
             }
 
@@ -82,7 +82,7 @@ open class FinTsClient @JvmOverloads constructor(
         jobExecutor.getAccounts(context) { getAccountsResponse ->
 
             if (getAccountsResponse.successful == false) {
-                callback(AddAccountResponse(context, getAccountsResponse, context.bank))
+                callback(AddAccountResponse(context, getAccountsResponse))
                 return@getAccounts
             }
 
@@ -92,8 +92,7 @@ open class FinTsClient @JvmOverloads constructor(
                 addAccountGetAccountBalancesAndTransactions(context, getAccountsResponse, callback)
             }
             else {
-                val retrievedAccountData = context.bank.accounts.associateBy( { it }, { RetrievedAccountData.balanceAndTransactionsNotRequestedByUser(it) } )
-                addAccountDone(context, getAccountsResponse, retrievedAccountData, callback)
+                addAccountDone(context, getAccountsResponse, listOf(), callback)
             }
         }
     }
@@ -102,38 +101,34 @@ open class FinTsClient @JvmOverloads constructor(
                                                                    callback: (AddAccountResponse) -> Unit) {
 
         val bank = context.bank
-        val retrievedAccountData = bank.accounts.associateBy( { it }, { RetrievedAccountData.unsuccessful(it) } ).toMutableMap()
+        val retrievedTransactionsResponses = mutableListOf<GetAccountTransactionsResponse>()
 
         val accountsSupportingRetrievingTransactions = bank.accounts.filter { it.supportsRetrievingBalance || it.supportsRetrievingAccountTransactions }
         val countAccountsSupportingRetrievingTransactions = accountsSupportingRetrievingTransactions.size
         var countRetrievedAccounts = 0
 
         if (countAccountsSupportingRetrievingTransactions == 0) {
-            addAccountDone(context, getAccountsResponse, retrievedAccountData, callback)
-            return // no necessary just to make it clearer that code below doesn't get called
+            addAccountDone(context, getAccountsResponse, retrievedTransactionsResponses, callback)
+            return // not necessary just to make it clearer that code below doesn't get called
         }
 
         accountsSupportingRetrievingTransactions.forEach { account ->
-            tryGetTransactionsOfLast90DaysWithoutTan(bank, account) { response ->
-                retrievedAccountData.put(account, response.retrievedData.first())
-
-                if (response.internalError != null) { // TODO: errors from response get lost! User then only sees "null" as error message
-                    //getAccountsResponse.errorMessage = response.errorMessage
-                }
+            tryGetAccountTransactionsOfLast90DaysWithoutTan(bank, account) { response ->
+                retrievedTransactionsResponses.add(response)
 
                 countRetrievedAccounts++
                 if (countRetrievedAccounts == countAccountsSupportingRetrievingTransactions) {
-                    addAccountDone(context, getAccountsResponse, retrievedAccountData, callback)
+                    addAccountDone(context, getAccountsResponse, retrievedTransactionsResponses, callback)
                 }
             }
         }
     }
 
     protected open fun addAccountDone(context: JobContext, getAccountsResponse: BankResponse,
-                                      retrievedAccountData: Map<AccountData, RetrievedAccountData>,
+                                      retrievedTransactionsResponses: List<GetAccountTransactionsResponse>,
                                       callback: (AddAccountResponse) -> Unit) {
 
-        callback(AddAccountResponse(context, getAccountsResponse, context.bank, retrievedAccountData.values.toList()))
+        callback(AddAccountResponse(context, getAccountsResponse, retrievedTransactionsResponses))
     }
 
 
@@ -143,18 +138,20 @@ open class FinTsClient @JvmOverloads constructor(
      *
      * Check if bank supports this.
      */
-    open fun tryGetTransactionsOfLast90DaysWithoutTan(bank: BankData, account: AccountData, callback: (GetTransactionsResponse) -> Unit) {
+    open fun tryGetAccountTransactionsOfLast90DaysWithoutTan(bank: BankData, account: AccountData, callback: (GetAccountTransactionsResponse) -> Unit) {
 
-        val ninetyDaysAgo = Date.today.addDays(-90)
-
-        getTransactionsAsync(GetTransactionsParameter(account, account.supportsRetrievingBalance, ninetyDaysAgo, abortIfTanIsRequired = true), bank) { response ->
-            callback(response)
-        }
+        getAccountTransactionsAsync(createGetAccountTransactionsOfLast90DaysParameter(bank, account), callback)
     }
 
-    open fun getTransactionsAsync(parameter: GetTransactionsParameter, bank: BankData, callback: (GetTransactionsResponse) -> Unit) {
+    protected open fun createGetAccountTransactionsOfLast90DaysParameter(bank: BankData, account: AccountData): GetAccountTransactionsParameter {
+        val ninetyDaysAgo = Date.today.addDays(-90)
 
-        val context = JobContext(JobContextType.GetTransactions, this.callback, product, bank, parameter.account)
+        return GetAccountTransactionsParameter(bank, account, account.supportsRetrievingBalance, ninetyDaysAgo, abortIfTanIsRequired = true)
+    }
+
+    open fun getAccountTransactionsAsync(parameter: GetAccountTransactionsParameter, callback: (GetAccountTransactionsResponse) -> Unit) {
+
+        val context = JobContext(JobContextType.GetTransactions, this.callback, product, parameter.bank, parameter.account)
 
         jobExecutor.getTransactionsAsync(context, parameter, callback)
     }

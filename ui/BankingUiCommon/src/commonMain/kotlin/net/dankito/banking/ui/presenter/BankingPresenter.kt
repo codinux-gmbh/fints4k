@@ -371,7 +371,7 @@ open class BankingPresenter(
         getBankingClientForBank(account.bank)?.let { client ->
             val startDate = Date()
 
-            client.getTransactionsAsync(GetTransactionsParameter(account,true, fromDate, null, abortIfTanIsRequired, { receivedAccountTransactionChunk(account, it) } )) { response ->
+            client.getAccountTransactionsAsync(GetTransactionsParameter(account,true, fromDate, null, abortIfTanIsRequired, { receivedAccountTransactionChunk(account, it) } )) { response ->
 
                 if (response.tanRequiredButWeWereToldToAbortIfSo == false) { // don't call retrievedAccountTransactions() if aborted due to TAN required but we told client to abort if so
                     retrievedAccountTransactions(response, startDate, fromDate == null)

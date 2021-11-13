@@ -45,7 +45,7 @@ open class TestAccessBankingClient(
         }
     }
 
-    override fun getTransactionsAsync(parameter: GetTransactionsParameter, callback: (GetTransactionsResponse) -> Unit) {
+    override fun getAccountTransactionsAsync(parameter: GetTransactionsParameter, callback: (GetTransactionsResponse) -> Unit) {
         asyncRunner.runAsync {
             callback(GetTransactionsResponse(createRetrievedAccountData(parameter.account)))
         }

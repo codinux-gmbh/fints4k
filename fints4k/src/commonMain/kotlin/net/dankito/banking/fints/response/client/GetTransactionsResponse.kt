@@ -1,29 +1,35 @@
 package net.dankito.banking.fints.response.client
 
-import net.dankito.banking.fints.model.JobContext
 import net.dankito.banking.fints.model.RetrievedAccountData
-import net.dankito.banking.fints.response.BankResponse
 
 
 open class GetTransactionsResponse(
-    context: JobContext,
-    response: BankResponse,
-    open val retrievedData: List<RetrievedAccountData> = listOf(),
-    /**
-     * This value is only set if [GetTransactionsParameter.maxCountEntries] was set to tell caller if maxCountEntries parameter has been evaluated or not
-     */
-    open var isSettingMaxCountEntriesAllowedByBank: Boolean? = null
-) : FinTsClientResponse(context, response) {
+    open val retrievedResponses: List<GetAccountTransactionsResponse>,
+    errorMessage: String? = null
+) : FinTsClientResponse(isSuccessful(retrievedResponses), retrievedResponses.any { it.noTanMethodSelected },
+    retrievedResponses.any { it.isStrongAuthenticationRequired }, retrievedResponses.map { it.tanRequired }.firstOrNull(),
+    retrievedResponses.flatMap { it.messageLogWithoutSensitiveData },
+    errorMessage ?: retrievedResponses.mapNotNull { it.internalError }.joinToString("\r\n"),
+    retrievedResponses.flatMap { it.errorMessagesFromBank }, retrievedResponses.any { it.isPinLocked },
+    retrievedResponses.any { it.wrongCredentialsEntered }, retrievedResponses.any { it.userCancelledAction },
+    retrievedResponses.any { it.tanRequiredButWeWereToldToAbortIfSo },
+    retrievedResponses.any { it.isJobAllowed }, retrievedResponses.any { it.isJobAllowed },
+    retrievedResponses.flatMap { it.allowedVersions }.toSet().toList(),
+    retrievedResponses.flatMap { it.supportedVersions }.toSet().toList()
+) {
 
-    override val successful: Boolean
-        get() = super.successful
-                && retrievedData.isNotEmpty()
-                && retrievedData.none { it.account.supportsRetrievingAccountTransactions && it.successfullyRetrievedData == false }
+    companion object {
 
-    // TODO: remove again if then in AddAccountResponse errors get displayed that should or extract getRetrievingTransactionsError() and override in AddAccountResponse
-    override val internalError: String?
-        get() = super.internalError
-            ?: retrievedData.mapNotNull { it.errorMessage }.firstOrNull()
+        fun isSuccessful(retrievedResponses: List<GetAccountTransactionsResponse>): Boolean {
+            return retrievedResponses.isNotEmpty() &&
+                    retrievedResponses.none { it.retrievedData?.account?.supportsRetrievingAccountTransactions == true && it.retrievedData?.successfullyRetrievedData == false }
+        }
+
+    }
+
+
+    open val retrievedData: List<RetrievedAccountData>
+        get() = retrievedResponses.mapNotNull { it.retrievedData }
 
 
     override fun toString(): String {

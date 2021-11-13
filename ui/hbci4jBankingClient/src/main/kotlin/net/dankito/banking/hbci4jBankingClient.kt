@@ -136,7 +136,7 @@ open class hbci4jBankingClient(
         return getTransactions(GetTransactionsParameter(account, account.supportsRetrievingBalance, ninetyDaysAgo)) // TODO: implement abortIfTanIsRequired
     }
 
-    override fun getTransactionsAsync(parameter: GetTransactionsParameter, callback: (GetTransactionsResponse) -> Unit) {
+    override fun getAccountTransactionsAsync(parameter: GetTransactionsParameter, callback: (GetTransactionsResponse) -> Unit) {
         asyncRunner.runAsync {
             callback(getTransactions(parameter))
         }

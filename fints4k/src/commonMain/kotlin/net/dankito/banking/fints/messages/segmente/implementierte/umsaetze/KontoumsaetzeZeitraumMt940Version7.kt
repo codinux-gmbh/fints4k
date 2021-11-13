@@ -1,9 +1,8 @@
 package net.dankito.banking.fints.messages.segmente.implementierte.umsaetze
 
 import net.dankito.banking.fints.messages.datenelementgruppen.implementierte.account.KontoverbindungInternational
-import net.dankito.banking.fints.model.AccountData
 import net.dankito.banking.fints.model.BankData
-import net.dankito.banking.fints.model.GetTransactionsParameter
+import net.dankito.banking.fints.model.GetAccountTransactionsParameter
 
 
 /**
@@ -18,6 +17,6 @@ import net.dankito.banking.fints.model.GetTransactionsParameter
  */
 open class KontoumsaetzeZeitraumMt940Version7(
     segmentNumber: Int,
-    parameter: GetTransactionsParameter,
+    parameter: GetAccountTransactionsParameter,
     bank: BankData
 ) : KontoumsaetzeZeitraumMt940Base(7, segmentNumber, KontoverbindungInternational(parameter.account, bank), parameter)
