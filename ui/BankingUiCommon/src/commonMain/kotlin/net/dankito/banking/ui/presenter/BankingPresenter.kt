@@ -824,16 +824,7 @@ open class BankingPresenter(
         })
 
         return logEntries.map { entry ->
-            MessageLogEntryDateFormatter.format(entry.time) + " " + entry.bank.bankCode + " " + getMessageLogPrefix(entry) + "\r\n" + entry.message
-        }
-    }
-
-    protected open fun getMessageLogPrefix(entry: MessageLogEntry): String {
-        // TODO: translate
-        return when (entry.type) {
-            MessageLogEntryType.Sent -> "Sending message"
-            MessageLogEntryType.Received -> "Received message"
-            MessageLogEntryType.Error -> "Error"
+            MessageLogEntryDateFormatter.format(entry.time) + " " + entry.message
         }
     }
 

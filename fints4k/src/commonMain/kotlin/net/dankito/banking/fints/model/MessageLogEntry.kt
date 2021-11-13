@@ -7,8 +7,8 @@ import net.dankito.utils.multiplatform.Date
 open class MessageLogEntry(
     open val type: MessageLogEntryType,
     open val message: String,
-    open val time: Date,
-    open val context: MessageContext
+    open val context: MessageContext,
+    open val time: Date = Date()
 ) {
 
     override fun toString(): String {

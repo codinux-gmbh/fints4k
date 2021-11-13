@@ -20,6 +20,8 @@ open class MessageLogCollector {
 
         const val MaxCountStackTraceElements = 15
 
+        private const val NewLine = "\r\n"
+
         private val log = LoggerFactory.getLogger(MessageLogCollector::class)
     }
 
@@ -28,38 +30,41 @@ open class MessageLogCollector {
 
     // in either case remove sensitive data after response is parsed as otherwise some information like account holder name and accounts may is not set yet on BankData
     open val messageLogWithoutSensitiveData: List<MessageLogEntry>
-        get() = messageLog.map { MessageLogEntry(it.type, safelyRemoveSensitiveDataFromMessage(it.message, it.context.bank), it.time, it.context) }
+        get() = messageLog.map { MessageLogEntry(it.type, safelyRemoveSensitiveDataFromMessage(it.message, it.context.bank), it.context, it.time) }
 
 
     protected open val stackTraceHelper = StackTraceHelper()
 
 
     open fun addMessageLog(type: MessageLogEntryType, message: String, context: MessageContext) {
-        val timeStamp = Date()
-        val prettyPrintMessage = prettyPrintHbciMessage(message)
+        val messageToLog = createMessage(type, prettyPrintHbciMessage(message), context, true)
 
-        messageLog.add(MessageLogEntry(type, prettyPrintMessage, timeStamp, context))
+        messageLog.add(MessageLogEntry(type, messageToLog, context))
 
-        val messageTrace = createMessageTraceString(type, context)
-        log.debug { "$messageTrace\r\n$prettyPrintMessage" }
+        log.debug { messageToLog }
     }
-
 
     open fun logError(loggingClass: KClass<*>, message: String, context: MessageContext, e: Exception? = null) {
         val type = MessageLogEntryType.Error
-        val messageTrace = createMessageTraceString(type, context) + " "
+        val messageToLog = createMessage(type, message, context, false)
 
         if (e != null) {
-            getLogger(loggingClass).error(e) { messageTrace + message }
+            getLogger(loggingClass).error(e) { messageToLog }
         } else {
-            getLogger(loggingClass).error(messageTrace + message)
+            getLogger(loggingClass).error(messageToLog)
         }
 
-        val errorStackTrace = if (e != null) "\r\n" + getStackTrace(e) else ""
+        val errorStackTrace = if (e != null) NewLine + getStackTrace(e) else ""
 
-        messageLog.add(MessageLogEntry(type, message + errorStackTrace, Date(), context))
+        messageLog.add(MessageLogEntry(type, messageToLog + errorStackTrace, context))
     }
 
+
+    protected open fun createMessage(type: MessageLogEntryType, message: String, context: MessageContext, separateWithNewLine: Boolean): String {
+        val messageTrace = createMessageTraceString(type, context)
+
+        return "$messageTrace${ if (separateWithNewLine) NewLine else " " }$message"
+    }
 
     protected open fun createMessageTraceString(type: MessageLogEntryType, context: MessageContext): String {
         return "${twoDigits(context.jobNumber)}_${twoDigits(context.dialogNumber)}_${twoDigits(context.messageNumber)}_" +
@@ -82,7 +87,7 @@ open class MessageLogCollector {
     }
 
     protected open fun prettyPrintHbciMessage(message: String): String {
-        return message.replace("'", "'\r\n")
+        return message.replace("'", "'$NewLine")
     }
 
 
@@ -90,7 +95,7 @@ open class MessageLogCollector {
         try {
             return removeSensitiveDataFromMessage(message, bank)
         } catch (e: Exception) {
-            return "! WARNING !\r\nCould not remove sensitive data!\r\n$e\r\n${getStackTrace(e)}\r\n$message"
+            return "! WARNING !${NewLine}Could not remove sensitive data!$NewLine$e$NewLine${getStackTrace(e)}$NewLine$message"
         }
     }
 
