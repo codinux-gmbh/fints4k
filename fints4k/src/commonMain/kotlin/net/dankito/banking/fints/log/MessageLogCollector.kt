@@ -30,7 +30,7 @@ open class MessageLogCollector {
 
     // in either case remove sensitive data after response is parsed as otherwise some information like account holder name and accounts may is not set yet on BankData
     open val messageLogWithoutSensitiveData: List<MessageLogEntry>
-        get() = messageLog.map { MessageLogEntry(it.type, safelyRemoveSensitiveDataFromMessage(it.message, it.context.bank), it.context, it.time) }
+        get() = ArrayList(messageLog)
 
 
     protected open val stackTraceHelper = StackTraceHelper()
@@ -39,9 +39,9 @@ open class MessageLogCollector {
     open fun addMessageLog(type: MessageLogEntryType, message: String, context: MessageContext) {
         val messageToLog = createMessage(type, prettyPrintHbciMessage(message), context, true)
 
-        messageLog.add(MessageLogEntry(type, messageToLog, context))
+        addMessageLogEntry(type, messageToLog, context)
 
-        log.debug { messageToLog }
+        log.info { messageToLog }
     }
 
     open fun logError(loggingClass: KClass<*>, message: String, context: MessageContext, e: Exception? = null) {
@@ -56,7 +56,13 @@ open class MessageLogCollector {
 
         val errorStackTrace = if (e != null) NewLine + getStackTrace(e) else ""
 
-        messageLog.add(MessageLogEntry(type, messageToLog + errorStackTrace, context))
+        addMessageLogEntry(type, messageToLog + errorStackTrace, context)
+    }
+
+    protected open fun addMessageLogEntry(type: MessageLogEntryType, message: String, context: MessageContext) {
+        val withoutSensitiveData = safelyRemoveSensitiveDataFromMessage(message, context.bank)
+
+        messageLog.add(MessageLogEntry(type, withoutSensitiveData, context))
     }
 
 
