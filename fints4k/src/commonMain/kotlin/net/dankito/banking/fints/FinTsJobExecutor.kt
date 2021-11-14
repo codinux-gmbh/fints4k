@@ -147,8 +147,6 @@ open class FinTsJobExecutor(
 
                 getUsersTanMethod(context) { didSelectTanMethod ->
                     if (didSelectTanMethod) {
-                        context.startNewDialog()
-
                         initDialogWithStrongCustomerAuthenticationAfterSuccessfulPreconditionChecks(context) { initDialogResponse ->
                             closeDialog(context)
 
@@ -164,9 +162,6 @@ open class FinTsJobExecutor(
 
 
     open fun getAccounts(context: JobContext, callback: (BankResponse) -> Unit) {
-
-        context.startNewDialog(false)
-
         initDialogWithStrongCustomerAuthenticationAfterSuccessfulPreconditionChecks(context) { response ->
             closeDialog(context)
 
@@ -578,6 +573,8 @@ open class FinTsJobExecutor(
     }
 
     protected open fun initDialogWithStrongCustomerAuthenticationAfterSuccessfulPreconditionChecks(context: JobContext, callback: (BankResponse) -> Unit) {
+
+        context.startNewDialog(false) // don't know if it's ok for all invocations of this method to set closeDialog to false (was actually only set in getAccounts())
 
         val message = messageBuilder.createInitDialogMessage(context)
 
