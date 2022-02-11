@@ -40,12 +40,6 @@ buildscript {
 }
 
 
-def commonScriptsFile = new File(new File(project.gradle.gradleUserHomeDir, "scripts"), "commonScripts.gradle")
-if (commonScriptsFile.exists()) {
-    apply from: commonScriptsFile
-}
-
-
 allprojects {
     repositories {
         mavenLocal()
@@ -61,7 +55,14 @@ allprojects {
 
 task jarAll {
     dependsOn = [
-            "common:jvmJar",
+            "multiplatform-utils:jvmJar",
             "fints4k:jvmJar",
+    ]
+}
+
+task publishAllToMavenLocal {
+    dependsOn = [
+            "multiplatform-utils:publishToMavenLocal",
+            "fints4k:publishToMavenLocal",
     ]
 }

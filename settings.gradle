@@ -5,9 +5,9 @@ pluginManagement {
     }
 }
 
-rootProject.name = 'fints4kProject'
+rootProject.name = "fints4kProject"
 
 
-include ':fints4k'
+include ":fints4k"
 
-include ':common'
+include ":multiplatform-utils"
