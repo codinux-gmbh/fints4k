@@ -1,66 +1,51 @@
-
-buildscript {
-    repositories {
-        jcenter()
-    }
-}
-
 plugins {
     id "org.jetbrains.kotlin.multiplatform"
-    id "com.android.library"
     id "maven-publish"
 }
 
 
 kotlin {
-    jvm("jvm6") {
-        compilations.main.kotlinOptions {
-            jvmTarget = "1.6"
+    jvm {
+        compilations.all {
+            kotlinOptions.jvmTarget = '1.8'
+        }
+        withJava()
+        testRuns["test"].executionTask.configure {
+            useJUnitPlatform()
         }
     }
 
-    android()
+//    js(BOTH) {
+//        browser {
+//            commonWebpackConfig {
+//                cssSupport.enabled = true
+//            }
+//        }
+//    }
 
-    targets {
-        final def iOSTarget = iOSIsRealDevice ? presets.iosArm64 : presets.iosX64
-
-        fromPreset(iOSTarget, 'ios') {
-            binaries {
-                framework {
-                    baseName = "fints4k"
-
-                    embedBitcode(embedBitcodeValue)
-
-                    export(project(":common"))
-                }
+    ios {
+        binaries {
+            framework {
+                baseName = "fints4k"
             }
         }
     }
 
-    js() {
-
-        nodejs {
-            testTask {
-                enabled = false
-            }
-        }
-
-        browser {
-            testTask {
-                enabled = false
-            }
-
-        }
-    }
+//    def hostOs = System.getProperty("os.name")
+//    def isMingwX64 = hostOs.startsWith("Windows")
+//    def nativeTarget
+//    if (hostOs == "Mac OS X") nativeTarget = macosX64('native') { binaries.executable() }
+//    else if (hostOs == "Linux") nativeTarget = linuxX64("native") { binaries.executable() }
+//    else if (isMingwX64) nativeTarget = mingwX64("native") { binaries.executable() }
+//    else throw new GradleException("Host OS is not supported in Kotlin/Native.")
 
 
     sourceSets {
         commonMain {
             dependencies {
-                implementation kotlin("stdlib-common")
-                implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core-common:$kotlinCoroutinesVersion"
-
                 api project(":common")
+
+                implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion"
 
                 implementation "io.ktor:ktor-client-core:$ktorVersion"
             }
@@ -68,29 +53,23 @@ kotlin {
 
         commonTest {
             dependencies {
-                implementation kotlin("test-common")
-                implementation kotlin("test-annotations-common")
+                implementation kotlin("test")
 
                 implementation "ch.tutteli.atrium:atrium-fluent-en_GB-common:$atriumVersion"
             }
         }
 
 
-        jvm6Main {
+        jvmMain {
             dependencies {
-//                implementation "io.ktor:ktor-client-cio:$ktorVersion"
                 implementation "io.ktor:ktor-client-okhttp:$ktorVersion"
 
                 implementation "org.slf4j:slf4j-api:$slf4jVersion"
             }
         }
 
-        jvm6Test {
+        jvmTest {
             dependencies {
-                implementation kotlin("test-junit")
-
-                implementation "org.junit.jupiter:junit-jupiter:$junit5Version"
-                runtimeOnly "org.junit.jupiter:junit-jupiter-engine:$junit5Version"
 
                 implementation "org.assertj:assertj-core:$assertJVersion"
                 implementation "org.mockito:mockito-core:$mockitoVersion"
@@ -98,9 +77,9 @@ kotlin {
                 implementation "ch.tutteli.atrium:atrium-fluent-en_GB:$atriumVersion"
 
 
-                implementation project(":BankingUiCommon")
-                implementation project(":BankFinder")
-                implementation project(":fints4kBankingClient")
+//                implementation project(":BankingUiCommon")
+//                implementation project(":BankFinder")
+//                implementation project(":fints4kBankingClient")
 
 
                 implementation "org.apache.commons:commons-csv:1.8"
@@ -111,111 +90,36 @@ kotlin {
         }
 
 
-        androidMain {
-            dependsOn jvm6Main
+//        jsMain {
+//            dependencies {
+//                implementation "io.ktor:ktor-client-js:$ktorVersion"
+//            }
+//        }
+//
+//        jsTest {
+//
+//        }
 
-            dependencies {
-                implementation "io.ktor:ktor-client-android:$ktorVersion"
-            }
-        }
 
         iosMain {
             dependencies {
-                implementation "org.jetbrains.kotlin:kotlin-stdlib-common:$kotlinVersion"
+                // ktor Native needs "-native-mt" coroutines version. Export it so that referencing applications don't need to import it on their own
+                api("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion-native-mt")
 
                 implementation "io.ktor:ktor-client-ios:$ktorVersion"
-                implementation "io.ktor:ktor-client-core-native:$ktorVersion"
             }
         }
 
 
-        jsMain {
-            dependsOn commonMain
-
+        nativeMain {
             dependencies {
-                api kotlin("stdlib-js")
+                // ktor Native needs "-native-mt" coroutines version. Export it so that referencing applications don't need to import it on their own
+                api"org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion-native-mt"
 
-                implementation "io.ktor:ktor-client-js:$ktorVersion"
-                implementation "io.ktor:ktor-client-encoding-js:$ktorVersion"
-                implementation "io.ktor:ktor-client-js-kotlinMultiplatform:$ktorVersion"
-            }
-        }
-
-        jsTest {
-            dependencies {
-                implementation kotlin("test-js")
-
-                implementation "ch.tutteli.atrium:atrium-fluent-en_GB-js:$atriumVersion"
+                // requires cURL to be installed on your system
+                implementation "io.ktor:ktor-client-curl:$ktorVersion"
             }
         }
 
     }
-}
-
-
-// Task to generate iOS framework for xcode projects.
-task packForXcode(type: Sync) {
-
-    final File frameworkDir = new File(buildDir, "xcode-frameworks")
-    final String mode = project.findProperty("XCODE_CONFIGURATION")?.toUpperCase() ?: 'DEBUG'
-
-    final def framework = kotlin.targets.ios.binaries.getFramework("", mode)
-
-    inputs.property "mode", mode
-    dependsOn framework.linkTask
-
-    from { framework.outputFile.parentFile }
-    into frameworkDir
-
-    doLast {
-        new File(frameworkDir, 'gradlew').with {
-            text = "#!/bin/bash\nexport 'JAVA_HOME=${System.getProperty("java.home")}'\ncd '${rootProject.rootDir}'\n./gradlew \$@\n"
-            setExecutable(true)
-        }
-    }
-}
-
-// Run packForXcode when building.
-tasks.build.dependsOn packForXcode
-
-
-android {
-    compileSdkVersion androidCompileSdkVersion
-
-
-    defaultConfig {
-        minSdkVersion androidMinSdkVersion
-        targetSdkVersion androidTargetSdkVersion
-
-        versionName version
-        versionCode appVersionCode
-
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-    }
-
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-        }
-    }
-
-    packagingOptions {
-        pickFirst 'META-INF/ktor-http.kotlin_module'
-        pickFirst 'META-INF/kotlinx-io.kotlin_module'
-        pickFirst 'META-INF/atomicfu.kotlin_module'
-        pickFirst 'META-INF/ktor-utils.kotlin_module'
-        pickFirst 'META-INF/kotlinx-coroutines-io.kotlin_module'
-        pickFirst 'META-INF/ktor-client-core.kotlin_module'
-        pickFirst 'META-INF/DEPENDENCIES'
-        pickFirst 'META-INF/NOTICE'
-        pickFirst 'META-INF/LICENSE'
-        pickFirst 'META-INF/LICENSE.txt'
-        pickFirst 'META-INF/NOTICE.txt'
-    }
-
-    lintOptions {
-        abortOnError false
-    }
-
 }

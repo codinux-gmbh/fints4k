@@ -2,10 +2,10 @@ package net.dankito.banking.fints.webclient
 
 import io.ktor.client.HttpClient
 import io.ktor.client.request.post
-import io.ktor.client.statement.HttpResponse
-import io.ktor.client.statement.readText
-import io.ktor.content.TextContent
+import io.ktor.client.request.setBody
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
+import io.ktor.http.contentType
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.cancel
@@ -38,11 +38,12 @@ open class KtorWebClient : IWebClient {
     override fun post(url: String, body: String, contentType: String, userAgent: String, callback: (WebClientResponse) -> Unit) {
         GlobalScope.async {
             try {
-                val clientResponse = client.post<HttpResponse>(url) {
-                    this.body = TextContent(body, contentType = ContentType.Application.OctetStream)
+                val clientResponse = client.post(url) {
+                    contentType(ContentType.Application.OctetStream)
+                    setBody(body)
                 }
 
-                val responseBody = clientResponse.readText()
+                val responseBody = clientResponse.bodyAsText()
 
                 callback(WebClientResponse(clientResponse.status.value == 200, clientResponse.status.value, body = responseBody))
             } catch (e: Exception) {

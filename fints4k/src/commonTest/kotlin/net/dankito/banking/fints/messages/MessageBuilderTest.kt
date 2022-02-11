@@ -15,6 +15,7 @@ import net.dankito.banking.fints.util.FinTsUtils
 import net.dankito.utils.multiplatform.Date
 import net.dankito.utils.multiplatform.Month
 import kotlin.test.AfterTest
+import kotlin.test.Ignore
 import kotlin.test.Test
 
 
@@ -191,6 +192,7 @@ class MessageBuilderTest : FinTsTestBase() {
         ))
     }
 
+    @Ignore
     @Test
     fun createGetTransactionsMessage_WithContinuationIdSet() {
 

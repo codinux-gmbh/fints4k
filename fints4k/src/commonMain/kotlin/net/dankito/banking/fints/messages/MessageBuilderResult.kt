@@ -24,7 +24,7 @@ open class MessageBuilderResult(
     }
 
     open val getHighestAllowedVersion: Int?
-        get() = allowedVersions.max()
+        get() = allowedVersions.maxOrNull()
 
     open fun isSendEnteredTanMessage(): Boolean {
         // contains only a ZweiSchrittTanEinreichung segment
