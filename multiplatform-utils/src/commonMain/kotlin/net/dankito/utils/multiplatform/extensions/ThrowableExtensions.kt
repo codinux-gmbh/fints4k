@@ -1,25 +1,4 @@
-package net.dankito.utils.multiplatform
-
-
-val Char.isLowerCase: Boolean
-    get() = lowercaseChar() == this
-
-val Char.isUpperCase: Boolean
-    get() = isLowerCase == false
-
-
-fun CharArray.asString(): String {
-    return this.joinToString("")
-}
-
-
-fun Date.isBefore(other: Date): Boolean {
-    return compareTo(other) < 0
-}
-
-fun Date.isBeforeOrEquals(other: Date): Boolean {
-    return compareTo(other) <= 0
-}
+package net.dankito.utils.multiplatform.extensions
 
 
 fun Throwable.getAllExceptionMessagesJoined(maxDepth: Int = 5): String {

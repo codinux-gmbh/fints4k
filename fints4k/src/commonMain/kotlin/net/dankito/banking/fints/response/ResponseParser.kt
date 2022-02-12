@@ -21,7 +21,7 @@ import net.dankito.banking.fints.model.Money
 import net.dankito.banking.fints.response.segments.*
 import net.dankito.banking.fints.util.MessageUtils
 import net.dankito.utils.multiplatform.Date
-import net.dankito.utils.multiplatform.getAllExceptionMessagesJoined
+import net.dankito.utils.multiplatform.extensions.getAllExceptionMessagesJoined
 import net.dankito.utils.multiplatform.log.LoggerFactory
 
 

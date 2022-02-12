@@ -1,6 +1,16 @@
 package net.dankito.utils.multiplatform
 
 
+
+fun Date.isBefore(other: Date): Boolean {
+    return compareTo(other) < 0
+}
+
+fun Date.isBeforeOrEquals(other: Date): Boolean {
+    return compareTo(other) <= 0
+}
+
+
 fun Date.format(format: DateFormatter): String {
     return format.format(this)
 }

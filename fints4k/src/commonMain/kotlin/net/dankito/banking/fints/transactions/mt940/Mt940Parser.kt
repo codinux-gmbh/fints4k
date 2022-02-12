@@ -6,7 +6,7 @@ import net.dankito.banking.fints.transactions.mt940.model.*
 import net.dankito.utils.multiplatform.Date
 import net.dankito.utils.multiplatform.DateFormatter
 import net.dankito.utils.multiplatform.Month
-import net.dankito.utils.multiplatform.isUpperCase
+import net.dankito.utils.multiplatform.extensions.isUpperCase
 import net.dankito.utils.multiplatform.log.LoggerFactory
 
 
