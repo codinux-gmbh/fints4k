@@ -37,13 +37,13 @@ abstract class FinTsTestBase {
 
         const val ControlReference = "4477"
 
-        val Bank = BankData(BankCode, CustomerId, Pin, BankFinTsServerAddress, Bic, "", BankCountryCode, selectedTanMethod = TanMethod("chipTAN-optisch", SecurityFunction, TanMethodType.ChipTanFlickercode), selectedLanguage = Language)
+        val Bank = createTestBank()
 
         val Currency = "EUR"
 
         val AccountHolderName = "Martina Musterfrau"
 
-        val Account = AccountData(CustomerId, null, BankCountryCode, BankCode, Iban, CustomerId, AccountType.Girokonto, Currency, AccountHolderName, null, null, listOf(), listOf())
+        val Account = createTestAccount()
 
         const val ProductName = "FinTS-TestClient25Stellen"
 
@@ -59,11 +59,20 @@ abstract class FinTsTestBase {
         init {
             Bank.changeTanMediumParameters = ChangeTanMediaParameters(JobParameters("", 1, 1, 1, ":0:0"), false, false, false, false, false, listOf())
         }
+
+
+        fun createTestBank(): BankData {
+            return BankData(BankCode, CustomerId, Pin, BankFinTsServerAddress, Bic, "", BankCountryCode, selectedTanMethod = TanMethod("chipTAN-optisch", SecurityFunction, TanMethodType.ChipTanFlickercode), selectedLanguage = Language)
+        }
+
+        fun createTestAccount(): AccountData {
+            return AccountData(CustomerId, null, BankCountryCode, BankCode, Iban, CustomerId, AccountType.Girokonto, Currency, AccountHolderName, null, null, listOf(), listOf())
+        }
     }
 
 
-    protected open fun createContext(dialogId: String = DialogContext.InitialDialogId): JobContext {
-        val context = JobContext(JobContextType.AnonymousBankInfo, SimpleFinTsClientCallback(), Product, Bank)
+    protected open fun createContext(bank: BankData = Bank, dialogId: String = DialogContext.InitialDialogId): JobContext {
+        val context = JobContext(JobContextType.AnonymousBankInfo, SimpleFinTsClientCallback(), Product, bank)
         context.startNewDialog(dialogId = dialogId)
 
         return context

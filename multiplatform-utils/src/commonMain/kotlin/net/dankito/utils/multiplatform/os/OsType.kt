@@ -7,6 +7,8 @@ enum class OsType {
 
     Android,
 
-    iOS
+    iOS,
+
+    Native // TODO: get if running on Linux, Windows or macOs
 
 }

@@ -36,9 +36,6 @@ class Mt940ParserTest : FinTsTestBase() {
 
         val AccountStatement1ClosingBalanceAmount = Amount("13580,23")
         val AccountStatement1With2TransactionsClosingBalanceAmount = Amount("13148,13")
-
-        val Mt940DateFormatter = DateFormatter("yyMMdd")
-        val BookingDateFormatter = DateFormatter("MMdd")
     }
 
     private val underTest = Mt940Parser()
@@ -388,11 +385,13 @@ class Mt940ParserTest : FinTsTestBase() {
 
 
     private fun convertMt940Date(date: LocalDate): String {
-        return date.format(Mt940DateFormatter)
+        // don't use DateFormatter for this as it's not implemented in Kotlin/Native
+        return (date.year % 100).toString() + date.monthNumber.toStringWithTwoDigits() + date.dayOfMonth.toStringWithTwoDigits()
     }
 
     private fun convertToShortBookingDate(date: LocalDate): String {
-        return date.format(BookingDateFormatter)
+        // don't use DateFormatter for this as it's not implemented in Kotlin/Native
+        return date.monthNumber.toStringWithTwoDigits() + date.dayOfMonth.toStringWithTwoDigits()
     }
 
 }

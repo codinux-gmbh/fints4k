@@ -53,8 +53,8 @@ open class JobContext(
 
 
     open fun startNewDialog(closeDialog: Boolean = true, dialogId: String = DialogContext.InitialDialogId,
-                       versionOfSecurityProcedure: VersionDesSicherheitsverfahrens = VersionDesSicherheitsverfahrens.Version_2,
-                       chunkedResponseHandler: ((BankResponse) -> Unit)? = dialog.chunkedResponseHandler) : DialogContext {
+                            versionOfSecurityProcedure: VersionDesSicherheitsverfahrens = VersionDesSicherheitsverfahrens.Version_2,
+                            chunkedResponseHandler: ((BankResponse) -> Unit)? = dialog.chunkedResponseHandler) : DialogContext {
 
         val newDialogContext = DialogContext(closeDialog, dialogId, chunkedResponseHandler)
 

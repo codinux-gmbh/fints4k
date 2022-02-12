@@ -67,7 +67,6 @@ inline fun <reified T : Throwable> assertThrows(action: () -> Unit) {
     action()
     fail("action() didn't throw any exception. Expected was ${T::class.qualifiedName}")
   } catch (throwable: Throwable) {
-    println("Throwable is of type ${throwable::class.simpleName}: $throwable")
     assertTrue(throwable is T)
   }
 }

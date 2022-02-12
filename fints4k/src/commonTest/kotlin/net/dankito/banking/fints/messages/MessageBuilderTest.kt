@@ -34,9 +34,12 @@ class MessageBuilderTest : FinTsTestBase() {
     }
 
 
+    // we need to create our own copy as otherwise Kotlin/Native throws an InvalidMutabilityException
+    private val bank = createTestBank()
+
     @AfterTest
     fun tearDown() {
-        Bank.supportedJobs = listOf()
+        bank.supportedJobs = listOf()
     }
 
 
@@ -44,7 +47,7 @@ class MessageBuilderTest : FinTsTestBase() {
     fun createAnonymousDialogInitMessage() {
 
         // given
-        val context = createContext()
+        val context = createContext(bank)
 
         // when
         val result = underTest.createAnonymousDialogInitMessage(context).createdMessage
@@ -63,7 +66,7 @@ class MessageBuilderTest : FinTsTestBase() {
 
         // given
         val dialogId = createDialogId()
-        val context = createContext(dialogId)
+        val context = createContext(bank, dialogId)
 
         // when
         val result = underTest.createAnonymousDialogEndMessage(context).createdMessage ?: ""
@@ -81,7 +84,7 @@ class MessageBuilderTest : FinTsTestBase() {
     fun createDialogInitMessage() {
 
         // given
-        val context = createContext()
+        val context = createContext(bank)
 
         // when
         val result = underTest.createSynchronizeCustomerSystemIdMessage(context).createdMessage ?: ""
@@ -105,7 +108,7 @@ class MessageBuilderTest : FinTsTestBase() {
 
         // given
         val dialogId = createDialogId()
-        val context = createContext(dialogId)
+        val context = createContext(bank, dialogId)
 
         // when
         val result = underTest.createDialogEndMessage(context).createdMessage ?: ""
@@ -126,10 +129,10 @@ class MessageBuilderTest : FinTsTestBase() {
     fun createGetTransactionsMessage_JobIsNotAllowed() {
 
         // given
-        val context = createContext()
+        val context = createContext(bank)
 
         // when
-        val result = underTest.createGetTransactionsMessage(context, GetAccountTransactionsParameter(Bank, Account))
+        val result = underTest.createGetTransactionsMessage(context, GetAccountTransactionsParameter(bank, Account))
 
         // then
         assertFalse(result.isJobAllowed)
@@ -141,14 +144,14 @@ class MessageBuilderTest : FinTsTestBase() {
         // given
         val getTransactionsJob = JobParameters("HKKAZ", 1, 1, null, "HKKAZ:73:5")
         val getTransactionsJobWithPreviousVersion = JobParameters("HKKAZ", 1, 1, null, "HKKAZ:72:4")
-        Bank.supportedJobs = listOf(getTransactionsJob)
+        bank.supportedJobs = listOf(getTransactionsJob)
         val account = AccountData(CustomerId, null, BankCountryCode, BankCode, null, CustomerId, AccountType.Girokonto, "EUR", "", null, null, listOf(getTransactionsJob.jobName), listOf(getTransactionsJobWithPreviousVersion))
-        Bank.addAccount(account)
+        bank.addAccount(account)
 
-        val context = createContext()
+        val context = createContext(bank)
 
         // when
-        val result = underTest.createGetTransactionsMessage(context, GetAccountTransactionsParameter(Bank, account))
+        val result = underTest.createGetTransactionsMessage(context, GetAccountTransactionsParameter(bank, account))
 
         // then
         assertTrue(result.isJobAllowed)
@@ -160,19 +163,19 @@ class MessageBuilderTest : FinTsTestBase() {
 
         // given
         val getTransactionsJob = RetrieveAccountTransactionsParameters(JobParameters(CustomerSegmentId.AccountTransactionsMt940.id, 1, 1, null, "HIKAZS:73:5"), 180, true, false)
-        Bank.supportedJobs = listOf(getTransactionsJob)
-        Bank.pinInfo = PinInfo(getTransactionsJob, null, null, null, null, null, listOf(JobTanConfiguration(CustomerSegmentId.AccountTransactionsMt940.id, true)))
+        bank.supportedJobs = listOf(getTransactionsJob)
+        bank.pinInfo = PinInfo(getTransactionsJob, null, null, null, null, null, listOf(JobTanConfiguration(CustomerSegmentId.AccountTransactionsMt940.id, true)))
         val account = AccountData(CustomerId, null, BankCountryCode, BankCode, null, CustomerId, AccountType.Girokonto, "EUR", "", null, null, listOf(getTransactionsJob.jobName), listOf(getTransactionsJob))
-        Bank.addAccount(account)
+        bank.addAccount(account)
 
-        val context = createContext()
+        val context = createContext(bank)
 
         val fromDate = LocalDate(2019, Month.AUGUST, 6)
         val toDate = LocalDate(2019, Month.OCTOBER, 21)
         val maxCountEntries = 99
 
         // when
-        val result = underTest.createGetTransactionsMessage(context, GetAccountTransactionsParameter(Bank, account, false, fromDate, toDate, maxCountEntries))
+        val result = underTest.createGetTransactionsMessage(context, GetAccountTransactionsParameter(bank, account, false, fromDate, toDate, maxCountEntries))
 
         // then
         assertNotNull(result.createdMessage)
@@ -194,12 +197,12 @@ class MessageBuilderTest : FinTsTestBase() {
 
         // given
         val getTransactionsJob = RetrieveAccountTransactionsParameters(JobParameters(CustomerSegmentId.AccountTransactionsMt940.id, 1, 1, null, "HIKAZS:73:5"), 180, true, false)
-        Bank.supportedJobs = listOf(getTransactionsJob)
-        Bank.pinInfo = PinInfo(getTransactionsJob, null, null, null, null, null, listOf(JobTanConfiguration(CustomerSegmentId.AccountTransactionsMt940.id, true)))
+        bank.supportedJobs = listOf(getTransactionsJob)
+        bank.pinInfo = PinInfo(getTransactionsJob, null, null, null, null, null, listOf(JobTanConfiguration(CustomerSegmentId.AccountTransactionsMt940.id, true)))
         val account = AccountData(CustomerId, null, BankCountryCode, BankCode, null, CustomerId, AccountType.Girokonto, "EUR", "", null, null, listOf(getTransactionsJob.jobName), listOf(getTransactionsJob))
-        Bank.addAccount(account)
+        bank.addAccount(account)
 
-        val context = createContext()
+        val context = createContext(bank)
 
         val fromDate = LocalDate(2019, Month.AUGUST, 6)
         val toDate = LocalDate(2019, Month.OCTOBER, 21)
@@ -208,7 +211,7 @@ class MessageBuilderTest : FinTsTestBase() {
 
         // when
         val result = underTest.createGetTransactionsMessage(context, // TODO: test Aufsetzpunkt / continuationId
-            GetAccountTransactionsParameter(Bank, account, false, fromDate, toDate, maxCountEntries, false))
+            GetAccountTransactionsParameter(bank, account, false, fromDate, toDate, maxCountEntries, false))
 
         // then
         assertNotNull(result.createdMessage)
