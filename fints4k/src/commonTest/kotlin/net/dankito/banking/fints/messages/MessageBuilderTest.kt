@@ -74,7 +74,7 @@ class MessageBuilderTest : FinTsTestBase() {
 
         // then
         expect(normalizeBinaryData(result)).toBe(normalizeBinaryData(
-            "HNHBK:1:3+000000000117+300+$dialogId+1'" +
+            "HNHBK:1:3+000000000067+300+$dialogId+1'" +
             "HKEND:2:1+$dialogId'" +
             "HNHBS:3:1+1'"
         ))
@@ -116,9 +116,9 @@ class MessageBuilderTest : FinTsTestBase() {
 
         // then
         expect(normalizeBinaryData(result)).toBe(normalizeBinaryData(
-            "HNHBK:1:3+000000000359+300+$dialogId+1'" +
+            "HNHBK:1:3+000000000309+300+$dialogId+1'" +
             "HNVSK:998:3+PIN:2+998+1+1::0+1:$Date:$Time+2:2:13:@8@        :5:1+280:$BankCode:$CustomerId:V:0:0+0'" +
-            "HNVSD:999:1+@165@" + "HNSHK:2:4+PIN:2+${SecurityFunction.code}+$ControlReference+1+1+1::0+1+1:$Date:$Time+1:999:1+6:10:16+280:$BankCode:$CustomerId:S:0:0'" +
+            "HNVSD:999:1+@140@" + "HNSHK:2:4+PIN:2+${SecurityFunction.code}+$ControlReference+1+1+1::0+1+1:$Date:$Time+1:999:1+6:10:16+280:$BankCode:$CustomerId:S:0:0'" +
             "HKEND:3:1+$dialogId'" +
             "HNSHA:4:2+$ControlReference++$Pin''" +
             "HNHBS:5:1+1'"

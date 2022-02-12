@@ -10,7 +10,7 @@ import net.dankito.banking.fints.response.segments.AccountType
 import net.dankito.banking.fints.response.segments.ChangeTanMediaParameters
 import net.dankito.banking.fints.response.segments.JobParameters
 import net.dankito.utils.multiplatform.Date
-import net.dankito.utils.multiplatform.UUID
+import kotlin.random.Random
 
 
 abstract class FinTsTestBase {
@@ -70,7 +70,7 @@ abstract class FinTsTestBase {
     }
 
     protected open fun createDialogId(): String {
-        return UUID.random().replace("-", "")
+        return Random(net.dankito.utils.multiplatform.Date.nanoSecondsSinceEpoch).nextInt(1000000, 9999999).toString()
     }
 
     protected open fun convertDate(date: Date): String {
