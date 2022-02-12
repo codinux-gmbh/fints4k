@@ -42,7 +42,7 @@ abstract class TextDatenelement(var value: String?, existenzstatus: Existenzstat
                         throwInvalidCharacterException()
                     }
                 }
-            } catch (e: Exception) {
+            } catch (e: Throwable) {
                 throwInvalidCharacterException()
             }
         }
