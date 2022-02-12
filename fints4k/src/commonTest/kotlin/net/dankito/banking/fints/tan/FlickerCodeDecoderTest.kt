@@ -1,9 +1,8 @@
 package net.dankito.banking.fints.tan
 
-import ch.tutteli.atrium.api.fluent.en_GB.toBe
-import ch.tutteli.atrium.api.verbs.expect
 import net.dankito.banking.fints.model.HHDVersion
 import kotlin.test.Test
+import kotlin.test.assertEquals
 
 
 class FlickerCodeDecoderTest {
@@ -23,7 +22,7 @@ class FlickerCodeDecoderTest {
 
 
         // then
-        expect(response.parsedDataSet).toBe("070520829019981A")
+        assertEquals("070520829019981A", response.parsedDataSet)
     }
 
 
@@ -39,7 +38,7 @@ class FlickerCodeDecoderTest {
 
 
         // then
-        expect(response.parsedDataSet).toBe("100520829019981849453939424F46494B")
+        assertEquals("100520829019981849453939424F46494B", response.parsedDataSet)
     }
 
     @Test
@@ -52,7 +51,7 @@ class FlickerCodeDecoderTest {
         val result = underTest.decodeChallenge(challenge, HHDVersion.HHD_1_3)
 
         // then
-        expect(result.parsedDataSet).toBe("1204881696280598765432101533322C30303A")
+        assertEquals("1204881696280598765432101533322C30303A", result.parsedDataSet)
     }
 
     @Test
@@ -65,7 +64,7 @@ class FlickerCodeDecoderTest {
         val result = underTest.decodeChallenge(challenge, HHDVersion.HHD_1_3)
 
         // then
-        expect(result.parsedDataSet).toBe("0604800402430B")
+        assertEquals("0604800402430B", result.parsedDataSet)
     }
 
 
@@ -79,7 +78,7 @@ class FlickerCodeDecoderTest {
         val result = underTest.decodeChallenge(challenge, HHDVersion.HHD_1_4)
 
         // then
-        expect(result.parsedDataSet).toBe("1F85012392301246564445323631323334353637383039383736353433323175")
+        assertEquals("1F85012392301246564445323631323334353637383039383736353433323175", result.parsedDataSet)
     }
 
     @Test
@@ -92,7 +91,7 @@ class FlickerCodeDecoderTest {
         val result = underTest.decodeChallenge(challenge, HHDVersion.HHD_1_4)
 
         // then
-        expect(result.parsedDataSet).toBe("2584011093744F5644453236313233343536373830393837363534333231463130302C303008")
+        assertEquals("2584011093744F5644453236313233343536373830393837363534333231463130302C303008", result.parsedDataSet)
     }
 
 }

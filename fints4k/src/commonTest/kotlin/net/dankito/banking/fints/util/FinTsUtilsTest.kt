@@ -1,11 +1,10 @@
 package net.dankito.banking.fints.util
 
-import ch.tutteli.atrium.api.fluent.en_GB.toBe
-import ch.tutteli.atrium.api.verbs.expect
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import net.dankito.utils.multiplatform.extensions.of
 import kotlin.test.Test
+import kotlin.test.assertEquals
 
 class FinTsUtilsTest {
 
@@ -22,7 +21,7 @@ class FinTsUtilsTest {
         val result = underTest.formatDate(date)
 
         // then
-        expect(result).toBe("19880327")
+        assertEquals("19880327", result)
     }
 
     @Test
@@ -35,7 +34,7 @@ class FinTsUtilsTest {
         val result = underTest.formatDateAsInt(date)
 
         // then
-        expect(result).toBe(19880327)
+        assertEquals(19880327, result)
     }
 
 
@@ -49,7 +48,7 @@ class FinTsUtilsTest {
         val result = underTest.formatTime(time)
 
         // then
-        expect(result).toBe("080201")
+        assertEquals("080201", result)
     }
 
     @Test
@@ -62,7 +61,7 @@ class FinTsUtilsTest {
         val result = underTest.formatTime(time)
 
         // then
-        expect(result).toBe("182251")
+        assertEquals("182251", result)
     }
 
     @Test
@@ -75,7 +74,7 @@ class FinTsUtilsTest {
         val result = underTest.formatTimeAsInt(time)
 
         // then
-        expect(result).toBe(80201)
+        assertEquals(80201, result)
     }
 
     @Test
@@ -88,7 +87,7 @@ class FinTsUtilsTest {
         val result = underTest.formatTimeAsInt(time)
 
         // then
-        expect(result).toBe(182251)
+        assertEquals(182251, result)
     }
 
 }

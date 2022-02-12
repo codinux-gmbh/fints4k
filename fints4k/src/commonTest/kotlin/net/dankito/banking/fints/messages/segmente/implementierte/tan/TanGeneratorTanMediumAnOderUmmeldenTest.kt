@@ -1,13 +1,12 @@
 package net.dankito.banking.fints.messages.segmente.implementierte.tan
 
-import ch.tutteli.atrium.api.fluent.en_GB.toBe
-import ch.tutteli.atrium.api.verbs.expect
 import net.dankito.banking.fints.FinTsTestBase
 import net.dankito.banking.fints.messages.datenelemente.implementierte.tan.TanGeneratorTanMedium
 import net.dankito.banking.fints.messages.datenelemente.implementierte.tan.TanMediumKlasse
 import net.dankito.banking.fints.messages.datenelemente.implementierte.tan.TanMediumStatus
 import net.dankito.banking.fints.response.segments.ChangeTanMediaParameters
 import kotlin.test.Test
+import kotlin.test.assertEquals
 
 
 class TanGeneratorTanMediumAnOderUmmeldenTest: FinTsTestBase() {
@@ -50,7 +49,7 @@ class TanGeneratorTanMediumAnOderUmmeldenTest: FinTsTestBase() {
 
 
         // then
-        expect(result).toBe("HKTAU:$SegmentNumber:1+G+$CardNumber")
+        assertEquals(result, "HKTAU:$SegmentNumber:1+G+$CardNumber")
     }
 
     @Test
@@ -67,7 +66,7 @@ class TanGeneratorTanMediumAnOderUmmeldenTest: FinTsTestBase() {
 
 
         // then
-        expect(result).toBe("HKTAU:$SegmentNumber:1+G+$CardNumber+++$ATC+$TAN")
+        assertEquals(result, "HKTAU:$SegmentNumber:1+G+$CardNumber+++$ATC+$TAN")
     }
 
     @Test
@@ -84,7 +83,7 @@ class TanGeneratorTanMediumAnOderUmmeldenTest: FinTsTestBase() {
 
 
         // then
-        expect(result).toBe("HKTAU:$SegmentNumber:1+G+$CardNumber+$CardSequenceNumber")
+        assertEquals(result, "HKTAU:$SegmentNumber:1+G+$CardNumber+$CardSequenceNumber")
     }
 
     @Test
@@ -101,7 +100,7 @@ class TanGeneratorTanMediumAnOderUmmeldenTest: FinTsTestBase() {
 
 
         // then
-        expect(result).toBe("HKTAU:$SegmentNumber:1+G+$CardNumber+$CardSequenceNumber++$ATC+$TAN")
+        assertEquals(result, "HKTAU:$SegmentNumber:1+G+$CardNumber+$CardSequenceNumber++$ATC+$TAN")
     }
 
 
@@ -119,7 +118,7 @@ class TanGeneratorTanMediumAnOderUmmeldenTest: FinTsTestBase() {
 
 
         // then
-        expect(result).toBe("HKTAU:$SegmentNumber:2+G+$CardNumber+++$CustomerId::$BankCountryCode:$BankCode")
+        assertEquals(result, "HKTAU:$SegmentNumber:2+G+$CardNumber+++$CustomerId::$BankCountryCode:$BankCode")
     }
 
     @Test
@@ -136,7 +135,7 @@ class TanGeneratorTanMediumAnOderUmmeldenTest: FinTsTestBase() {
 
 
         // then
-        expect(result).toBe("HKTAU:$SegmentNumber:2+G+$CardNumber+++$CustomerId::$BankCountryCode:$BankCode++++$ATC+$TAN")
+        assertEquals(result, "HKTAU:$SegmentNumber:2+G+$CardNumber+++$CustomerId::$BankCountryCode:$BankCode++++$ATC+$TAN")
     }
 
     @Test
@@ -153,7 +152,7 @@ class TanGeneratorTanMediumAnOderUmmeldenTest: FinTsTestBase() {
 
 
         // then
-        expect(result).toBe("HKTAU:$SegmentNumber:2+G+$CardNumber+$CardSequenceNumber++$CustomerId::$BankCountryCode:$BankCode")
+        assertEquals(result, "HKTAU:$SegmentNumber:2+G+$CardNumber+$CardSequenceNumber++$CustomerId::$BankCountryCode:$BankCode")
     }
 
     @Test
@@ -170,7 +169,7 @@ class TanGeneratorTanMediumAnOderUmmeldenTest: FinTsTestBase() {
 
 
         // then
-        expect(result).toBe("HKTAU:$SegmentNumber:2+G+$CardNumber++$CardType+$CustomerId::$BankCountryCode:$BankCode")
+        assertEquals(result, "HKTAU:$SegmentNumber:2+G+$CardNumber++$CardType+$CustomerId::$BankCountryCode:$BankCode")
     }
 
     @Test
@@ -187,7 +186,7 @@ class TanGeneratorTanMediumAnOderUmmeldenTest: FinTsTestBase() {
 
 
         // then
-        expect(result).toBe("HKTAU:$SegmentNumber:2+G+$CardNumber+$CardSequenceNumber+$CardType+$CustomerId::$BankCountryCode:$BankCode++++$ATC+$TAN")
+        assertEquals(result, "HKTAU:$SegmentNumber:2+G+$CardNumber+$CardSequenceNumber+$CardType+$CustomerId::$BankCountryCode:$BankCode++++$ATC+$TAN")
     }
 
     // TODO: may also test 'gueltig ab' and 'gueltig bis'

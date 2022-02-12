@@ -1,8 +1,7 @@
 package net.dankito.banking.fints.messages.segmente.implementierte
 
-import ch.tutteli.atrium.api.fluent.en_GB.toBe
-import ch.tutteli.atrium.api.verbs.expect
 import kotlin.test.Test
+import kotlin.test.assertEquals
 
 class SignaturabschlussTest {
 
@@ -20,7 +19,7 @@ class SignaturabschlussTest {
         val result = underTest.format()
 
         // then
-        expect(result).toBe("HNSHA:$segmentNumber:2+$controlReference++$pin")
+        assertEquals(result, "HNSHA:$segmentNumber:2+$controlReference++$pin")
     }
 
 }

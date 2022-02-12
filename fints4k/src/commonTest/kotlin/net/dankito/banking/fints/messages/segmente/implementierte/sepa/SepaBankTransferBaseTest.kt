@@ -1,7 +1,6 @@
 package net.dankito.banking.fints.messages.segmente.implementierte.sepa
 
-import ch.tutteli.atrium.api.fluent.en_GB.contains
-import ch.tutteli.atrium.api.verbs.expect
+import net.dankito.banking.fints.extensions.assertContains
 import net.dankito.banking.fints.messages.segmente.id.CustomerSegmentId
 import net.dankito.banking.fints.model.*
 import kotlin.test.Test
@@ -42,7 +41,7 @@ class SepaBankTransferBaseTest {
 
 
         // then
-        expect(result).contains(debitorName, debitorIban, debitorBic, recipientName, recipientIban, recipientBic,
+        assertContains(result, debitorName, debitorIban, debitorBic, recipientName, recipientIban, recipientBic,
             amount.toString().replace(',', '.'), reference, "urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.001.001.03")
     }
 
@@ -64,7 +63,7 @@ class SepaBankTransferBaseTest {
 
 
         // then
-        expect(result).contains(debitorName, debitorIban, debitorBic, recipientName, recipientIban, recipientBic,
+        assertContains(result, debitorName, debitorIban, debitorBic, recipientName, recipientIban, recipientBic,
             amount.toString().replace(',', '.'), reference, "urn?:iso?:std?:iso?:20022?:tech?:xsd?:pain.001.003.03")
     }
 

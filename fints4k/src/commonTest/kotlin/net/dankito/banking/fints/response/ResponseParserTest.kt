@@ -1,6 +1,5 @@
 package net.dankito.banking.fints.response
 
-import ch.tutteli.atrium.api.fluent.en_GB.*
 import net.dankito.banking.fints.FinTsTestBase
 import net.dankito.banking.fints.messages.datenelemente.implementierte.Dialogsprache
 import net.dankito.banking.fints.messages.datenelemente.implementierte.HbciVersion
@@ -12,14 +11,13 @@ import net.dankito.banking.fints.messages.datenelementgruppen.implementierte.sig
 import net.dankito.banking.fints.messages.segmente.id.ISegmentId
 import net.dankito.banking.fints.messages.segmente.id.MessageSegmentId
 import net.dankito.banking.fints.response.segments.*
-import ch.tutteli.atrium.api.verbs.expect
 import kotlinx.datetime.LocalDate
-import net.dankito.banking.fints.extensions.isFalse
-import net.dankito.banking.fints.extensions.isTrue
+import net.dankito.banking.fints.extensions.assertContains
+import net.dankito.banking.fints.extensions.assertContainsExactly
+import net.dankito.banking.fints.extensions.assertEmpty
+import net.dankito.banking.fints.extensions.assertSize
 import net.dankito.banking.fints.model.Amount
-import kotlin.test.Ignore
-import kotlin.test.Test
-import kotlin.test.fail
+import kotlin.test.*
 
 
 class ResponseParserTest : FinTsTestBase() {
@@ -37,9 +35,9 @@ class ResponseParserTest : FinTsTestBase() {
         )
 
         // then
-        expect(result.receivedSegments).hasSize(2)
+        assertSize(2, result.receivedSegments)
 
-        expect(result.messageHeader?.dialogId).toBe("abcd'efg")
+        assertEquals("abcd'efg", result.messageHeader?.dialogId)
     }
 
     @Test
@@ -52,9 +50,9 @@ class ResponseParserTest : FinTsTestBase() {
         )
 
         // then
-        expect(result.receivedSegments).hasSize(2)
+        assertSize(2, result.receivedSegments)
 
-        expect(result.messageHeader?.dialogId).toBe("abcd+efg")
+        assertEquals("abcd+efg", result.messageHeader?.dialogId)
     }
 
     @Test
@@ -67,9 +65,9 @@ class ResponseParserTest : FinTsTestBase() {
         )
 
         // then
-        expect(result.receivedSegments).hasSize(2)
+        assertSize(2, result.receivedSegments)
 
-        expect(result.messageHeader?.dialogId).toBe("https://www.example.org")
+        assertEquals("https://www.example.org", result.messageHeader?.dialogId)
     }
 
     @Test
@@ -82,9 +80,9 @@ class ResponseParserTest : FinTsTestBase() {
         )
 
         // then
-        expect(result.receivedSegments).hasSize(2)
+        assertSize(2, result.receivedSegments)
 
-        expect(result.messageHeader?.dialogId).toBe("abcd?efg")
+        assertEquals("abcd?efg", result.messageHeader?.dialogId)
     }
 
 
@@ -98,13 +96,13 @@ class ResponseParserTest : FinTsTestBase() {
                 "HNHBS:3:1+1'")
 
         // then
-        expect(result.receivedSegments).hasSize(5)
+        assertSize(5, result.receivedSegments)
 
         assertCouldParseSegment(result, InstituteSegmentId.MessageFeedback, 2, 2)
 
-        expect(result.messageFeedback).notToBeNull()
-        expect(result.messageFeedback?.isError ?: false).isTrue()
-        expect(result.messageFeedback?.feedbacks?.map { it.message } ?: listOf()).containsExactly("Nachricht nicht erwartet.", "Dialoginitialisierung abgebrochen.")
+        assertNotNull(result.messageFeedback)
+        assertTrue(result.messageFeedback?.isError ?: false)
+        assertContainsExactly(result.messageFeedback?.feedbacks?.map { it.message } ?: listOf(), "Nachricht nicht erwartet.", "Dialoginitialisierung abgebrochen.")
     }
 
 
@@ -117,13 +115,13 @@ class ResponseParserTest : FinTsTestBase() {
         // then
         assertSuccessfullyParsedSegment(result, MessageSegmentId.MessageHeader, 1, 3)
 
-        expect(result.messageHeader).notToBeNull()
+        assertNotNull(result.messageHeader)
         val header = result.receivedSegments.first() as ReceivedMessageHeader
 
-        expect(header.messageSize).toBe(596)
-        expect(header.finTsVersion).toBe(300)
-        expect(header.dialogId).toBe("817407729605=887211382312BLB4=")
-        expect(header.messageNumber).toBe(2)
+        assertEquals(596, header.messageSize)
+        assertEquals(300, header.finTsVersion)
+        assertEquals("817407729605=887211382312BLB4=", header.dialogId)
+        assertEquals(2, header.messageNumber)
     }
 
 
@@ -136,17 +134,17 @@ class ResponseParserTest : FinTsTestBase() {
         // then
         assertSuccessfullyParsedSegment(result, InstituteSegmentId.MessageFeedback, 3, 2)
 
-        expect(result.messageFeedback).notToBeNull()
+        assertNotNull(result.messageFeedback)
 
-        expect(result.messageFeedback?.feedbacks ?: listOf()).hasSize(1)
+        assertCountFeedbacks(result, 1)
 
         val firstFeedback = result.messageFeedback?.feedbacks?.get(0)!!
-        expect(firstFeedback.responseCode).toBe(3060)
-        expect(firstFeedback.isSuccess).isFalse()
-        expect(firstFeedback.isWarning).isTrue()
-        expect(firstFeedback.isError).isFalse()
-        expect(firstFeedback.message).toBe("Bitte beachten Sie die enthaltenen Warnungen/Hinweise.")
-        expect(firstFeedback.parameter).toBe(null)
+        assertEquals(3060, firstFeedback.responseCode)
+        assertFalse(firstFeedback.isSuccess)
+        assertTrue(firstFeedback.isWarning)
+        assertFalse(firstFeedback.isError)
+        assertEquals("Bitte beachten Sie die enthaltenen Warnungen/Hinweise.", firstFeedback.message)
+        assertEquals(null, firstFeedback.parameter)
     }
 
     @Test
@@ -158,17 +156,17 @@ class ResponseParserTest : FinTsTestBase() {
         // then
         assertCouldParseSegment(result, InstituteSegmentId.MessageFeedback, 3, 2)
 
-        expect(result.messageFeedback).notToBeNull()
+        assertNotNull(result.messageFeedback)
 
-        expect(result.messageFeedback?.feedbacks ?: listOf()).hasSize(1)
+        assertCountFeedbacks(result, 1)
 
         val firstFeedback = result.messageFeedback?.feedbacks?.get(0)!!
-        expect(firstFeedback.responseCode).toBe(9050)
-        expect(firstFeedback.isSuccess).isFalse()
-        expect(firstFeedback.isWarning).isFalse()
-        expect(firstFeedback.isError).isTrue()
-        expect(firstFeedback.message).toBe("Die Nachricht enthält Fehler.")
-        expect(firstFeedback.parameter).toBe(null)
+        assertEquals(9050, firstFeedback.responseCode)
+        assertFalse(firstFeedback.isSuccess)
+        assertFalse(firstFeedback.isWarning)
+        assertTrue(firstFeedback.isError)
+        assertEquals("Die Nachricht enthält Fehler.", firstFeedback.message)
+        assertEquals(null, firstFeedback.parameter)
     }
 
     @Test
@@ -180,25 +178,25 @@ class ResponseParserTest : FinTsTestBase() {
         // then
         assertCouldParseSegment(result, InstituteSegmentId.MessageFeedback, 3, 2)
 
-        expect(result.messageFeedback).notToBeNull()
+        assertNotNull(result.messageFeedback)
 
-        expect(result.messageFeedback?.feedbacks ?: listOf()).hasSize(2)
+        assertCountFeedbacks(result, 2)
 
         val firstFeedback = result.messageFeedback?.feedbacks?.get(0)!!
-        expect(firstFeedback.responseCode).toBe(9050)
-        expect(firstFeedback.isSuccess).isFalse()
-        expect(firstFeedback.isWarning).isFalse()
-        expect(firstFeedback.isError).isTrue()
-        expect(firstFeedback.message).toBe("Die Nachricht enthält Fehler.")
-        expect(firstFeedback.parameter).toBe(null)
+        assertEquals(9050, firstFeedback.responseCode)
+        assertFalse(firstFeedback.isSuccess)
+        assertFalse(firstFeedback.isWarning)
+        assertTrue(firstFeedback.isError)
+        assertEquals("Die Nachricht enthält Fehler.", firstFeedback.message)
+        assertEquals(null, firstFeedback.parameter)
 
         val secondFeedback = result.messageFeedback?.feedbacks?.get(1)!!
-        expect(secondFeedback.responseCode).toBe(3905)
-        expect(secondFeedback.isSuccess).isFalse()
-        expect(secondFeedback.isWarning).isTrue()
-        expect(secondFeedback.isError).isFalse()
-        expect(secondFeedback.message).toBe("Es wurde keine Challenge erzeugt.")
-        expect(secondFeedback.parameter).toBe(null)
+        assertEquals(3905, secondFeedback.responseCode)
+        assertFalse(secondFeedback.isSuccess)
+        assertTrue(secondFeedback.isWarning)
+        assertFalse(secondFeedback.isError)
+        assertEquals("Es wurde keine Challenge erzeugt.", secondFeedback.message)
+        assertEquals(null, secondFeedback.parameter)
     }
 
     @Test
@@ -210,25 +208,25 @@ class ResponseParserTest : FinTsTestBase() {
         // then
         assertCouldParseSegment(result, InstituteSegmentId.MessageFeedback, 3, 2)
 
-        expect(result.messageFeedback).notToBeNull()
+        assertNotNull(result.messageFeedback)
 
-        expect(result.messageFeedback?.feedbacks ?: listOf()).hasSize(2)
+        assertCountFeedbacks(result, 2)
 
         val firstFeedback = result.messageFeedback?.feedbacks?.get(0)!!
-        expect(firstFeedback.responseCode).toBe(9050)
-        expect(firstFeedback.isSuccess).isFalse()
-        expect(firstFeedback.isWarning).isFalse()
-        expect(firstFeedback.isError).isTrue()
-        expect(firstFeedback.message).toBe("Die Nachricht enthält Fehler.")
-        expect(firstFeedback.parameter).toBe(null)
+        assertEquals(9050, firstFeedback.responseCode)
+        assertFalse(firstFeedback.isSuccess)
+        assertFalse(firstFeedback.isWarning)
+        assertTrue(firstFeedback.isError)
+        assertEquals("Die Nachricht enthält Fehler.", firstFeedback.message)
+        assertEquals(null, firstFeedback.parameter)
 
         val secondFeedback = result.messageFeedback?.feedbacks?.get(1)!!
-        expect(secondFeedback.responseCode).toBe(3905)
-        expect(secondFeedback.isSuccess).isFalse()
-        expect(secondFeedback.isWarning).isTrue()
-        expect(secondFeedback.isError).isFalse()
-        expect(secondFeedback.message).toBe("Es wurde keine Challenge erzeugt.")
-        expect(secondFeedback.parameter).toBe(null)
+        assertEquals(3905, secondFeedback.responseCode)
+        assertFalse(secondFeedback.isSuccess)
+        assertTrue(secondFeedback.isWarning)
+        assertFalse(secondFeedback.isError)
+        assertEquals("Es wurde keine Challenge erzeugt.", secondFeedback.message)
+        assertEquals(null, secondFeedback.parameter)
     }
 
 
@@ -242,7 +240,7 @@ class ResponseParserTest : FinTsTestBase() {
         // then
         assertCouldParseSegment(result, InstituteSegmentId.SegmentFeedback, 4, 2, 3)
 
-        expect(result.aufsetzpunkt).toBe("9345-10-26-11.52.15.693455")
+        assertEquals("9345-10-26-11.52.15.693455", result.aufsetzpunkt)
     }
 
     @Test
@@ -255,42 +253,41 @@ class ResponseParserTest : FinTsTestBase() {
         // then
         assertCouldParseSegment(result, InstituteSegmentId.SegmentFeedback, 4, 2, 4)
 
-        expect(result.segmentFeedbacks).hasSize(1)
+        assertSize(1, result.segmentFeedbacks)
 
-        expect(result.supportedTanMethodsForUser).containsExactly(Sicherheitsfunktion.PIN_TAN_910,
+        assertContainsExactly(result.supportedTanMethodsForUser, Sicherheitsfunktion.PIN_TAN_910,
             Sicherheitsfunktion.PIN_TAN_911, Sicherheitsfunktion.PIN_TAN_912, Sicherheitsfunktion.PIN_TAN_913)
 
         val segmentFeedback = result.segmentFeedbacks.first()
 
-        expect(segmentFeedback.feedbacks).hasSize(3)
+        assertSize(3, segmentFeedback.feedbacks)
 
         val firstFeedback = segmentFeedback.feedbacks[0]
-        expect(firstFeedback.responseCode).toBe(3050)
-        expect(firstFeedback.isSuccess).isFalse()
-        expect(firstFeedback.isWarning).isTrue()
-        expect(firstFeedback.isError).isFalse()
-        expect(firstFeedback.message).toBe("BPD nicht mehr aktuell, aktuelle Version enthalten.")
-        expect(firstFeedback.parameter).toBe(null)
+        assertEquals(3050, firstFeedback.responseCode)
+        assertFalse(firstFeedback.isSuccess)
+        assertTrue(firstFeedback.isWarning)
+        assertFalse(firstFeedback.isError)
+        assertEquals("BPD nicht mehr aktuell, aktuelle Version enthalten.", firstFeedback.message)
+        assertEquals(null, firstFeedback.parameter)
 
         val secondFeedback = segmentFeedback.feedbacks[1]
-        expect(secondFeedback is SupportedTanMethodsForUserFeedback).isTrue()
-        expect((secondFeedback as SupportedTanMethodsForUserFeedback).supportedTanMethods)
-            .containsExactly(Sicherheitsfunktion.PIN_TAN_910,Sicherheitsfunktion.PIN_TAN_911,
+        assertTrue(secondFeedback is SupportedTanMethodsForUserFeedback)
+        assertContainsExactly(secondFeedback.supportedTanMethods, Sicherheitsfunktion.PIN_TAN_910,Sicherheitsfunktion.PIN_TAN_911,
                 Sicherheitsfunktion.PIN_TAN_912, Sicherheitsfunktion.PIN_TAN_913)
-        expect(secondFeedback.responseCode).toBe(3920)
-        expect(secondFeedback.isSuccess).isFalse()
-        expect(secondFeedback.isWarning).isTrue()
-        expect(secondFeedback.isError).isFalse()
-        expect(secondFeedback.message).toBe("Zugelassene Zwei-Schritt-Verfahren für den Benutzer.")
-        expect(secondFeedback.parameter).toBe(null)
+        assertEquals(3920, secondFeedback.responseCode)
+        assertFalse(secondFeedback.isSuccess)
+        assertTrue(secondFeedback.isWarning)
+        assertFalse(secondFeedback.isError)
+        assertEquals("Zugelassene Zwei-Schritt-Verfahren für den Benutzer.", secondFeedback.message)
+        assertEquals(null, secondFeedback.parameter)
 
         val thirdFeedback = segmentFeedback.feedbacks[2]
-        expect(thirdFeedback.responseCode).toBe(20)
-        expect(thirdFeedback.isSuccess).isTrue()
-        expect(thirdFeedback.isWarning).isFalse()
-        expect(thirdFeedback.isError).isFalse()
-        expect(thirdFeedback.message).toBe("Der Auftrag wurde ausgeführt.")
-        expect(thirdFeedback.parameter).toBe(null)
+        assertEquals(20, thirdFeedback.responseCode)
+        assertTrue(thirdFeedback.isSuccess)
+        assertFalse(thirdFeedback.isWarning)
+        assertFalse(thirdFeedback.isError)
+        assertEquals("Der Auftrag wurde ausgeführt.", thirdFeedback.message)
+        assertEquals(null, thirdFeedback.parameter)
     }
 
 
@@ -304,7 +301,7 @@ class ResponseParserTest : FinTsTestBase() {
         assertSuccessfullyParsedSegment(result, InstituteSegmentId.Synchronization, 173, 4, 6)
 
         result.getFirstSegmentById<ReceivedSynchronization>(InstituteSegmentId.Synchronization)?.let { segment ->
-            expect(segment.customerSystemId).toBe("WL/2/Trhmm0BAAAjIADlyFkXrAQA")
+            assertEquals("WL/2/Trhmm0BAAAjIADlyFkXrAQA", segment.customerSystemId)
         }
         ?: run { fail("No segment of type ReceivedSynchronization found in ${result.receivedSegments}") }
     }
@@ -320,18 +317,18 @@ class ResponseParserTest : FinTsTestBase() {
         assertSuccessfullyParsedSegment(result, InstituteSegmentId.BankParameters, 5, 3, 3)
 
         result.getFirstSegmentById<BankParameters>(InstituteSegmentId.BankParameters)?.let { segment ->
-            expect(segment.bpdVersion).toBe(34)
-            expect(segment.bankCountryCode).toBe(280)
-            expect(segment.bankCode).toBe("10070000")
-            expect(segment.bankName).toBe("Deutsche Bank")
+            assertEquals(34, segment.bpdVersion)
+            assertEquals(280, segment.bankCountryCode)
+            assertEquals("10070000", segment.bankCode)
+            assertEquals("Deutsche Bank", segment.bankName)
 
-            expect(segment.countMaxJobsPerMessage).toBe(0)
-            expect(segment.supportedLanguages).containsExactly(Dialogsprache.German)
-            expect(segment.supportedHbciVersions).containsExactly(HbciVersion.FinTs_3_0_0)
+            assertEquals(0, segment.countMaxJobsPerMessage)
+            assertContainsExactly(segment.supportedLanguages, Dialogsprache.German)
+            assertContainsExactly(segment.supportedHbciVersions, HbciVersion.FinTs_3_0_0)
 
-            expect(segment.maxMessageSize).toBe(0)
-            expect(segment.minTimeout).toBe(null)
-            expect(segment.maxTimeout).toBe(null)
+            assertEquals(0, segment.maxMessageSize)
+            assertEquals(null, segment.minTimeout)
+            assertEquals(null, segment.maxTimeout)
         }
         ?: run { fail("No segment of type BankParameters found in ${result.receivedSegments}") }
     }
@@ -348,18 +345,18 @@ class ResponseParserTest : FinTsTestBase() {
         assertSuccessfullyParsedSegment(result, InstituteSegmentId.BankParameters, 3, 3, 3)
 
         result.getFirstSegmentById<BankParameters>(InstituteSegmentId.BankParameters)?.let { segment ->
-            expect(segment.bpdVersion).toBe(0)
-            expect(segment.bankCountryCode).toBe(280)
-            expect(segment.bankCode).toBe("70033100")
-            expect(segment.bankName).toBe("Baader Bank AG")
+            assertEquals(0, segment.bpdVersion)
+            assertEquals(280, segment.bankCountryCode)
+            assertEquals("70033100", segment.bankCode)
+            assertEquals("Baader Bank AG", segment.bankName)
 
-            expect(segment.countMaxJobsPerMessage).toBe(1)
-            expect(segment.supportedLanguages).containsExactly(Dialogsprache.German)
-            expect(segment.supportedHbciVersions).containsExactly(HbciVersion.FinTs_3_0_0)
+            assertEquals(1, segment.countMaxJobsPerMessage)
+            assertContainsExactly(segment.supportedLanguages, Dialogsprache.German)
+            assertContainsExactly(segment.supportedHbciVersions, HbciVersion.FinTs_3_0_0)
 
-            expect(segment.maxMessageSize).toBe(null)
-            expect(segment.minTimeout).toBe(0)
-            expect(segment.maxTimeout).toBe(300)
+            assertEquals(null, segment.maxMessageSize)
+            assertEquals(0, segment.minTimeout)
+            assertEquals(300, segment.maxTimeout)
         }
         ?: run { fail("No segment of type BankParameters found in ${result.receivedSegments}") }
     }
@@ -374,9 +371,9 @@ class ResponseParserTest : FinTsTestBase() {
         assertSuccessfullyParsedSegment(result, InstituteSegmentId.SecurityMethods, 7, 3, 3)
 
         result.getFirstSegmentById<SecurityMethods>(InstituteSegmentId.SecurityMethods)?.let { segment ->
-            expect(segment.mixingAllowed).isFalse()
+            assertFalse(segment.mixingAllowed)
 
-            expect(segment.securityProfiles).contains(
+            assertContains(segment.securityProfiles,
                 Sicherheitsprofil(Sicherheitsverfahren.RDH, VersionDesSicherheitsverfahrens.Version_1),
                 Sicherheitsprofil(Sicherheitsverfahren.RDH, VersionDesSicherheitsverfahrens.Version_9),
                 Sicherheitsprofil(Sicherheitsverfahren.RDH, VersionDesSicherheitsverfahrens.Version_10),
@@ -397,9 +394,9 @@ class ResponseParserTest : FinTsTestBase() {
         assertSuccessfullyParsedSegment(result, InstituteSegmentId.SecurityMethods, 7, 3, 3)
 
         result.getFirstSegmentById<SecurityMethods>(InstituteSegmentId.SecurityMethods)?.let { segment ->
-            expect(segment.mixingAllowed).isFalse()
+            assertFalse(segment.mixingAllowed)
 
-            expect(segment.securityProfiles).contains(
+            assertContains(segment.securityProfiles,
                 Sicherheitsprofil(Sicherheitsverfahren.RDH, VersionDesSicherheitsverfahrens.Version_1),
                 Sicherheitsprofil(Sicherheitsverfahren.RDH, VersionDesSicherheitsverfahrens.Version_3),
                 Sicherheitsprofil(Sicherheitsverfahren.RDH, VersionDesSicherheitsverfahrens.Version_5),
@@ -428,12 +425,12 @@ class ResponseParserTest : FinTsTestBase() {
         assertSuccessfullyParsedSegment(result, InstituteSegmentId.CommunicationInfo, 5, 4, 3)
 
         result.getFirstSegmentById<CommunicationInfo>(InstituteSegmentId.CommunicationInfo)?.let { segment ->
-            expect(segment.bankInfo.bankCountryCode).toBe(BankCountryCode)
-            expect(segment.bankInfo.bankCode).toBe(BankCode)
+            assertEquals(BankCountryCode, segment.bankInfo.bankCountryCode)
+            assertEquals(BankCode, segment.bankInfo.bankCode)
 
-            expect(segment.defaultLanguage).toBe(language)
+            assertEquals(language, segment.defaultLanguage)
 
-            expect(segment.parameters).containsExactly(
+            assertContainsExactly(segment.parameters,
                 CommunicationParameter(Kommunikationsdienst.Https, BankFinTsServerAddress),
                 CommunicationParameter(Kommunikationsdienst.TCP_IP, BankFinTsServerAddress)
             )
@@ -452,11 +449,11 @@ class ResponseParserTest : FinTsTestBase() {
         assertSuccessfullyParsedSegment(result, InstituteSegmentId.UserParameters, 6, 4, 4)
 
         result.getFirstSegmentById<UserParameters>(InstituteSegmentId.UserParameters)?.let { segment ->
-            expect(segment.userIdentifier).toBe("3498443795")
-            expect(segment.updVersion).toBe(34)
-            expect(segment.areListedJobsBlocked).isTrue()
-            expect(segment.username).toBe(null)
-            expect(segment.extension).toBe("PERSNR0010789316542")
+            assertEquals("3498443795", segment.userIdentifier)
+            assertEquals(34, segment.updVersion)
+            assertTrue(segment.areListedJobsBlocked)
+            assertEquals(null, segment.username)
+            assertEquals("PERSNR0010789316542", segment.extension)
         }
         ?: run { fail("No segment of type UserParameters found in ${result.receivedSegments}") }
     }
@@ -474,20 +471,20 @@ class ResponseParserTest : FinTsTestBase() {
         assertSuccessfullyParsedSegment(result, InstituteSegmentId.AccountInfo, 7, 6, 4)
 
         result.getFirstSegmentById<AccountInfo>(InstituteSegmentId.AccountInfo)?.let { segment ->
-            expect(segment.accountIdentifier).toBe("0987654321")
-            expect(segment.subAccountAttribute).toBe(null)
-            expect(segment.bankCountryCode).toBe(280)
-            expect(segment.bankCode).toBe("12345678")
-            expect(segment.iban).toBe("DE11123456780987654321")
-            expect(segment.customerId).toBe("2197654321")
-            expect(segment.accountType).toBe(AccountType.Girokonto)
-            expect(segment.currency).toBe("EUR")
-            expect(segment.accountHolderName1).toBe("Hans Dampf")
-            expect(segment.accountHolderName2).toBe(null)
-            expect(segment.productName).toBe("Sichteinlagen")
-            expect(segment.accountLimit).toBe(null)
-            expect(segment.allowedJobNames).hasSize(44)
-            expect(segment.extension).notToBeNull()
+            assertEquals("0987654321", segment.accountIdentifier)
+            assertEquals(null, segment.subAccountAttribute)
+            assertEquals(280, segment.bankCountryCode)
+            assertEquals("12345678", segment.bankCode)
+            assertEquals("DE11123456780987654321", segment.iban)
+            assertEquals("2197654321", segment.customerId)
+            assertEquals(AccountType.Girokonto, segment.accountType)
+            assertEquals("EUR", segment.currency)
+            assertEquals("Hans Dampf", segment.accountHolderName1)
+            assertNull(segment.accountHolderName2)
+            assertEquals("Sichteinlagen", segment.productName)
+            assertEquals(null, segment.accountLimit)
+            assertSize(44, segment.allowedJobNames)
+            assertNotNull(segment.extension)
         }
         ?: run { fail("No segment of type AccountInfo found in ${result.receivedSegments}") }
     }
@@ -502,20 +499,20 @@ class ResponseParserTest : FinTsTestBase() {
         assertSuccessfullyParsedSegment(result, InstituteSegmentId.AccountInfo, 74, 6, 3)
 
         result.getFirstSegmentById<AccountInfo>(InstituteSegmentId.AccountInfo)?.let { segment ->
-            expect(segment.accountIdentifier).toBe("9999999999")
-            expect(segment.subAccountAttribute).toBe(null)
-            expect(segment.bankCountryCode).toBe(280)
-            expect(segment.bankCode).toBe("10070000")
-            expect(segment.iban).toBe(null)
-            expect(segment.customerId).toBe("9999999999")
-            expect(segment.accountType).toBe(null)
-            expect(segment.currency).toBe(null)
-            expect(segment.accountHolderName1).toBe("anonym")
-            expect(segment.accountHolderName2).toBe(null)
-            expect(segment.productName).toBe(null)
-            expect(segment.accountLimit).toBe(null)
-            expect(segment.allowedJobNames).isEmpty()
-            expect(segment.extension).toBe(null)
+            assertEquals("9999999999", segment.accountIdentifier)
+            assertEquals(null, segment.subAccountAttribute)
+            assertEquals(280, segment.bankCountryCode)
+            assertEquals("10070000", segment.bankCode)
+            assertEquals(null, segment.iban)
+            assertEquals("9999999999", segment.customerId)
+            assertEquals(null, segment.accountType)
+            assertEquals(null, segment.currency)
+            assertEquals("anonym", segment.accountHolderName1)
+            assertNull(segment.accountHolderName2)
+            assertEquals(null, segment.productName)
+            assertEquals(null, segment.accountLimit)
+            assertEmpty(segment.allowedJobNames)
+            assertEquals(null, segment.extension)
         }
         ?: run { fail("No segment of type AccountInfo found in ${result.receivedSegments}") }
     }
@@ -530,13 +527,13 @@ class ResponseParserTest : FinTsTestBase() {
         assertSuccessfullyParsedSegment(result, InstituteSegmentId.SepaAccountInfo, 5, 1, 3)
 
         result.getFirstSegmentById<SepaAccountInfo>(InstituteSegmentId.SepaAccountInfo)?.let { segment ->
-            expect(segment.account.isSepaAccount).isTrue()
-            expect(segment.account.iban).toBe(Iban)
-            expect(segment.account.bic).toBe(Bic)
-            expect(segment.account.accountIdentifier).toBe(CustomerId)
-            expect(segment.account.subAccountAttribute).toBe(null)
-            expect(segment.account.bankInfo.bankCountryCode).toBe(BankCountryCode)
-            expect(segment.account.bankInfo.bankCode).toBe(BankCode)
+            assertTrue(segment.account.isSepaAccount)
+            assertEquals(Iban, segment.account.iban)
+            assertEquals(Bic, segment.account.bic)
+            assertEquals(CustomerId, segment.account.accountIdentifier)
+            assertEquals(null, segment.account.subAccountAttribute)
+            assertEquals(BankCountryCode, segment.account.bankInfo.bankCountryCode)
+            assertEquals(BankCode, segment.account.bankInfo.bankCode)
         }
         ?: run { fail("No segment of type SepaAccountInfo found in ${result.receivedSegments}") }
     }
@@ -552,18 +549,18 @@ class ResponseParserTest : FinTsTestBase() {
         assertCouldParseResponse(result)
 
         val sepaAccountInfoParameters = result.getSegmentsById<SepaAccountInfoParameters>(InstituteSegmentId.SepaAccountInfoParameters)
-        expect(sepaAccountInfoParameters).hasSize(2)
+        assertSize(2, sepaAccountInfoParameters)
 
         assertCouldParseJobParametersSegment(sepaAccountInfoParameters[0], InstituteSegmentId.SepaAccountInfoParameters, 147, 1, 3, "HKSPA", 1, 1, 1)
         assertCouldParseJobParametersSegment(sepaAccountInfoParameters[1], InstituteSegmentId.SepaAccountInfoParameters, 148, 2, 3, "HKSPA", 1, 1, 1)
 
         for (segment in sepaAccountInfoParameters) {
-            expect(segment.retrieveSingleAccountAllowed).isTrue()
-            expect(segment.nationalAccountRelationshipAllowed).isFalse()
-            expect(segment.structuredReferenceAllowed).isFalse()
-            expect(segment.settingMaxAllowedEntriesAllowed).isFalse()
-            expect(segment.countReservedReferenceLength).toBe(SepaAccountInfoParameters.CountReservedReferenceLengthNotSet)
-            expect(segment.supportedSepaFormats).containsExactly(
+            assertTrue(segment.retrieveSingleAccountAllowed)
+            assertFalse(segment.nationalAccountRelationshipAllowed)
+            assertFalse(segment.structuredReferenceAllowed)
+            assertFalse(segment.settingMaxAllowedEntriesAllowed)
+            assertEquals(SepaAccountInfoParameters.CountReservedReferenceLengthNotSet, segment.countReservedReferenceLength)
+            assertContainsExactly(segment.supportedSepaFormats,
                 "sepade.pain.001.001.02.xsd",
                 "sepade.pain.001.002.02.xsd",
                 "sepade.pain.001.002.03.xsd",
@@ -576,7 +573,6 @@ class ResponseParserTest : FinTsTestBase() {
         }
     }
 
-    @ExperimentalWithOptions
     @Test
     fun parseSupportedJobs() {
 
@@ -678,11 +674,11 @@ class ResponseParserTest : FinTsTestBase() {
 
         // then
 
-        expect(result.successful).isTrue()
-        expect(result.receivedSegments).hasSize(92)
+        assertTrue(result.successful)
+        assertSize(92, result.receivedSegments)
 
         for (segment in result.receivedSegments) {
-            expect(segment is JobParameters).withRepresentation("$segment should be of type JobParameters").isTrue()
+            assertTrue(segment is JobParameters, "$segment should be of type JobParameters")
         }
     }
 
@@ -697,15 +693,15 @@ class ResponseParserTest : FinTsTestBase() {
         assertSuccessfullyParsedSegment(result, InstituteSegmentId.PinInfo, 49, 1, 4)
 
         result.getFirstSegmentById<PinInfo>(InstituteSegmentId.PinInfo)?.let { segment ->
-            expect(segment.minPinLength).toBe(5)
-            expect(segment.maxPinLength).toBe(20)
-            expect(segment.minTanLength).toBe(6)
-            expect(segment.userIdHint).toBe("VR-NetKey oder Alias")
-            expect(segment.customerIdHint).toBe(null)
+            assertEquals(5, segment.minPinLength)
+            assertEquals(20, segment.maxPinLength)
+            assertEquals(6, segment.minTanLength)
+            assertEquals("VR-NetKey oder Alias", segment.userIdHint)
+            assertEquals(null, segment.customerIdHint)
 
-            expect(segment.jobTanConfiguration).hasSize(37)
-            expect(segment.jobTanConfiguration.first { it.segmentId == "HKKAZ" }.tanRequired).isTrue()
-            expect(segment.jobTanConfiguration.first { it.segmentId == "HKSAL" }.tanRequired).isFalse()
+            assertSize(37, segment.jobTanConfiguration)
+            assertTrue(segment.jobTanConfiguration.first { it.segmentId == "HKKAZ" }.tanRequired)
+            assertFalse(segment.jobTanConfiguration.first { it.segmentId == "HKSAL" }.tanRequired)
         }
         ?: run { fail("No segment of type PinInfo found in ${result.receivedSegments}") }
     }
@@ -721,16 +717,15 @@ class ResponseParserTest : FinTsTestBase() {
         assertSuccessfullyParsedSegment(result, InstituteSegmentId.TanInfo, 171, 6, 4)
 
         result.getFirstSegmentById<TanInfo>(InstituteSegmentId.TanInfo)?.let { segment ->
-            expect(segment.maxCountJobs).toBe(1)
-            expect(segment.minimumCountSignatures).toBe(1)
-            expect(segment.securityClass).toBe(1)
-            expect(segment.tanProcedureParameters.oneStepProcedureAllowed).isTrue()
-            expect(segment.tanProcedureParameters.moreThanOneTanDependentJobPerMessageAllowed).isFalse()
-            expect(segment.tanProcedureParameters.jobHashValue).toBe("0")
+            assertEquals(1, segment.maxCountJobs)
+            assertEquals(1, segment.minimumCountSignatures)
+            assertEquals(1, segment.securityClass)
+            assertTrue(segment.tanProcedureParameters.oneStepProcedureAllowed)
+            assertFalse(segment.tanProcedureParameters.moreThanOneTanDependentJobPerMessageAllowed)
+            assertEquals("0", segment.tanProcedureParameters.jobHashValue)
 
-            expect(segment.tanProcedureParameters.methodParameters).hasSize(7)
-            expect(segment.tanProcedureParameters.methodParameters.map { it.methodName })
-                .containsExactly("chipTAN manuell", "chipTAN optisch", "chipTAN-USB", "chipTAN-QR",
+            assertSize(7, segment.tanProcedureParameters.methodParameters)
+            assertContainsExactly(segment.tanProcedureParameters.methodParameters.map { it.methodName }, "chipTAN manuell", "chipTAN optisch", "chipTAN-USB", "chipTAN-QR",
                     "smsTAN", "pushTAN", "iTAN")
         }
         ?: run { fail("No segment of type TanInfo found in ${result.receivedSegments}") }
@@ -747,7 +742,7 @@ class ResponseParserTest : FinTsTestBase() {
 
         result.getFirstSegmentById<TanInfo>(InstituteSegmentId.TanInfo)?.let { segment ->
             val tanMethodParameters = segment.tanProcedureParameters.methodParameters
-            expect(tanMethodParameters).hasSize(5)
+            assertSize(5, tanMethodParameters)
 
             assertTanMethodParameter(tanMethodParameters, 0, Sicherheitsfunktion.PIN_TAN_942, DkTanMethod.mobileTAN, "mobile TAN")
             assertTanMethodParameter(tanMethodParameters, 1, Sicherheitsfunktion.PIN_TAN_944, DkTanMethod.mobileTAN, "SecureGo")
@@ -769,7 +764,7 @@ class ResponseParserTest : FinTsTestBase() {
 
         result.getFirstSegmentById<TanInfo>(InstituteSegmentId.TanInfo)?.let { segment ->
             val tanMethodParameters = segment.tanProcedureParameters.methodParameters
-            expect(tanMethodParameters).hasSize(7)
+            assertSize(7, tanMethodParameters)
 
             assertTanMethodParameter(tanMethodParameters, 0, Sicherheitsfunktion.PIN_TAN_910, null, "chipTAN manuell")
             assertTanMethodParameter(tanMethodParameters, 1, Sicherheitsfunktion.PIN_TAN_911, DkTanMethod.HHDOPT1, "chipTAN optisch")
@@ -793,7 +788,7 @@ class ResponseParserTest : FinTsTestBase() {
 
         result.getFirstSegmentById<TanInfo>(InstituteSegmentId.TanInfo)?.let { segment ->
             val tanMethodParameters = segment.tanProcedureParameters.methodParameters
-            expect(tanMethodParameters).hasSize(5)
+            assertSize(5, tanMethodParameters)
 
             assertTanMethodParameter(tanMethodParameters, 0, Sicherheitsfunktion.PIN_TAN_901, null, "SMS-TAN")
             assertTanMethodParameter(tanMethodParameters, 1, Sicherheitsfunktion.PIN_TAN_904, DkTanMethod.HHDOPT1, "chipTAN comfort")
@@ -809,9 +804,9 @@ class ResponseParserTest : FinTsTestBase() {
 
         val tanMethodParameters = parsedTanMethodParameters[index]
 
-        expect(tanMethodParameters.securityFunction).toBe(securityFunction)
-        expect(tanMethodParameters.dkTanMethod).toBe(tanMethod)
-        expect(tanMethodParameters.methodName).toBe(methodName)
+        assertEquals(securityFunction, tanMethodParameters.securityFunction)
+        assertEquals(tanMethod, tanMethodParameters.dkTanMethod)
+        assertEquals(methodName, tanMethodParameters.methodName)
     }
 
     @Test
@@ -824,16 +819,15 @@ class ResponseParserTest : FinTsTestBase() {
         assertSuccessfullyParsedSegment(result, InstituteSegmentId.TanInfo, 27, 6, 3)
 
         result.getFirstSegmentById<TanInfo>(InstituteSegmentId.TanInfo)?.let { segment ->
-            expect(segment.maxCountJobs).toBe(1)
-            expect(segment.minimumCountSignatures).toBe(1)
-            expect(segment.securityClass).toBe(1)
-            expect(segment.tanProcedureParameters.oneStepProcedureAllowed).isFalse()
-            expect(segment.tanProcedureParameters.moreThanOneTanDependentJobPerMessageAllowed).isFalse()
-            expect(segment.tanProcedureParameters.jobHashValue).toBe("0")
+            assertEquals(1, segment.maxCountJobs)
+            assertEquals(1, segment.minimumCountSignatures)
+            assertEquals(1, segment.securityClass)
+            assertFalse(segment.tanProcedureParameters.oneStepProcedureAllowed)
+            assertFalse(segment.tanProcedureParameters.moreThanOneTanDependentJobPerMessageAllowed)
+            assertEquals("0", segment.tanProcedureParameters.jobHashValue)
 
-            expect(segment.tanProcedureParameters.methodParameters).hasSize(2)
-            expect(segment.tanProcedureParameters.methodParameters.map { it.methodName })
-                .containsExactly("mobileTAN-Verfahren", "photoTAN-Verfahren")
+            assertSize(2, segment.tanProcedureParameters.methodParameters)
+            assertContainsExactly(segment.tanProcedureParameters.methodParameters.map { it.methodName }, "mobileTAN-Verfahren", "photoTAN-Verfahren")
         }
         ?: run { fail("No segment of type TanInfo found in ${result.receivedSegments}") }
     }
@@ -848,16 +842,16 @@ class ResponseParserTest : FinTsTestBase() {
         assertSuccessfullyParsedSegment(result, InstituteSegmentId.TanInfo, 56, 6, 3)
 
         result.getFirstSegmentById<TanInfo>(InstituteSegmentId.TanInfo)?.let { segment ->
-            expect(segment.maxCountJobs).toBe(1)
-            expect(segment.minimumCountSignatures).toBe(1)
-            expect(segment.securityClass).toBe(1)
-            expect(segment.tanProcedureParameters.oneStepProcedureAllowed).isFalse()
-            expect(segment.tanProcedureParameters.moreThanOneTanDependentJobPerMessageAllowed).isFalse()
-            expect(segment.tanProcedureParameters.jobHashValue).toBe("0")
+            assertEquals(1, segment.maxCountJobs)
+            assertEquals(1, segment.minimumCountSignatures)
+            assertEquals(1, segment.securityClass)
+            assertFalse(segment.tanProcedureParameters.oneStepProcedureAllowed)
+            assertFalse(segment.tanProcedureParameters.moreThanOneTanDependentJobPerMessageAllowed)
+            assertEquals("0", segment.tanProcedureParameters.jobHashValue)
 
-            expect(segment.tanProcedureParameters.methodParameters).hasSize(5)
-            expect(segment.tanProcedureParameters.methodParameters.map { it.methodName })
-                .containsExactly("SMS-TAN", "chipTAN comfort", "chipTAN comfort manuell", "BV AppTAN", "PhotoTAN")
+            assertSize(5, segment.tanProcedureParameters.methodParameters)
+            assertContainsExactly(segment.tanProcedureParameters.methodParameters.map { it.methodName },
+                "SMS-TAN", "chipTAN comfort", "chipTAN comfort manuell", "BV AppTAN", "PhotoTAN")
         }
         ?: run { fail("No segment of type TanInfo found in ${result.receivedSegments}") }
     }
@@ -872,16 +866,16 @@ class ResponseParserTest : FinTsTestBase() {
         assertSuccessfullyParsedSegment(result, InstituteSegmentId.TanInfo, 33, 7, 3)
 
         result.getFirstSegmentById<TanInfo>(InstituteSegmentId.TanInfo)?.let { segment ->
-            expect(segment.maxCountJobs).toBe(1)
-            expect(segment.minimumCountSignatures).toBe(1)
-            expect(segment.securityClass).toBe(0)
-            expect(segment.tanProcedureParameters.oneStepProcedureAllowed).isFalse()
-            expect(segment.tanProcedureParameters.moreThanOneTanDependentJobPerMessageAllowed).isFalse()
-            expect(segment.tanProcedureParameters.jobHashValue).toBe("1")
+            assertEquals(1, segment.maxCountJobs)
+            assertEquals(1, segment.minimumCountSignatures)
+            assertEquals(0, segment.securityClass)
+            assertFalse(segment.tanProcedureParameters.oneStepProcedureAllowed)
+            assertFalse(segment.tanProcedureParameters.moreThanOneTanDependentJobPerMessageAllowed)
+            assertEquals("1", segment.tanProcedureParameters.jobHashValue)
 
-            expect(segment.tanProcedureParameters.methodParameters).hasSize(6)
-            expect(segment.tanProcedureParameters.methodParameters.map { it.methodName })
-                .containsExactly("iTAN", "mobile TAN", "App-basiertes Verfahren", "chipTAN 1.4",
+            assertSize(6, segment.tanProcedureParameters.methodParameters)
+            assertContainsExactly(segment.tanProcedureParameters.methodParameters.map { it.methodName },
+                "iTAN", "mobile TAN", "App-basiertes Verfahren", "chipTAN 1.4",
                     "chipTAN 1.4 manuell", "Vorlagen und Informationen")
         }
         ?: run { fail("No segment of type TanInfo found in ${result.receivedSegments}") }
@@ -897,40 +891,40 @@ class ResponseParserTest : FinTsTestBase() {
         assertSuccessfullyParsedSegment(result, InstituteSegmentId.TanInfo, 177, 7, 4)
 
         result.getFirstSegmentById<TanInfo>(InstituteSegmentId.TanInfo)?.let { segment ->
-            expect(segment.maxCountJobs).toBe(1)
-            expect(segment.minimumCountSignatures).toBe(1)
-            expect(segment.securityClass).toBe(1)
-            expect(segment.tanProcedureParameters.oneStepProcedureAllowed).isFalse()
-            expect(segment.tanProcedureParameters.moreThanOneTanDependentJobPerMessageAllowed).isFalse()
-            expect(segment.tanProcedureParameters.jobHashValue).toBe("0")
+            assertEquals(1, segment.maxCountJobs)
+            assertEquals(1, segment.minimumCountSignatures)
+            assertEquals(1, segment.securityClass)
+            assertFalse(segment.tanProcedureParameters.oneStepProcedureAllowed)
+            assertFalse(segment.tanProcedureParameters.moreThanOneTanDependentJobPerMessageAllowed)
+            assertEquals("0", segment.tanProcedureParameters.jobHashValue)
 
-            expect(segment.tanProcedureParameters.methodParameters).hasSize(1)
+            assertSize(1, segment.tanProcedureParameters.methodParameters)
 
             val decoupledPushTanMethod = segment.tanProcedureParameters.methodParameters.first()
 
-            expect(decoupledPushTanMethod.securityFunction).toBe(Sicherheitsfunktion.PIN_TAN_922)
-            expect(decoupledPushTanMethod.tanProcess).toBe(TanProcess.TanProcess2)
-            expect(decoupledPushTanMethod.technicalTanMethodIdentification).toBe("pushTAN-dec")
-            expect(decoupledPushTanMethod.dkTanMethod).toBe(DkTanMethod.Decoupled)
-            expect(decoupledPushTanMethod.versionDkTanMethod).toBe(null)
-            expect(decoupledPushTanMethod.methodName).toBe("pushTAN 2.0")
-            expect(decoupledPushTanMethod.maxTanInputLength).toBe(null)
-            expect(decoupledPushTanMethod.allowedTanFormat).toBe(null)
+            assertEquals(Sicherheitsfunktion.PIN_TAN_922, decoupledPushTanMethod.securityFunction)
+            assertEquals(TanProcess.TanProcess2, decoupledPushTanMethod.tanProcess)
+            assertEquals("pushTAN-dec", decoupledPushTanMethod.technicalTanMethodIdentification)
+            assertEquals(DkTanMethod.Decoupled, decoupledPushTanMethod.dkTanMethod)
+            assertEquals(null, decoupledPushTanMethod.versionDkTanMethod)
+            assertEquals("pushTAN 2.0", decoupledPushTanMethod.methodName)
+            assertEquals(null, decoupledPushTanMethod.maxTanInputLength)
+            assertEquals(null, decoupledPushTanMethod.allowedTanFormat)
 
-            expect(decoupledPushTanMethod.descriptionToShowToUser).toBe("Aufforderung")
-            expect(decoupledPushTanMethod.maxReturnValueLength).toBe(2048)
-            expect(decoupledPushTanMethod.multipleTansAllowed).toBe(true)
-            expect(decoupledPushTanMethod.timeAndDialogRelation).toBe(TanZeitUndDialogbezug.TanZeitversetztDialoguebergreifendErlaubt)
-            expect(decoupledPushTanMethod.cancellationAllowed).toBe(false)
+            assertEquals("Aufforderung", decoupledPushTanMethod.descriptionToShowToUser)
+            assertEquals(2048, decoupledPushTanMethod.maxReturnValueLength)
+            assertEquals(true, decoupledPushTanMethod.multipleTansAllowed)
+            assertEquals(TanZeitUndDialogbezug.TanZeitversetztDialoguebergreifendErlaubt, decoupledPushTanMethod.timeAndDialogRelation)
+            assertEquals(false, decoupledPushTanMethod.cancellationAllowed)
 
-            expect(decoupledPushTanMethod.nameOfTanMediumRequired).toBe(BezeichnungDesTanMediumsErforderlich.BezeichnungDesTanMediumsMussAngegebenWerden)
-            expect(decoupledPushTanMethod.countSupportedActiveTanMedia).toBe(2)
+            assertEquals(BezeichnungDesTanMediumsErforderlich.BezeichnungDesTanMediumsMussAngegebenWerden, decoupledPushTanMethod.nameOfTanMediumRequired)
+            assertEquals(2, decoupledPushTanMethod.countSupportedActiveTanMedia)
 
-            expect(decoupledPushTanMethod.maxNumberOfStateRequestsForDecoupled).toBe(180)
-            expect(decoupledPushTanMethod.initialDelayInSecondsForStateRequestsForDecoupled).toBe(1)
-            expect(decoupledPushTanMethod.delayInSecondsForNextStateRequestsForDecoupled).toBe(1)
-            expect(decoupledPushTanMethod.manualConfirmationAllowedForDecoupled).toBe(true)
-            expect(decoupledPushTanMethod.periodicStateRequestsAllowedForDecoupled).toBe(true)
+            assertEquals(180, decoupledPushTanMethod.maxNumberOfStateRequestsForDecoupled)
+            assertEquals(1, decoupledPushTanMethod.initialDelayInSecondsForStateRequestsForDecoupled)
+            assertEquals(1, decoupledPushTanMethod.delayInSecondsForNextStateRequestsForDecoupled)
+            assertEquals(true, decoupledPushTanMethod.manualConfirmationAllowedForDecoupled)
+            assertEquals(true, decoupledPushTanMethod.periodicStateRequestsAllowedForDecoupled)
         }
         ?: run { fail("No segment of type TanInfo found in ${result.receivedSegments}") }
     }
@@ -944,16 +938,16 @@ class ResponseParserTest : FinTsTestBase() {
         // then
         assertSuccessfullyParsedSegment(result, InstituteSegmentId.Tan, 6, 6, 5)
 
-        expect(result.isStrongAuthenticationRequired).isFalse()
+        assertFalse(result.isStrongAuthenticationRequired)
 
         result.getFirstSegmentById<TanResponse>(InstituteSegmentId.Tan)?.let { segment ->
-            expect(segment.tanProcess).toBe(TanProcess.TanProcess4)
-            expect(segment.jobHashValue).toBe(null)
-            expect(segment.jobReference).toBe(TanResponse.NoJobReferenceResponse)
-            expect(segment.challenge).toBe(TanResponse.NoChallengeResponse)
-            expect(segment.challengeHHD_UC).toBe(null)
-            expect(segment.validityDateTimeForChallenge).toBe(null)
-            expect(segment.tanMediaIdentifier).toBe(null)
+            assertEquals(TanProcess.TanProcess4, segment.tanProcess)
+            assertEquals(null, segment.jobHashValue)
+            assertEquals(TanResponse.NoJobReferenceResponse, segment.jobReference)
+            assertEquals(TanResponse.NoChallengeResponse, segment.challenge)
+            assertNull(segment.challengeHHD_UC)
+            assertEquals(null, segment.validityDateTimeForChallenge)
+            assertEquals(null, segment.tanMediaIdentifier)
         }
         ?: run { fail("No segment of type TanResponse found in ${result.receivedSegments}") }
     }
@@ -973,16 +967,16 @@ class ResponseParserTest : FinTsTestBase() {
         // then
         assertSuccessfullyParsedSegment(result, InstituteSegmentId.Tan, 5, 6, 4)
 
-        expect(result.isStrongAuthenticationRequired).isTrue()
+        assertTrue(result.isStrongAuthenticationRequired)
 
         result.getFirstSegmentById<TanResponse>(InstituteSegmentId.Tan)?.let { segment ->
-            expect(segment.tanProcess).toBe(TanProcess.TanProcess4)
-            expect(segment.jobHashValue).toBe(null)
-            expect(segment.jobReference).toBe(jobReference)
-            expect(segment.challenge).toBe(unmaskString(challenge))
-            expect(segment.challengeHHD_UC).toBe(challengeHHD_UC)
-            expect(segment.validityDateTimeForChallenge).toBe(null)
-            expect(segment.tanMediaIdentifier).toBe(tanMediaIdentifier)
+            assertEquals(TanProcess.TanProcess4, segment.tanProcess)
+            assertEquals(null, segment.jobHashValue)
+            assertEquals(jobReference, segment.jobReference)
+            assertEquals(unmaskString(challenge), segment.challenge)
+            assertEquals(challengeHHD_UC, segment.challengeHHD_UC)
+            assertEquals(null, segment.validityDateTimeForChallenge)
+            assertEquals(tanMediaIdentifier, segment.tanMediaIdentifier)
         }
         ?: run { fail("No segment of type TanResponse found in ${result.receivedSegments}") }
     }
@@ -1002,11 +996,11 @@ class ResponseParserTest : FinTsTestBase() {
         // then
         assertSuccessfullyParsedSegment(result, InstituteSegmentId.TanMediaList, 5, 4, 3)
 
-        expect(result.isStrongAuthenticationRequired).isFalse()
+        assertFalse(result.isStrongAuthenticationRequired)
 
         result.getFirstSegmentById<TanMediaList>(InstituteSegmentId.TanMediaList)?.let { segment ->
-            expect(segment.usageOption).toBe(TanEinsatzOption.KundeKannGenauEinMediumZuEinerZeitNutzen)
-            expect(segment.tanMedia).containsExactly(
+            assertEquals(TanEinsatzOption.KundeKannGenauEinMediumZuEinerZeitNutzen, segment.usageOption)
+            assertContainsExactly(segment.tanMedia,
                 TanGeneratorTanMedium(TanMediumKlasse.TanGenerator, TanMediumStatus.AktivFolgekarte, oldCardNumber, cardSequenceNumber, null, null, null, mediaName),
                 TanGeneratorTanMedium(TanMediumKlasse.TanGenerator, TanMediumStatus.Verfuegbar, cardSequenceNumber, null, null, null, null, mediaName)
             )
@@ -1026,16 +1020,16 @@ class ResponseParserTest : FinTsTestBase() {
         assertSuccessfullyParsedSegment(result, InstituteSegmentId.ChangeTanMediaParameters, 64, 1, 3)
 
         result.getFirstSegmentById<ChangeTanMediaParameters>(InstituteSegmentId.ChangeTanMediaParameters)?.let { segment ->
-            expect(segment.maxCountJobs).toBe(1)
-            expect(segment.minimumCountSignatures).toBe(1)
-            expect(segment.securityClass).toBe(1)
+            assertEquals(1, segment.maxCountJobs)
+            assertEquals(1, segment.minimumCountSignatures)
+            assertEquals(1, segment.securityClass)
 
-            expect(segment.enteringTanListNumberRequired).isTrue()
-            expect(segment.enteringCardSequenceNumberRequired).isFalse()
-            expect(segment.enteringAtcAndTanRequired).isTrue()
-            expect(segment.enteringCardTypeAllowed).isFalse()
-            expect(segment.accountInfoRequired).isFalse()
-            expect(segment.allowedCardTypes).isEmpty()
+            assertTrue(segment.enteringTanListNumberRequired)
+            assertFalse(segment.enteringCardSequenceNumberRequired)
+            assertTrue(segment.enteringAtcAndTanRequired)
+            assertFalse(segment.enteringCardTypeAllowed)
+            assertFalse(segment.accountInfoRequired)
+            assertEmpty(segment.allowedCardTypes)
         }
         ?: run { fail("No segment of type ChangeTanMediaParameters found in ${result.receivedSegments}") }
     }
@@ -1050,16 +1044,16 @@ class ResponseParserTest : FinTsTestBase() {
         assertSuccessfullyParsedSegment(result, InstituteSegmentId.ChangeTanMediaParameters, 64, 2, 3)
 
         result.getFirstSegmentById<ChangeTanMediaParameters>(InstituteSegmentId.ChangeTanMediaParameters)?.let { segment ->
-            expect(segment.maxCountJobs).toBe(1)
-            expect(segment.minimumCountSignatures).toBe(1)
-            expect(segment.securityClass).toBe(1)
+            assertEquals(1, segment.maxCountJobs)
+            assertEquals(1, segment.minimumCountSignatures)
+            assertEquals(1, segment.securityClass)
 
-            expect(segment.enteringTanListNumberRequired).isFalse()
-            expect(segment.enteringCardSequenceNumberRequired).isTrue()
-            expect(segment.enteringAtcAndTanRequired).isFalse()
-            expect(segment.enteringCardTypeAllowed).isTrue()
-            expect(segment.accountInfoRequired).isFalse()
-            expect(segment.allowedCardTypes).containsExactly(11, 13, 15, 17)
+            assertFalse(segment.enteringTanListNumberRequired)
+            assertTrue(segment.enteringCardSequenceNumberRequired)
+            assertFalse(segment.enteringAtcAndTanRequired)
+            assertTrue(segment.enteringCardTypeAllowed)
+            assertFalse(segment.accountInfoRequired)
+            assertContainsExactly(segment.allowedCardTypes, 11, 13, 15, 17)
         }
         ?: run { fail("No segment of type ChangeTanMediaParameters found in ${result.receivedSegments}") }
     }
@@ -1074,16 +1068,16 @@ class ResponseParserTest : FinTsTestBase() {
         assertSuccessfullyParsedSegment(result, InstituteSegmentId.ChangeTanMediaParameters, 64, 3, 3)
 
         result.getFirstSegmentById<ChangeTanMediaParameters>(InstituteSegmentId.ChangeTanMediaParameters)?.let { segment ->
-            expect(segment.maxCountJobs).toBe(1)
-            expect(segment.minimumCountSignatures).toBe(1)
-            expect(segment.securityClass).toBe(1)
+            assertEquals(1, segment.maxCountJobs)
+            assertEquals(1, segment.minimumCountSignatures)
+            assertEquals(1, segment.securityClass)
 
-            expect(segment.enteringTanListNumberRequired).isFalse()
-            expect(segment.enteringCardSequenceNumberRequired).isTrue()
-            expect(segment.enteringAtcAndTanRequired).isFalse()
-            expect(segment.enteringCardTypeAllowed).isTrue()
-            expect(segment.accountInfoRequired).isTrue()
-            expect(segment.allowedCardTypes).containsExactly(11, 13, 15, 17)
+            assertFalse(segment.enteringTanListNumberRequired)
+            assertTrue(segment.enteringCardSequenceNumberRequired)
+            assertFalse(segment.enteringAtcAndTanRequired)
+            assertTrue(segment.enteringCardTypeAllowed)
+            assertTrue(segment.accountInfoRequired)
+            assertContainsExactly(segment.allowedCardTypes, 11, 13, 15, 17)
         }
         ?: run { fail("No segment of type ChangeTanMediaParameters found in ${result.receivedSegments}") }
     }
@@ -1107,11 +1101,11 @@ class ResponseParserTest : FinTsTestBase() {
         assertSuccessfullyParsedSegment(result, InstituteSegmentId.Balance, 8, 5, 3)
 
         result.getFirstSegmentById<BalanceSegment>(InstituteSegmentId.Balance)?.let { segment ->
-            expect(segment.balance).toBe(Amount(balance))
-            expect(segment.currency).toBe("EUR")
-            expect(segment.date).toBe(date)
-            expect(segment.accountProductName).toBe(accountProductName)
-            expect(segment.balanceOfPreBookedTransactions).toBe(null)
+            assertEquals(Amount(balance), segment.balance)
+            assertEquals("EUR", segment.currency)
+            assertEquals(date, segment.date)
+            assertEquals(accountProductName, segment.accountProductName)
+            assertEquals(null, segment.balanceOfPreBookedTransactions)
         }
         ?: run { fail("No segment of type BalanceSegment found in ${result.receivedSegments}") }
     }
@@ -1134,11 +1128,11 @@ class ResponseParserTest : FinTsTestBase() {
         assertSuccessfullyParsedSegment(result, InstituteSegmentId.Balance, 7, 5, 3)
 
         result.getFirstSegmentById<BalanceSegment>(InstituteSegmentId.Balance)?.let { segment ->
-            expect(segment.balance).toBe(balance)
-            expect(segment.currency).toBe("EUR")
-            expect(segment.date).toBe(date)
-            expect(segment.accountProductName).toBe(accountProductName)
-            expect(segment.balanceOfPreBookedTransactions).toBe(null)
+            assertEquals(balance, segment.balance)
+            assertEquals("EUR", segment.currency)
+            assertEquals(date, segment.date)
+            assertEquals(accountProductName, segment.accountProductName)
+            assertEquals(null, segment.balanceOfPreBookedTransactions)
         }
         ?: run { fail("No segment of type BalanceSegment found in ${result.receivedSegments}") }
     }
@@ -1161,11 +1155,11 @@ class ResponseParserTest : FinTsTestBase() {
         assertSuccessfullyParsedSegment(result, InstituteSegmentId.Balance, 7, 5, 3)
 
         result.getFirstSegmentById<BalanceSegment>(InstituteSegmentId.Balance)?.let { segment ->
-            expect(segment.balance).toBe(balance)
-            expect(segment.currency).toBe("EUR")
-            expect(segment.date).toBe(date)
-            expect(segment.accountProductName).toBe(accountProductName)
-            expect(segment.balanceOfPreBookedTransactions).toBe(null)
+            assertEquals(balance, segment.balance)
+            assertEquals("EUR", segment.currency)
+            assertEquals(date, segment.date)
+            assertEquals(accountProductName, segment.accountProductName)
+            assertEquals(null, segment.balanceOfPreBookedTransactions)
         }
         ?: run { fail("No segment of type BalanceSegment found in ${result.receivedSegments}") }
     }
@@ -1184,9 +1178,9 @@ class ResponseParserTest : FinTsTestBase() {
         assertSuccessfullyParsedSegment(result, InstituteSegmentId.AccountTransactionsMt940Parameters, 21, 4, 4)
 
         result.getFirstSegmentById<RetrieveAccountTransactionsParameters>(InstituteSegmentId.AccountTransactionsMt940Parameters)?.let { segment ->
-            expect(segment.countDaysForWhichTransactionsAreKept).toBe(countDaysForWhichTransactionsAreKept)
-            expect(segment.settingCountEntriesAllowed).isFalse()
-            expect(segment.settingAllAccountAllowed).isFalse()
+            assertEquals(countDaysForWhichTransactionsAreKept, segment.countDaysForWhichTransactionsAreKept)
+            assertFalse(segment.settingCountEntriesAllowed)
+            assertFalse(segment.settingAllAccountAllowed)
         }
         ?: run { fail("No segment of type AccountTransactionsMt940Parameters found in ${result.receivedSegments}") }
     }
@@ -1204,9 +1198,9 @@ class ResponseParserTest : FinTsTestBase() {
         assertSuccessfullyParsedSegment(result, InstituteSegmentId.AccountTransactionsMt940Parameters, 23, 6, 4)
 
         result.getFirstSegmentById<RetrieveAccountTransactionsParameters>(InstituteSegmentId.AccountTransactionsMt940Parameters)?.let { segment ->
-            expect(segment.countDaysForWhichTransactionsAreKept).toBe(countDaysForWhichTransactionsAreKept)
-            expect(segment.settingCountEntriesAllowed).isFalse()
-            expect(segment.settingAllAccountAllowed).isFalse()
+            assertEquals(countDaysForWhichTransactionsAreKept, segment.countDaysForWhichTransactionsAreKept)
+            assertFalse(segment.settingCountEntriesAllowed)
+            assertFalse(segment.settingAllAccountAllowed)
         }
         ?: run { fail("No segment of type AccountTransactionsMt940Parameters found in ${result.receivedSegments}") }
     }
@@ -1230,18 +1224,18 @@ class ResponseParserTest : FinTsTestBase() {
         assertSuccessfullyParsedSegment(result, InstituteSegmentId.CreditCardTransactions, 7, 2, 3)
 
         result.getFirstSegmentById<ReceivedCreditCardTransactionsAndBalance>(InstituteSegmentId.CreditCardTransactions)?.let { segment ->
-            expect(segment.balance.amount.string).toBe(balance)
-            expect(segment.balance.date).toBe(LocalDate(2020, 9, 23))
-            expect(segment.balance.time).notToBeNull()
-            expect(segment.transactions.size).toBe(2)
+            assertEquals(balance, segment.balance.amount.string)
+            assertEquals(LocalDate(2020, 9, 23), segment.balance.date)
+            assertNotNull(segment.balance.time)
+            assertEquals(2, segment.transactions.size)
 
             segment.transactions.forEach { transaction ->
-                expect(transaction.transactionDescriptionBase).toBe(otherPartyName)
-                expect(transaction.bookingDate).toBe(LocalDate(2020, 8, 19))
-                expect(transaction.valueDate).toBe(LocalDate(2020, 8, 20))
-                expect(transaction.amount.amount.string).toBe("-" + amount)
-                expect(transaction.amount.currency.code).toBe("EUR")
-                expect(transaction.isCleared).isTrue()
+                assertEquals(otherPartyName, transaction.transactionDescriptionBase)
+                assertEquals(LocalDate(2020, 8, 19), transaction.bookingDate)
+                assertEquals(LocalDate(2020, 8, 20), transaction.valueDate)
+                assertEquals("-" + amount, transaction.amount.amount.string)
+                assertEquals("EUR", transaction.amount.currency.code)
+                assertTrue(transaction.isCleared)
             }
         }
         ?: run { fail("No segment of type ReceivedCreditCardTransactionsAndBalance found in ${result.receivedSegments}") }
@@ -1263,11 +1257,11 @@ class ResponseParserTest : FinTsTestBase() {
         assertSuccessfullyParsedSegment(result, InstituteSegmentId.CreditCardTransactions, 7, 2, 3)
 
         result.getFirstSegmentById<ReceivedCreditCardTransactionsAndBalance>(InstituteSegmentId.CreditCardTransactions)?.let { segment ->
-            expect(segment.balance.amount.string).toBe(balance)
-            expect(segment.balance.date).toBe(LocalDate(2020, 9, 23))
-            expect(segment.balance.time).notToBeNull()
+            assertEquals(balance, segment.balance.amount.string)
+            assertEquals(LocalDate(2020, 9, 23), segment.balance.date)
+            assertNotNull(segment.balance.time)
 
-            expect(segment.transactions).isEmpty()
+            assertEmpty(segment.transactions)
         }
         ?: run { fail("No segment of type ReceivedCreditCardTransactionsAndBalance found in ${result.receivedSegments}") }
     }
@@ -1285,9 +1279,9 @@ class ResponseParserTest : FinTsTestBase() {
         assertSuccessfullyParsedSegment(result, InstituteSegmentId.CreditCardTransactionsParameters, 15, 2, 4)
 
         result.getFirstSegmentById<RetrieveAccountTransactionsParameters>(InstituteSegmentId.CreditCardTransactionsParameters)?.let { segment ->
-            expect(segment.countDaysForWhichTransactionsAreKept).toBe(countDaysForWhichTransactionsAreKept)
-            expect(segment.settingCountEntriesAllowed).isTrue()
-            expect(segment.settingAllAccountAllowed).isTrue()
+            assertEquals(countDaysForWhichTransactionsAreKept, segment.countDaysForWhichTransactionsAreKept)
+            assertTrue(segment.settingCountEntriesAllowed)
+            assertTrue(segment.settingAllAccountAllowed)
         }
         ?: run { fail("No segment of type CreditCardTransactionsParameters found in ${result.receivedSegments}") }
     }
@@ -1302,11 +1296,11 @@ class ResponseParserTest : FinTsTestBase() {
     }
 
     private fun assertCouldParseResponse(result: BankResponse) {
-        expect(result.successful).isTrue()
-        expect(result.responseContainsErrors).isFalse()
-        expect(result.internalError).toBe(null)
-        expect(result.errorsToShowToUser).isEmpty()
-        expect(result.receivedResponse).notToBeNull()
+        assertTrue(result.successful)
+        assertFalse(result.responseContainsErrors)
+        assertNull(result.internalError)
+        assertEmpty(result.errorsToShowToUser)
+        assertNotNull(result.receivedResponse)
     }
 
     private fun assertCouldParseSegment(result: BankResponse, segmentId: ISegmentId, segmentNumber: Int,
@@ -1320,13 +1314,13 @@ class ResponseParserTest : FinTsTestBase() {
     private fun assertCouldParseSegment(segment: ReceivedSegment?, segmentId: ISegmentId, segmentNumber: Int,
                                         segmentVersion: Int, referenceSegmentNumber: Int?) {
 
-        expect(segment).notToBeNull()
+        assertNotNull(segment)
 
         segment?.let {
-            expect(segment.segmentId).toBe(segmentId.id)
-            expect(segment.segmentNumber).toBe(segmentNumber)
-            expect(segment.segmentVersion).toBe(segmentVersion)
-            expect(segment.referenceSegmentNumber).toBe(referenceSegmentNumber)
+            assertEquals(segmentId.id, segment.segmentId)
+            assertEquals(segmentNumber, segment.segmentNumber)
+            assertEquals(segmentVersion, segment.segmentVersion)
+            assertEquals(referenceSegmentNumber, segment.referenceSegmentNumber)
         }
     }
 
@@ -1337,11 +1331,15 @@ class ResponseParserTest : FinTsTestBase() {
         assertCouldParseSegment(segment, segmentId, segmentNumber, segmentVersion, referenceSegmentNumber)
 
         segment?.let {
-            expect(segment.jobName).toBe(jobName)
-            expect(segment.maxCountJobs).toBe(maxCountJobs)
-            expect(segment.minimumCountSignatures).toBe(minimumCountSignatures)
-            expect(segment.securityClass).toBe(securityClass)
+            assertEquals(jobName, segment.jobName)
+            assertEquals(maxCountJobs, segment.maxCountJobs)
+            assertEquals(minimumCountSignatures, segment.minimumCountSignatures)
+            assertEquals(securityClass, segment.securityClass)
         }
+    }
+
+    private fun assertCountFeedbacks(response: BankResponse, expectedCountFeedbacks: Int) {
+        assertSize(expectedCountFeedbacks, response.messageFeedback?.feedbacks ?: listOf<Feedback>())
     }
 
 }

@@ -1,10 +1,9 @@
 package net.dankito.banking.fints.messages.datenelemente.implementierte
 
-import ch.tutteli.atrium.api.fluent.en_GB.toBe
-import ch.tutteli.atrium.api.fluent.en_GB.toThrow
-import ch.tutteli.atrium.api.verbs.expect
+import net.dankito.banking.fints.extensions.assertThrows
 import net.dankito.banking.fints.messages.Existenzstatus
 import kotlin.test.Test
+import kotlin.test.assertEquals
 
 
 class BPDVersionTest {
@@ -19,7 +18,7 @@ class BPDVersionTest {
         val result = underTest.format()
 
         // then
-        expect(result).toBe("3")
+        assertEquals("3", result)
     }
 
 
@@ -56,9 +55,9 @@ class BPDVersionTest {
         val underTest = BPDVersion(-1, Existenzstatus.Mandatory)
 
         // when
-        expect {
+        assertThrows<IllegalArgumentException> {
             underTest.validate()
-        }.toThrow<IllegalArgumentException>()
+        }
     }
 
     @Test
@@ -68,9 +67,9 @@ class BPDVersionTest {
         val underTest = BPDVersion(1000, Existenzstatus.Mandatory)
 
         // when
-        expect {
+        assertThrows<IllegalArgumentException> {
             underTest.validate()
-        }.toThrow<IllegalArgumentException>()
+        }
     }
 
 }

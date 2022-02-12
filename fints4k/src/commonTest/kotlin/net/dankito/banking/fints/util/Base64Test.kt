@@ -1,12 +1,9 @@
 package net.dankito.banking.fints.util
 
-import ch.tutteli.atrium.api.fluent.en_GB.ExperimentalWithOptions
-import ch.tutteli.atrium.api.fluent.en_GB.toBe
-import ch.tutteli.atrium.api.fluent.en_GB.withRepresentation
-import ch.tutteli.atrium.api.verbs.expect
 import net.dankito.utils.multiplatform.extensions.randomWithSeed
 import kotlin.random.Random
 import kotlin.test.Test
+import kotlin.test.assertEquals
 
 
 class Base64Test {
@@ -31,7 +28,7 @@ class Base64Test {
     private fun testEncode(input: String, expectedOutput: String) {
         val actualOutput = underTest.encode(input)
 
-        expect(actualOutput).toBe(expectedOutput)
+        assertEquals(expectedOutput, actualOutput)
     }
 
 
@@ -52,12 +49,11 @@ class Base64Test {
     private fun testDecode(input: String, expectedOutput: String) {
         val actualOutput = underTest.decode(input)
 
-        expect(actualOutput).toBe(expectedOutput)
+        assertEquals(expectedOutput, actualOutput)
     }
 
 
     @Test
-    @ExperimentalWithOptions
     fun testRandomStrings() {
         val steps = 1000000
         val random = randomWithSeed()
@@ -74,7 +70,7 @@ class Base64Test {
 
 
             // then
-            expect(decoded).withRepresentation { "Decoded string '$decoded' should actually be '$original'" }.toBe(original)
+            assertEquals(original, decoded, "Decoded string '$decoded' should actually be '$original'")
         }
     }
 

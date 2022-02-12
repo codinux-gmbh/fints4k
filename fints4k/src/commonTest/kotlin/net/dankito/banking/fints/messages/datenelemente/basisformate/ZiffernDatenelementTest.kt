@@ -1,10 +1,9 @@
 package net.dankito.banking.fints.messages.datenelemente.basisformate
 
-import ch.tutteli.atrium.api.fluent.en_GB.toBe
-import ch.tutteli.atrium.api.fluent.en_GB.toThrow
-import ch.tutteli.atrium.api.verbs.expect
+import net.dankito.banking.fints.extensions.assertThrows
 import net.dankito.banking.fints.messages.Existenzstatus
 import kotlin.test.Test
+import kotlin.test.assertEquals
 
 
 class ZiffernDatenelementTest {
@@ -19,7 +18,7 @@ class ZiffernDatenelementTest {
         val result = underTest.format()
 
         // then
-        expect(result).toBe("000001")
+        assertEquals("000001", result)
     }
 
 
@@ -56,9 +55,9 @@ class ZiffernDatenelementTest {
         val underTest = createZiffernDatenelement(-1, 3)
 
         // when
-        expect {
+        assertThrows<IllegalArgumentException> {
             underTest.validate()
-        }.toThrow<IllegalArgumentException>()
+        }
     }
 
     @Test
@@ -68,9 +67,9 @@ class ZiffernDatenelementTest {
         val underTest = createZiffernDatenelement(1000, 3)
 
         // when
-        expect {
+        assertThrows<IllegalArgumentException> {
             underTest.validate()
-        }.toThrow<IllegalArgumentException>()
+        }
     }
 
 

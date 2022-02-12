@@ -1,9 +1,8 @@
 package net.dankito.banking.fints.messages.segmente.implementierte.umsaetze
 
-import ch.tutteli.atrium.api.fluent.en_GB.toBe
 import net.dankito.banking.fints.FinTsTestBase
-import ch.tutteli.atrium.api.verbs.expect
 import kotlin.test.Test
+import kotlin.test.assertEquals
 
 
 class SaldenabfrageVersion7Test : FinTsTestBase() {
@@ -18,7 +17,7 @@ class SaldenabfrageVersion7Test : FinTsTestBase() {
         val result = underTest.format()
 
         // then
-        expect(result).toBe("HKSAL:3:7+$Iban:$Bic:$CustomerId::280:$BankCode+N")
+        assertEquals(result, "HKSAL:3:7+$Iban:$Bic:$CustomerId::280:$BankCode+N")
     }
 
     @Test
@@ -31,7 +30,7 @@ class SaldenabfrageVersion7Test : FinTsTestBase() {
         val result = underTest.format()
 
         // then
-        expect(result).toBe("HKSAL:3:7+$Iban:$Bic:$CustomerId::280:$BankCode+J")
+        assertEquals(result, "HKSAL:3:7+$Iban:$Bic:$CustomerId::280:$BankCode+J")
     }
 
 }

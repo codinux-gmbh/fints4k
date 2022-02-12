@@ -88,7 +88,7 @@
 //        underTest.getAnonymousBankInfo(BankDataAnonymous) { result ->
 //
 //            // then
-//            expect(result.successful).isTrue()
+//            assertTrue(result.successful)
 //            expect(BankDataAnonymous.supportedHbciVersions).isNotEmpty()
 //            expect(BankDataAnonymous.tanMethodsSupportedByBank).isNotEmpty()
 //            expect(BankDataAnonymous.supportedJobs).isNotEmpty()
@@ -117,9 +117,9 @@
 //        countDownLatch.await(30, TimeUnit.SECONDS)
 //        val result = response.get()
 //
-//        expect(result.successful).isTrue()
+//        assertTrue(result.successful)
 //
-//        expect(didAskUserForTanMethod).isFalse()
+//        assertFalse(didAskUserForTanMethod)
 //
 //        expect(Bank.bankName).isNotEmpty()
 //        expect(Bank.supportedJobs).isNotEmpty() // supported jobs are now known
@@ -131,7 +131,7 @@
 //        expect(Bank.tanMethodsAvailableForUser).isNotEmpty()
 //        expect(Bank.selectedLanguage).notToBe(Dialogsprache.Default) // language is set now
 //        expect(Bank.customerSystemId).notToBe(KundensystemStatus.SynchronizingCustomerSystemId.code) // customer system id is now set
-//        expect(Bank.customerSystemStatus).toBe(KundensystemStatusWerte.Benoetigt) // customerSystemStatus is set now
+//        assertEquals(KundensystemStatusWerte.Benoetigt, Bank.customerSystemStatus) // customerSystemStatus is set now
 //        expect(Bank.accounts).isNotEmpty() // accounts are now known
 //        expect(Bank.accounts.first().allowedJobs).isNotEmpty() // allowed jobs are now known
 //    }
@@ -205,7 +205,7 @@
 //        countDownLatch.await(30, TimeUnit.SECONDS)
 //        val result = response.get()
 //
-//        expect(result.successful).isTrue()
+//        assertTrue(result.successful)
 //
 //        expect(result.tanMediaList).notToBeNull()
 //        expect(result.tanMediaList!!.usageOption).toBe(TanEinsatzOption.KundeKannGenauEinMediumZuEinerZeitNutzen) // TODO: may adjust to your value
@@ -263,7 +263,7 @@
 //        countDownLatch.await(30, TimeUnit.SECONDS)
 //        val result = response.get()
 //
-//        expect(result.successful).isTrue()
+//        assertTrue(result.successful)
 //
 //    }
 //

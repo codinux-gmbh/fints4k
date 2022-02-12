@@ -1,10 +1,8 @@
 package net.dankito.banking.fints.messages.segmente.implementierte
 
-import ch.tutteli.atrium.api.fluent.en_GB.toBe
 import net.dankito.banking.fints.FinTsTestBase
-import net.dankito.banking.fints.model.MessageBaseData
-import ch.tutteli.atrium.api.verbs.expect
 import kotlin.test.Test
+import kotlin.test.assertEquals
 
 
 class IdentifikationsSegmentTest : FinTsTestBase() {
@@ -19,7 +17,7 @@ class IdentifikationsSegmentTest : FinTsTestBase() {
         val result = underTest.format()
 
         // then
-        expect(result).toBe("HKIDN:2:2+280:12345678+0987654321+0+0")
+        assertEquals(result, "HKIDN:2:2+280:12345678+0987654321+0+0")
     }
 
 }

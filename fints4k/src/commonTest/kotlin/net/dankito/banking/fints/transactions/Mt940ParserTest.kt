@@ -1,21 +1,16 @@
 package net.dankito.banking.fints.transactions
 
-import ch.tutteli.atrium.api.fluent.en_GB.hasSize
-import ch.tutteli.atrium.api.fluent.en_GB.notToBeNull
-import ch.tutteli.atrium.api.fluent.en_GB.toBe
 import net.dankito.banking.fints.FinTsTestBase
 import net.dankito.banking.fints.transactions.mt940.Mt940Parser
 import net.dankito.banking.fints.transactions.mt940.model.Balance
 import net.dankito.banking.fints.transactions.mt940.model.InformationToAccountOwner
 import net.dankito.banking.fints.transactions.mt940.model.StatementLine
-import ch.tutteli.atrium.api.verbs.expect
 import kotlinx.datetime.LocalDate
-import kotlin.test.Test
-import net.dankito.banking.fints.extensions.isFalse
-import net.dankito.banking.fints.extensions.isTrue
+import net.dankito.banking.fints.extensions.*
 import net.dankito.banking.fints.model.Amount
-import net.dankito.utils.multiplatform.DateFormatter
-import net.dankito.utils.multiplatform.extensions.format
+import net.dankito.utils.multiplatform.extensions.toStringWithTwoDigits
+import kotlin.test.Test
+import kotlin.test.assertContains
 
 
 class Mt940ParserTest : FinTsTestBase() {
@@ -57,16 +52,16 @@ class Mt940ParserTest : FinTsTestBase() {
 
 
         // then
-        expect(result).hasSize(1)
+        assertSize(1, result)
 
         val statement = result.first()
 
-        expect(statement.bankCodeBicOrIban).toBe(BankCode)
-        expect(statement.accountIdentifier).toBe(CustomerId)
+        assertEquals(BankCode, statement.bankCodeBicOrIban)
+        assertEquals(CustomerId, statement.accountIdentifier)
         assertBalance(statement.openingBalance, true, AccountStatement1PreviousStatementBookingDate, AccountStatement1OpeningBalanceAmount)
         assertBalance(statement.closingBalance, true, AccountStatement1BookingDate, AccountStatement1ClosingBalanceAmount)
 
-        expect(statement.transactions).hasSize(1)
+        assertSize(1, statement.transactions)
 
         val transaction = statement.transactions.first()
         assertTurnover(transaction.statementLine, AccountStatement1BookingDate, AccountStatement1Transaction1Amount)
@@ -87,19 +82,19 @@ class Mt940ParserTest : FinTsTestBase() {
 
 
         // then
-        expect(result).hasSize(1)
+        assertSize(1, result)
 
         val statement = result.first()
 
-        expect(statement.bankCodeBicOrIban).toBe(BankCode)
-        expect(statement.accountIdentifier).toBe(CustomerId)
-        expect(statement.statementNumber).toBe(0)
-        expect(statement.sequenceNumber).toBe(null)
+        assertEquals(BankCode, statement.bankCodeBicOrIban)
+        assertEquals(CustomerId, statement.accountIdentifier)
+        assertEquals(0, statement.statementNumber)
+        assertNull(statement.sequenceNumber)
 
         assertBalance(statement.openingBalance, true, bookingDate, Amount("0,00"))
         assertBalance(statement.closingBalance, isCredit, bookingDate, amount)
 
-        expect(statement.transactions).hasSize(1)
+        assertSize(1, statement.transactions)
 
         val transaction = statement.transactions.first()
         assertTurnover(transaction.statementLine, bookingDate, amount, isCredit)
@@ -114,16 +109,16 @@ class Mt940ParserTest : FinTsTestBase() {
 
 
         // then
-        expect(result).hasSize(1)
+        assertSize(1, result)
 
         val statement = result.first()
 
-        expect(statement.bankCodeBicOrIban).toBe(BankCode)
-        expect(statement.accountIdentifier).toBe(CustomerId)
+        assertEquals(BankCode, statement.bankCodeBicOrIban)
+        assertEquals(CustomerId, statement.accountIdentifier)
         assertBalance(statement.openingBalance, true, AccountStatement1PreviousStatementBookingDate, AccountStatement1OpeningBalanceAmount)
         assertBalance(statement.closingBalance, true, AccountStatement1BookingDate, AccountStatement1With2TransactionsClosingBalanceAmount)
 
-        expect(statement.transactions).hasSize(2)
+        assertSize(2, statement.transactions)
 
         val firstTransaction = statement.transactions.first()
         assertTurnover(firstTransaction.statementLine, AccountStatement1BookingDate, AccountStatement1Transaction1Amount)
@@ -158,13 +153,17 @@ class Mt940ParserTest : FinTsTestBase() {
 
 
         // then
-        expect(result).hasSize(1)
-        expect(result.first().transactions).hasSize(2)
+        assertSize(1, result)
+        assertSize(2, result.first().transactions)
 
-        expect(result.first().transactions[0].statementLine.bookingDate).toBe(LocalDate(2019, 12, 30))
-        expect(result.first().transactions[0].statementLine.valueDate).toBe(LocalDate(2020, 1, 1))
-        expect(result.first().transactions[1].statementLine.bookingDate).toBe(LocalDate(2019, 12, 30))
-        expect(result.first().transactions[1].statementLine.valueDate).toBe(LocalDate(2020, 1, 1))
+        result.first().transactions[0].statementLine.apply {
+            assertEquals(LocalDate(2019, 12, 30), bookingDate)
+            assertEquals(LocalDate(2020, 1, 1), valueDate)
+        }
+        result.first().transactions[1].statementLine.apply {
+            assertEquals(LocalDate(2019, 12, 30), bookingDate)
+            assertEquals(LocalDate(2020, 1, 1), valueDate)
+        }
     }
 
     @Test
@@ -226,8 +225,8 @@ class Mt940ParserTest : FinTsTestBase() {
 
 
         // then
-        expect(result).hasSize(3)
-        expect(result.flatMap { it.transactions }).hasSize(7)
+        assertSize(3, result)
+        assertSize(7, result.flatMap { it.transactions })
     }
 
     @Test
@@ -265,22 +264,22 @@ class Mt940ParserTest : FinTsTestBase() {
 
 
         // then
-        expect(result).hasSize(1)
-        expect(result.flatMap { it.transactions }).hasSize(3)
+        assertSize(1, result)
+        assertSize(3, result.flatMap { it.transactions })
 
         result.flatMap { it.transactions }.forEach { transaction ->
-            expect(transaction.information).notToBeNull()
+            assertNotNull(transaction.information)
 
-            expect(transaction.information?.sepaReference).notToBeNull()
+            assertNotNull(transaction.information?.sepaReference)
 
             if (transaction.information?.unparsedReference?.contains("KREF+") == true) {
-                expect(transaction.information?.customerReference).notToBeNull()
+                assertNotNull(transaction.information?.customerReference)
             }
         }
     }
 
     @Test
-    fun `Fix that ?, gets detected as field code`() {
+    fun `Fix that questionmark, gets detected as field code`() {
         val transactionsString = """
             :20:STARTUMS
             :25:$BankCode/$CustomerId
@@ -302,43 +301,45 @@ class Mt940ParserTest : FinTsTestBase() {
 
 
         // then
-        expect(result).hasSize(1)
-        expect(result.first().transactions).hasSize(1)
+        assertSize(1, result)
+        assertSize(1, result.first().transactions)
 
-        expect(result.first().transactions[0].information?.bookingText).toBe("BASISLASTSCHRIFT")
-        expect(result.first().transactions[0].information?.otherPartyBankCode).toBe("TUBDDEDD")
-        expect(result.first().transactions[0].information?.otherPartyAccountId).toBe("DE87300308801234567890")
-        expect(result.first().transactions[0].information?.endToEndReference).toBe("6MKL2OT30QENNLIU")
-        expect(result.first().transactions[0].information?.mandateReference).toBe("?,3SQNdUbxm9z7dB)+gKYDJAKzCM0G")
-        expect(result.first().transactions[0].information?.sepaReference?.contains("IBAN: DE87300308801234567890 BIC: TUBDDEDD") ?: false).isTrue()
+        result.first().transactions[0].information?.apply {
+            assertEquals("BASISLASTSCHRIFT", bookingText)
+            assertEquals("TUBDDEDD", otherPartyBankCode)
+            assertEquals("DE87300308801234567890", otherPartyAccountId)
+            assertEquals("6MKL2OT30QENNLIU", endToEndReference)
+            assertEquals("?,3SQNdUbxm9z7dB)+gKYDJAKzCM0G", mandateReference)
+            assertContains(sepaReference ?: "", "IBAN: DE87300308801234567890 BIC: TUBDDEDD")
+        }
     }
 
 
     private fun assertBalance(balance: Balance, isCredit: Boolean, bookingDate: LocalDate, amount: Amount) {
-        expect(balance.isCredit).toBe(isCredit)
-        expect(balance.bookingDate).toBe(bookingDate)
-        expect(balance.amount).toBe(amount)
-        expect(balance.currency).toBe(Currency)
+        assertEquals(isCredit, balance.isCredit)
+        assertEquals(bookingDate, balance.bookingDate)
+        assertEquals(amount, balance.amount)
+        assertEquals(Currency, balance.currency)
     }
 
     private fun assertTurnover(statementLine: StatementLine, valueDate: LocalDate, amount: Amount, isCredit: Boolean = true,
                                bookingDate: LocalDate? = valueDate) {
 
-        expect(statementLine.isCredit).toBe(isCredit)
-        expect(statementLine.isReversal).isFalse()
-        expect(statementLine.valueDate).toBe(valueDate)
-        expect(statementLine.bookingDate).toBe(bookingDate)
-        expect(statementLine.amount).toBe(amount)
+        assertEquals(isCredit, statementLine.isCredit)
+        assertFalse(statementLine.isReversal)
+        assertEquals(valueDate, statementLine.valueDate)
+        assertEquals(bookingDate, statementLine.bookingDate)
+        assertEquals(amount, statementLine.amount)
     }
 
     private fun assertTransactionDetails(details: InformationToAccountOwner?, otherPartyName: String,
                                          otherPartyBankCode: String, otherPartyAccountId: String) {
 
-        expect(details).notToBeNull()
+        assertNotNull(details)
 
-        expect(details?.otherPartyName).toBe(otherPartyName)
-        expect(details?.otherPartyBankCode).toBe(otherPartyBankCode)
-        expect(details?.otherPartyAccountId).toBe(otherPartyAccountId)
+        assertEquals(otherPartyName, details.otherPartyName)
+        assertEquals(otherPartyBankCode, details.otherPartyBankCode)
+        assertEquals(otherPartyAccountId, details.otherPartyAccountId)
     }
 
 

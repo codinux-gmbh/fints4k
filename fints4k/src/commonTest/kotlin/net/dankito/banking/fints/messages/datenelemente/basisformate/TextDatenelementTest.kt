@@ -1,11 +1,10 @@
 package net.dankito.banking.fints.messages.datenelemente.basisformate
 
-import ch.tutteli.atrium.api.fluent.en_GB.toBe
-import ch.tutteli.atrium.api.fluent.en_GB.toThrow
-import ch.tutteli.atrium.api.verbs.expect
+import net.dankito.banking.fints.extensions.assertThrows
 import net.dankito.banking.fints.messages.Existenzstatus
 import net.dankito.banking.fints.messages.datenelementgruppen.implementierte.signatur.SicherheitsidentifikationDetails
 import kotlin.test.Test
+import kotlin.test.assertEquals
 
 
 class TextDatenelementTest {
@@ -30,9 +29,9 @@ class TextDatenelementTest {
         val underTest = createTextDatenelement("α")
 
         // when
-        expect {
+        assertThrows<IllegalArgumentException> {
             underTest.validate()
-        }.toThrow<IllegalArgumentException>()
+        }
     }
 
     @Test
@@ -42,9 +41,9 @@ class TextDatenelementTest {
         val underTest = createTextDatenelement("Я")
 
         // when
-        expect {
+        assertThrows<IllegalArgumentException> {
             underTest.validate()
-        }.toThrow<IllegalArgumentException>()
+        }
     }
 
     @Test
@@ -54,9 +53,9 @@ class TextDatenelementTest {
         val underTest = createTextDatenelement("€") // is only allowed by ISO-8859-15, not by ISO-8859-1
 
         // when
-        expect {
+        assertThrows<IllegalArgumentException> {
             underTest.validate()
-        }.toThrow<IllegalArgumentException>()
+        }
     }
 
 
@@ -75,7 +74,7 @@ class TextDatenelementTest {
 
 
         // then
-        expect(result).toBe(expected)
+        assertEquals(expected, result)
     }
 
     @Test
@@ -93,7 +92,7 @@ class TextDatenelementTest {
 
 
         // then
-        expect(result).toBe(expected)
+        assertEquals(expected, result)
     }
 
     @Test
@@ -111,7 +110,7 @@ class TextDatenelementTest {
 
 
         // then
-        expect(result).toBe(expected)
+        assertEquals(expected, result)
     }
 
     @Test
@@ -130,7 +129,7 @@ class TextDatenelementTest {
 
 
         // then
-        expect(result).toBe(expected)
+        assertEquals(expected, result)
     }
 
 

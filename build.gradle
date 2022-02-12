@@ -11,10 +11,7 @@ ext {
 
     /*      Test        */
 
-    junitVersion = '4.12'
     junit5Version = '5.5.2'
-
-    atriumVersion = "0.15.0"
 
     assertJVersion = '3.12.2'
 

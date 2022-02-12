@@ -1,8 +1,5 @@
 package net.dankito.banking.fints.messages
 
-import ch.tutteli.atrium.api.fluent.en_GB.notToBeNull
-import ch.tutteli.atrium.api.fluent.en_GB.toBe
-import ch.tutteli.atrium.api.verbs.expect
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.Month
@@ -15,9 +12,7 @@ import net.dankito.banking.fints.response.segments.JobParameters
 import net.dankito.banking.fints.response.segments.PinInfo
 import net.dankito.banking.fints.response.segments.RetrieveAccountTransactionsParameters
 import net.dankito.banking.fints.util.FinTsUtils
-import kotlin.test.AfterTest
-import kotlin.test.Ignore
-import kotlin.test.Test
+import kotlin.test.*
 
 
 class MessageBuilderTest : FinTsTestBase() {
@@ -55,7 +50,7 @@ class MessageBuilderTest : FinTsTestBase() {
         val result = underTest.createAnonymousDialogInitMessage(context).createdMessage
 
         // then
-        expect(result).toBe(
+        assertEquals(result,
             "HNHBK:1:3+000000000125+300+0+1'" +
             "HKIDN:2:2+280:12345678+${CustomerId}+0+0'" +
             "HKVVB:3:3+0+0+${Language.code}+$ProductName+$ProductVersion'" +
@@ -74,7 +69,7 @@ class MessageBuilderTest : FinTsTestBase() {
         val result = underTest.createAnonymousDialogEndMessage(context).createdMessage ?: ""
 
         // then
-        expect(normalizeBinaryData(result)).toBe(normalizeBinaryData(
+        assertEquals(normalizeBinaryData(result), normalizeBinaryData(
             "HNHBK:1:3+000000000067+300+$dialogId+1'" +
             "HKEND:2:1+$dialogId'" +
             "HNHBS:3:1+1'"
@@ -92,7 +87,7 @@ class MessageBuilderTest : FinTsTestBase() {
         val result = underTest.createSynchronizeCustomerSystemIdMessage(context).createdMessage ?: ""
 
         // then
-        expect(normalizeBinaryData(result)).toBe(normalizeBinaryData(
+        assertEquals(normalizeBinaryData(result), normalizeBinaryData(
             "HNHBK:1:3+000000000397+300+0+1'" +
             "HNVSK:998:3+PIN:2+998+1+1::0+1:$Date:$Time+2:2:13:@8@        :5:1+280:$BankCode:$CustomerId:V:0:0+0'" +
             "HNVSD:999:1+@234@" + "HNSHK:2:4+PIN:2+${SecurityFunction.code}+$ControlReference+1+1+1::0+1+1:$Date:$Time+1:999:1+6:10:16+280:$BankCode:$CustomerId:S:0:0'" +
@@ -116,7 +111,7 @@ class MessageBuilderTest : FinTsTestBase() {
         val result = underTest.createDialogEndMessage(context).createdMessage ?: ""
 
         // then
-        expect(normalizeBinaryData(result)).toBe(normalizeBinaryData(
+        assertEquals(normalizeBinaryData(result), normalizeBinaryData(
             "HNHBK:1:3+000000000309+300+$dialogId+1'" +
             "HNVSK:998:3+PIN:2+998+1+1::0+1:$Date:$Time+2:2:13:@8@        :5:1+280:$BankCode:$CustomerId:V:0:0+0'" +
             "HNVSD:999:1+@140@" + "HNSHK:2:4+PIN:2+${SecurityFunction.code}+$ControlReference+1+1+1::0+1+1:$Date:$Time+1:999:1+6:10:16+280:$BankCode:$CustomerId:S:0:0'" +
@@ -137,7 +132,7 @@ class MessageBuilderTest : FinTsTestBase() {
         val result = underTest.createGetTransactionsMessage(context, GetAccountTransactionsParameter(Bank, Account))
 
         // then
-        expect(result.isJobAllowed).toBe(false)
+        assertFalse(result.isJobAllowed)
     }
 
     @Test
@@ -156,8 +151,8 @@ class MessageBuilderTest : FinTsTestBase() {
         val result = underTest.createGetTransactionsMessage(context, GetAccountTransactionsParameter(Bank, account))
 
         // then
-        expect(result.isJobAllowed).toBe(true)
-        expect(result.isJobVersionSupported).toBe(false)
+        assertTrue(result.isJobAllowed)
+        assertFalse(result.isJobVersionSupported)
     }
 
     @Test
@@ -180,9 +175,9 @@ class MessageBuilderTest : FinTsTestBase() {
         val result = underTest.createGetTransactionsMessage(context, GetAccountTransactionsParameter(Bank, account, false, fromDate, toDate, maxCountEntries))
 
         // then
-        expect(result.createdMessage).notToBeNull()
+        assertNotNull(result.createdMessage)
 
-        expect(normalizeBinaryData(result.createdMessage!!)).toBe(normalizeBinaryData(
+        assertEquals(normalizeBinaryData(result.createdMessage!!), normalizeBinaryData(
             "HNHBK:1:3+000000000361+300+0+1'" +
             "HNVSK:998:3+PIN:2+998+1+1::0+1:$Date:$Time+2:2:13:@8@        :5:1+280:$BankCode:$CustomerId:V:0:0+0'" +
             "HNVSD:999:1+@198@" + "HNSHK:2:4+PIN:2+${SecurityFunction.code}+$ControlReference+1+1+1::0+1+1:$Date:$Time+1:999:1+6:10:16+280:$BankCode:$CustomerId:S:0:0'" +
@@ -216,9 +211,9 @@ class MessageBuilderTest : FinTsTestBase() {
             GetAccountTransactionsParameter(Bank, account, false, fromDate, toDate, maxCountEntries, false))
 
         // then
-        expect(result.createdMessage).notToBeNull()
+        assertNotNull(result.createdMessage)
 
-        expect(normalizeBinaryData(result.createdMessage!!)).toBe(normalizeBinaryData(
+        assertEquals(normalizeBinaryData(result.createdMessage!!), normalizeBinaryData(
             "HNHBK:1:3+000000000340+300+0+1'" +
             "HNVSK:998:3+PIN:2+998+1+1::0+1:$Date:$Time+2:2:13:@8@        :5:1+280:$BankCode:$CustomerId:V:0:0+0'" +
             "HNVSD:999:1+@225@" + "HNSHK:2:4+PIN:2+${SecurityFunction.code}+$ControlReference+1+1+1::0+1+1:$Date:$Time+1:999:1+6:10:16+280:$BankCode:$CustomerId:S:0:0'" +

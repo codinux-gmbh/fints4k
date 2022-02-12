@@ -56,8 +56,6 @@ kotlin {
         commonTest {
             dependencies {
                 implementation kotlin("test")
-
-                implementation "ch.tutteli.atrium:atrium-fluent-en_GB-common:$atriumVersion"
             }
         }
 
@@ -75,8 +73,6 @@ kotlin {
 
                 implementation "org.assertj:assertj-core:$assertJVersion"
                 implementation "org.mockito:mockito-core:$mockitoVersion"
-
-                implementation "ch.tutteli.atrium:atrium-fluent-en_GB:$atriumVersion"
 
 
 //                implementation project(":BankingUiCommon")

@@ -54,8 +54,6 @@ kotlin {
             dependencies {
                 implementation kotlin("test-common")
                 implementation kotlin("test-annotations-common")
-
-                implementation "ch.tutteli.atrium:atrium-fluent-en_GB-common:$atriumVersion"
             }
         }
 
@@ -75,11 +73,6 @@ kotlin {
 
                 implementation "org.junit.jupiter:junit-jupiter:$junit5Version"
                 runtimeOnly "org.junit.jupiter:junit-jupiter-engine:$junit5Version"
-
-                implementation "org.assertj:assertj-core:$assertJVersion"
-                implementation "org.mockito:mockito-core:$mockitoVersion"
-
-                implementation "ch.tutteli.atrium:atrium-fluent-en_GB:$atriumVersion"
 
                 implementation "org.slf4j:slf4j-simple:$slf4jVersion"
             }

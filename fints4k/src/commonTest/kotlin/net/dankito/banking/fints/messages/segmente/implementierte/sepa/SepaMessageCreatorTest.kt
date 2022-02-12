@@ -1,9 +1,8 @@
 package net.dankito.banking.fints.messages.segmente.implementierte.sepa
 
-import ch.tutteli.atrium.api.verbs.expect
-import net.dankito.banking.fints.extensions.isFalse
-import net.dankito.banking.fints.extensions.isTrue
 import kotlin.test.Test
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 
 class SepaMessageCreatorTest {
@@ -18,7 +17,7 @@ class SepaMessageCreatorTest {
         val result = underTest.containsOnlyAllowedCharacters("Marieke Musterfrau")
 
         // then
-        expect(result).isTrue()
+        assertTrue(result)
     }
 
     @Test
@@ -28,7 +27,7 @@ class SepaMessageCreatorTest {
         val result = underTest.containsOnlyAllowedCharacters("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789,.?+-/()")
 
         // then
-        expect(result).isTrue()
+        assertTrue(result)
     }
 
     @Test
@@ -38,7 +37,7 @@ class SepaMessageCreatorTest {
         val result = underTest.containsOnlyAllowedCharacters(":")
 
         // then
-        expect(result).isTrue()
+        assertTrue(result)
     }
 
     @Test
@@ -48,7 +47,7 @@ class SepaMessageCreatorTest {
         val result = underTest.containsOnlyAllowedCharacters("!")
 
         // then
-        expect(result).isFalse()
+        assertFalse(result)
     }
 
     @Test
@@ -58,17 +57,17 @@ class SepaMessageCreatorTest {
         val result = underTest.containsOnlyAllowedCharacters("€")
 
         // then
-        expect(result).isFalse()
+        assertFalse(result)
     }
 
     @Test
-    fun `containsOnlyAllowedCharacters @ is an illegal character`() {
+    fun `containsOnlyAllowedCharacters at sign is an illegal character`() {
 
         // when
         val result = underTest.containsOnlyAllowedCharacters("@")
 
         // then
-        expect(result).isFalse()
+        assertFalse(result)
     }
 
     @Test
@@ -78,7 +77,7 @@ class SepaMessageCreatorTest {
         val result = underTest.containsOnlyAllowedCharacters("ö")
 
         // then
-        expect(result).isFalse()
+        assertFalse(result)
     }
 
 }
