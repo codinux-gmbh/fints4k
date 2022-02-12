@@ -1,7 +1,5 @@
 package net.dankito.banking.fints.model
 
-import net.dankito.utils.multiplatform.BigDecimal
-
 
 open class Money(
     val amount: Amount,
@@ -14,9 +12,6 @@ open class Money(
     internal constructor() : this(Amount.Zero, "") // for object deserializers
 
 
-
-    open val bigDecimal: BigDecimal
-        get() = amount.bigDecimal
 
     open val displayString: String
         get() = "$amount $currency"

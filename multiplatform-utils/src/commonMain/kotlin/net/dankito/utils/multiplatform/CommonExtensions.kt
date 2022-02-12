@@ -2,7 +2,7 @@ package net.dankito.utils.multiplatform
 
 
 val Char.isLowerCase: Boolean
-    get() = toLowerCase() == this
+    get() = lowercaseChar() == this
 
 val Char.isUpperCase: Boolean
     get() = isLowerCase == false
