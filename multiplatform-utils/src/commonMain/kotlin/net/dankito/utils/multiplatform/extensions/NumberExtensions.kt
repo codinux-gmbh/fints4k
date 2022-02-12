@@ -1,16 +1,26 @@
 package net.dankito.utils.multiplatform.extensions
 
-import net.dankito.utils.multiplatform.StringHelper
-
 
 fun Int.toStringWithTwoDigits(): String {
   return toStringWithMinDigits(2)
 }
 
-fun Int.toStringWithMinDigits(countDigits: Int): String {
-  return format("%0${countDigits}d")
+fun Int.toStringWithMinDigits(minimumCountDigits: Int): String {
+  val countDigitsToAdd = minimumCountDigits - this.numberOfDigits
+  val prefix = if (countDigitsToAdd > 0) "0".repeat(countDigitsToAdd) else ""
+
+  return prefix + this.toString()
 }
 
-fun Int.format(format: String): String {
-  return StringHelper.format(format, this)
-}
+val Int.numberOfDigits: Int
+  get() {
+    var number = this
+    var count = 0
+
+    while (number != 0) {
+      number /= 10
+      ++count
+    }
+
+    return count
+  }
