@@ -1,6 +1,7 @@
 package net.dankito.banking.fints.model
 
-import net.dankito.utils.multiplatform.Date
+import kotlinx.datetime.LocalDate
+import net.dankito.utils.multiplatform.extensions.atUnixEpochStart
 
 
 open class AccountTransaction(
@@ -8,12 +9,12 @@ open class AccountTransaction(
     val amount: Money,
     val isReversal: Boolean,
     val unparsedReference: String,
-    val bookingDate: Date,
+    val bookingDate: LocalDate,
     val otherPartyName: String?,
     val otherPartyBankCode: String?,
     val otherPartyAccountId: String?,
     val bookingText: String?,
-    val valueDate: Date,
+    val valueDate: LocalDate,
     val statementNumber: Int,
     val sequenceNumber: Int?,
     val openingBalance: Money?,
@@ -44,9 +45,9 @@ open class AccountTransaction(
 ) {
 
     // for object deserializers
-    internal constructor() : this(AccountData(), Money(Amount.Zero, ""), "", Date(0), null, null, null, null, Date(0))
+    internal constructor() : this(AccountData(), Money(Amount.Zero, ""), "", LocalDate.atUnixEpochStart, null, null, null, null, LocalDate.atUnixEpochStart)
 
-    constructor(account: AccountData, amount: Money, unparsedReference: String, bookingDate: Date, otherPartyName: String?, otherPartyBankCode: String?, otherPartyAccountId: String?, bookingText: String?, valueDate: Date)
+    constructor(account: AccountData, amount: Money, unparsedReference: String, bookingDate: LocalDate, otherPartyName: String?, otherPartyBankCode: String?, otherPartyAccountId: String?, bookingText: String?, valueDate: LocalDate)
         : this(account, amount, false, unparsedReference, bookingDate, otherPartyName, otherPartyBankCode, otherPartyAccountId, bookingText, valueDate,
         0, null, null, null,
         null, null, null, null, null, null, null, null, null, null, null,  null, null,

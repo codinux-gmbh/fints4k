@@ -1,5 +1,6 @@
 package net.dankito.banking.fints
 
+import kotlinx.datetime.LocalDate
 import net.dankito.banking.fints.messages.MessageBuilder
 import net.dankito.banking.fints.messages.MessageBuilderResult
 import net.dankito.banking.fints.messages.datenelemente.implementierte.signatur.VersionDesSicherheitsverfahrens
@@ -16,8 +17,11 @@ import net.dankito.banking.fints.tan.FlickerCodeDecoder
 import net.dankito.banking.fints.tan.TanImageDecoder
 import net.dankito.banking.fints.util.TanMethodSelector
 import net.dankito.utils.multiplatform.log.LoggerFactory
-import net.dankito.utils.multiplatform.Date
 import net.dankito.utils.multiplatform.ObjectReference
+import net.dankito.utils.multiplatform.extensions.millisSinceEpochAtEuropeBerlin
+import net.dankito.utils.multiplatform.extensions.minusDays
+import net.dankito.utils.multiplatform.extensions.todayAtEuropeBerlin
+import net.dankito.utils.multiplatform.extensions.todayAtSystemDefaultTimeZone
 
 
 /**
@@ -236,9 +240,9 @@ open class FinTsJobExecutor(
             val successful = response.tanRequiredButWeWereToldToAbortIfSo
                     || (response.successful && (parameter.alsoRetrieveBalance == false || balance != null))
             val fromDate = parameter.fromDate
-                ?: parameter.account.countDaysForWhichTransactionsAreKept?.let { Date.today.addDays(it * -1) }
-                ?: bookedTransactions.map { it.valueDate }.sortedBy { it.millisSinceEpoch }.firstOrNull()
-            val retrievedData = RetrievedAccountData(parameter.account, successful, balance, bookedTransactions, unbookedTransactions, fromDate, parameter.toDate ?: Date.today, response.internalError)
+                ?: parameter.account.countDaysForWhichTransactionsAreKept?.let { LocalDate.todayAtSystemDefaultTimeZone().minusDays(it) }
+                ?: bookedTransactions.minByOrNull { it.valueDate.millisSinceEpochAtEuropeBerlin }?.valueDate
+            val retrievedData = RetrievedAccountData(parameter.account, successful, balance, bookedTransactions, unbookedTransactions, fromDate, parameter.toDate ?: LocalDate.todayAtEuropeBerlin(), response.internalError)
 
             callback(GetAccountTransactionsResponse(context, response, retrievedData,
                 if (parameter.maxCountEntries != null) parameter.isSettingMaxCountEntriesAllowedByBank else null))

@@ -9,12 +9,13 @@ import net.dankito.banking.fints.transactions.mt940.model.Balance
 import net.dankito.banking.fints.transactions.mt940.model.InformationToAccountOwner
 import net.dankito.banking.fints.transactions.mt940.model.StatementLine
 import ch.tutteli.atrium.api.verbs.expect
+import kotlinx.datetime.LocalDate
 import kotlin.test.Test
 import net.dankito.banking.fints.extensions.isFalse
 import net.dankito.banking.fints.extensions.isTrue
 import net.dankito.banking.fints.model.Amount
-import net.dankito.utils.multiplatform.Date
 import net.dankito.utils.multiplatform.DateFormatter
+import net.dankito.utils.multiplatform.extensions.format
 
 
 class Mt940ParserTest : FinTsTestBase() {
@@ -23,8 +24,8 @@ class Mt940ParserTest : FinTsTestBase() {
 
         const val Currency = "EUR"
 
-        val AccountStatement1PreviousStatementBookingDate = Date(1988, 2, 26)
-        val AccountStatement1BookingDate = Date(1988, 2, 27)
+        val AccountStatement1PreviousStatementBookingDate = LocalDate(1988, 2, 26)
+        val AccountStatement1BookingDate = LocalDate(1988, 2, 27)
 
         val AccountStatement1OpeningBalanceAmount = Amount("12345,67")
 
@@ -79,7 +80,7 @@ class Mt940ParserTest : FinTsTestBase() {
         // given
         val amount = Amount("15,00")
         val isCredit = false
-        val bookingDate = Date(2020, 5, 11)
+        val bookingDate = LocalDate(2020, 5, 11)
 
         // when
         val result = underTest.parseMt940String(AccountStatementWithSingleTransaction_SheetNumberOmitted)
@@ -160,10 +161,10 @@ class Mt940ParserTest : FinTsTestBase() {
         expect(result).hasSize(1)
         expect(result.first().transactions).hasSize(2)
 
-        expect(result.first().transactions[0].statementLine.bookingDate).toBe(Date(2019, 12, 30))
-        expect(result.first().transactions[0].statementLine.valueDate).toBe(Date(2020, 1, 1))
-        expect(result.first().transactions[1].statementLine.bookingDate).toBe(Date(2019, 12, 30))
-        expect(result.first().transactions[1].statementLine.valueDate).toBe(Date(2020, 1, 1))
+        expect(result.first().transactions[0].statementLine.bookingDate).toBe(LocalDate(2019, 12, 30))
+        expect(result.first().transactions[0].statementLine.valueDate).toBe(LocalDate(2020, 1, 1))
+        expect(result.first().transactions[1].statementLine.bookingDate).toBe(LocalDate(2019, 12, 30))
+        expect(result.first().transactions[1].statementLine.valueDate).toBe(LocalDate(2020, 1, 1))
     }
 
     @Test
@@ -313,15 +314,15 @@ class Mt940ParserTest : FinTsTestBase() {
     }
 
 
-    private fun assertBalance(balance: Balance, isCredit: Boolean, bookingDate: Date, amount: Amount) {
+    private fun assertBalance(balance: Balance, isCredit: Boolean, bookingDate: LocalDate, amount: Amount) {
         expect(balance.isCredit).toBe(isCredit)
         expect(balance.bookingDate).toBe(bookingDate)
         expect(balance.amount).toBe(amount)
         expect(balance.currency).toBe(Currency)
     }
 
-    private fun assertTurnover(statementLine: StatementLine, valueDate: Date, amount: Amount, isCredit: Boolean = true,
-                               bookingDate: Date? = valueDate) {
+    private fun assertTurnover(statementLine: StatementLine, valueDate: LocalDate, amount: Amount, isCredit: Boolean = true,
+                               bookingDate: LocalDate? = valueDate) {
 
         expect(statementLine.isCredit).toBe(isCredit)
         expect(statementLine.isReversal).isFalse()
@@ -385,12 +386,12 @@ class Mt940ParserTest : FinTsTestBase() {
     """.trimIndent()
 
 
-    private fun convertMt940Date(date: Date): String {
-        return Mt940DateFormatter.format(date)
+    private fun convertMt940Date(date: LocalDate): String {
+        return date.format(Mt940DateFormatter)
     }
 
-    private fun convertToShortBookingDate(date: Date): String {
-        return BookingDateFormatter.format(date)
+    private fun convertToShortBookingDate(date: LocalDate): String {
+        return date.format(BookingDateFormatter)
     }
 
 }

@@ -1,7 +1,8 @@
 package net.dankito.banking.fints.transactions.mt940.model
 
+import kotlinx.datetime.LocalDate
+import net.dankito.utils.multiplatform.extensions.atUnixEpochStart
 import net.dankito.banking.fints.model.Amount
-import net.dankito.utils.multiplatform.Date
 
 
 open class Balance(
@@ -23,7 +24,7 @@ open class Balance(
      *
      * Max length = 6
      */
-    val bookingDate: Date,
+    val bookingDate: LocalDate,
 
     /**
      * Währungsschlüssel gem. ISO 4217
@@ -41,7 +42,7 @@ open class Balance(
 
 ) {
 
-    internal constructor() : this(false, false, Date(0), "", Amount.Zero) // for object deserializers
+    internal constructor() : this(false, false, LocalDate.atUnixEpochStart, "", Amount.Zero) // for object deserializers
 
 
     override fun toString(): String {

@@ -1,6 +1,6 @@
 package net.dankito.banking.fints.model
 
-import net.dankito.utils.multiplatform.Date
+import kotlinx.datetime.LocalDate
 import kotlin.jvm.JvmOverloads
 
 
@@ -8,8 +8,8 @@ open class GetAccountTransactionsParameter @JvmOverloads constructor(
     bank: BankData,
     account: AccountData,
     alsoRetrieveBalance: Boolean = true,
-    fromDate: Date? = null,
-    toDate: Date? = null,
+    fromDate: LocalDate? = null,
+    toDate: LocalDate? = null,
 
     /**
      * Be aware this is by far not supported by all banks.

@@ -3,6 +3,9 @@ package net.dankito.banking.fints.messages
 import ch.tutteli.atrium.api.fluent.en_GB.notToBeNull
 import ch.tutteli.atrium.api.fluent.en_GB.toBe
 import ch.tutteli.atrium.api.verbs.expect
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.Month
 import net.dankito.banking.fints.FinTsTestBase
 import net.dankito.banking.fints.messages.datenelemente.implementierte.tan.JobTanConfiguration
 import net.dankito.banking.fints.messages.segmente.id.CustomerSegmentId
@@ -12,8 +15,6 @@ import net.dankito.banking.fints.response.segments.JobParameters
 import net.dankito.banking.fints.response.segments.PinInfo
 import net.dankito.banking.fints.response.segments.RetrieveAccountTransactionsParameters
 import net.dankito.banking.fints.util.FinTsUtils
-import net.dankito.utils.multiplatform.Date
-import net.dankito.utils.multiplatform.Month
 import kotlin.test.AfterTest
 import kotlin.test.Ignore
 import kotlin.test.Test
@@ -22,11 +23,11 @@ import kotlin.test.Test
 class MessageBuilderTest : FinTsTestBase() {
 
     private val underTest = object : MessageBuilder(utils = object : FinTsUtils() {
-        override fun formatDate(date: Date): String {
+        override fun formatDate(date: LocalDate): String {
             return Date.toString()
         }
 
-        override fun formatTime(time: Date): String {
+        override fun formatTime(time: LocalDateTime): String {
             return Time.toString()
         }
     }) {
@@ -171,8 +172,8 @@ class MessageBuilderTest : FinTsTestBase() {
 
         val context = createContext()
 
-        val fromDate = Date(2019, Month.August, 6)
-        val toDate = Date(2019, Month.October, 21)
+        val fromDate = LocalDate(2019, Month.AUGUST, 6)
+        val toDate = LocalDate(2019, Month.OCTOBER, 21)
         val maxCountEntries = 99
 
         // when
@@ -205,8 +206,8 @@ class MessageBuilderTest : FinTsTestBase() {
 
         val context = createContext()
 
-        val fromDate = Date(2019, Month.August, 6)
-        val toDate = Date(2019, Month.October, 21)
+        val fromDate = LocalDate(2019, Month.AUGUST, 6)
+        val toDate = LocalDate(2019, Month.OCTOBER, 21)
         val maxCountEntries = 99
         val continuationId = "9345-10-26-11.52.15.693455"
 

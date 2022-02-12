@@ -1,6 +1,8 @@
 package net.dankito.banking.fints
 
+import kotlinx.datetime.LocalDate
 import net.dankito.banking.fints.callback.SimpleFinTsClientCallback
+import net.dankito.utils.multiplatform.extensions.randomWithSeed
 import net.dankito.banking.fints.messages.datenelemente.abgeleiteteformate.Datum
 import net.dankito.banking.fints.messages.datenelemente.abgeleiteteformate.Laenderkennzeichen
 import net.dankito.banking.fints.messages.datenelemente.implementierte.Dialogsprache
@@ -9,8 +11,6 @@ import net.dankito.banking.fints.model.*
 import net.dankito.banking.fints.response.segments.AccountType
 import net.dankito.banking.fints.response.segments.ChangeTanMediaParameters
 import net.dankito.banking.fints.response.segments.JobParameters
-import net.dankito.utils.multiplatform.Date
-import kotlin.random.Random
 
 
 abstract class FinTsTestBase {
@@ -70,10 +70,10 @@ abstract class FinTsTestBase {
     }
 
     protected open fun createDialogId(): String {
-        return Random(net.dankito.utils.multiplatform.Date.nanoSecondsSinceEpoch).nextInt(1000000, 9999999).toString()
+        return randomWithSeed().nextInt(1000000, 9999999).toString()
     }
 
-    protected open fun convertDate(date: Date): String {
+    protected open fun convertDate(date: LocalDate): String {
         return Datum.format(date)
     }
 

@@ -1,11 +1,12 @@
 package net.dankito.banking.fints.transactions.mt940
 
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.Month
+import net.dankito.utils.multiplatform.extensions.todayAtEuropeBerlin
 import net.dankito.banking.fints.log.IMessageLogAppender
 import net.dankito.banking.fints.model.Amount
 import net.dankito.banking.fints.transactions.mt940.model.*
-import net.dankito.utils.multiplatform.Date
 import net.dankito.utils.multiplatform.DateFormatter
-import net.dankito.utils.multiplatform.Month
 import net.dankito.utils.multiplatform.extensions.isUpperCase
 import net.dankito.utils.multiplatform.log.LoggerFactory
 
@@ -53,7 +54,7 @@ open class Mt940Parser(
 
         val DateFormatter = DateFormatter("yyMMdd")
 
-        val CurrentYearTwoDigit = Date().year() - 2000
+        val CurrentYearTwoDigit = LocalDate.todayAtEuropeBerlin().year - 2000
 
         val CreditDebitCancellationRegex = Regex("C|D|RC|RD")
 
@@ -449,7 +450,7 @@ open class Mt940Parser(
     }
 
 
-    protected open fun parseMt940Date(dateString: String): Date {
+    protected open fun parseMt940Date(dateString: String): LocalDate {
         // TODO: this should be necessary anymore, isn't it?
 
         // SimpleDateFormat is not thread-safe. Before adding another library i decided to parse
@@ -464,25 +465,25 @@ open class Mt940Parser(
                     year -= 100
                 }
 
-                return Date(year + 2000, month, day) // java.util.Date years start at 1900 at month at 0 not at 1
+                return LocalDate(year + 2000, month, day) // java.util.Date years start at 1900 at month at 0 not at 1
             } catch (e: Exception) {
                 logError("Could not parse dateString '$dateString'", e)
             }
         }
 
-        return DateFormatter.parse(dateString)!! // fallback to not thread-safe SimpleDateFormat. Works in most cases but not all
+        return DateFormatter.parseDate(dateString)!! // fallback to not thread-safe SimpleDateFormat. Works in most cases but not all
     }
 
     /**
      * Booking date string consists only of MMDD -> we need to take the year from value date string.
      */
-    protected open fun parseMt940BookingDate(bookingDateString: String, valueDateString: String, valueDate: Date): Date {
+    protected open fun parseMt940BookingDate(bookingDateString: String, valueDateString: String, valueDate: LocalDate): LocalDate {
         val bookingDate = parseMt940Date(valueDateString.substring(0, 2) + bookingDateString)
 
         // there are rare cases that booking date is e.g. on 31.12.2019 and value date on 01.01.2020 -> booking date would be on 31.12.2020 (and therefore in the future)
-        val bookingDateMonth = bookingDate.month()
-        if (bookingDateMonth != valueDate.month() && bookingDateMonth == Month.December) {
-            return parseMt940Date("" + (valueDate.year() - 1 - 2000) + bookingDateString)
+        val bookingDateMonth = bookingDate.month
+        if (bookingDateMonth != valueDate.month && bookingDateMonth == Month.DECEMBER) {
+            return parseMt940Date("" + (valueDate.year - 1 - 2000) + bookingDateString)
         }
 
         return bookingDate

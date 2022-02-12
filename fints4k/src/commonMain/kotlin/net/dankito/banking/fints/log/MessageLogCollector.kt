@@ -6,8 +6,8 @@ import net.dankito.banking.fints.model.MessageLogEntryType
 import net.dankito.utils.multiplatform.log.Logger
 import net.dankito.utils.multiplatform.log.LoggerFactory
 import net.dankito.utils.multiplatform.StackTraceHelper
-import net.dankito.utils.multiplatform.extensions.format
 import net.dankito.utils.multiplatform.extensions.getInnerException
+import net.dankito.utils.multiplatform.extensions.toStringWithTwoDigits
 import kotlin.reflect.KClass
 
 
@@ -80,7 +80,7 @@ open class MessageLogCollector {
     }
 
     protected open fun twoDigits(number: Int): String {
-        return number.format("%02d")
+        return number.toStringWithTwoDigits()
     }
 
     protected open fun getMessageTypeString(type: MessageLogEntryType): String {

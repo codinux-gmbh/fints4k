@@ -1,9 +1,10 @@
 package net.dankito.banking.fints.messages.datenelemente.abgeleiteteformate
 
+import kotlinx.datetime.LocalDate
 import net.dankito.banking.fints.messages.Existenzstatus
 import net.dankito.banking.fints.messages.datenelemente.basisformate.NumerischesDatenelement
-import net.dankito.utils.multiplatform.Date
-import net.dankito.utils.multiplatform.DateFormatter
+import net.dankito.utils.multiplatform.extensions.toStringWithMinDigits
+import net.dankito.utils.multiplatform.extensions.toStringWithTwoDigits
 import net.dankito.utils.multiplatform.log.LoggerFactory
 
 
@@ -17,17 +18,15 @@ open class Datum(date: Int?, existenzstatus: Existenzstatus) : NumerischesDatene
     companion object {
         const val HbciDateFormatString = "yyyyMMdd"
 
-        val HbciDateFormat = DateFormatter(HbciDateFormatString)
-
 
         private val log = LoggerFactory.getLogger(Datum::class)
 
 
-        fun format(date: Date): String {
-            return HbciDateFormat.format(date) // TODO: is this correct?
+        fun format(date: LocalDate): String { // create HbciDateFormatString
+            return date.year.toStringWithMinDigits(4) + date.monthNumber.toStringWithTwoDigits() + date.dayOfMonth.toStringWithTwoDigits() // TODO: is this correct?
         }
 
-        fun parse(dateString: String): Date {
+        fun parse(dateString: String): LocalDate {
             // do not use DateFormatter as Java DateFormat is not thread safe, resulting in a lot of curious errors in parallel execution
 
             if (dateString.length == 8) {
@@ -36,7 +35,7 @@ open class Datum(date: Int?, existenzstatus: Existenzstatus) : NumerischesDatene
                     val month = dateString.substring(4, 6)
                     val day = dateString.substring(6, 8)
 
-                    return Date(year.toInt(), month.toInt(), day.toInt())
+                    return LocalDate(year.toInt(), month.toInt(), day.toInt())
                 } catch (e: Exception) {
                     log.error(e) { "Could not parse date string '$dateString' to HBCI date" }
                 }
@@ -47,7 +46,7 @@ open class Datum(date: Int?, existenzstatus: Existenzstatus) : NumerischesDatene
     }
 
 
-    constructor(date: Date?, existenzstatus: Existenzstatus)
+    constructor(date: LocalDate?, existenzstatus: Existenzstatus)
             : this(date?.let { format(it).toInt() }, existenzstatus)
 
 }

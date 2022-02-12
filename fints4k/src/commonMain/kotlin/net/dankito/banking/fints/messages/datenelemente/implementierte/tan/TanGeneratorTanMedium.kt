@@ -1,6 +1,6 @@
 package net.dankito.banking.fints.messages.datenelemente.implementierte.tan
 
-import net.dankito.utils.multiplatform.Date
+import kotlinx.datetime.LocalDate
 
 
 open class TanGeneratorTanMedium(
@@ -9,8 +9,8 @@ open class TanGeneratorTanMedium(
     val cardNumber: String,
     val cardSequenceNumber: String?,
     val cardType: Int?,
-    val validFrom: Date?,
-    val validTo: Date?,
+    val validFrom: LocalDate?,
+    val validTo: LocalDate?,
     mediumName: String?
 ) : TanMedium(mediumClass, status, mediumName) {
 

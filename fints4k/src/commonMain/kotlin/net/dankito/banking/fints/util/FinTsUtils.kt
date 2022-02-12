@@ -1,18 +1,21 @@
 package net.dankito.banking.fints.util
 
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalDateTime
+import net.dankito.utils.multiplatform.extensions.nowAtEuropeBerlin
+import net.dankito.utils.multiplatform.extensions.todayAtEuropeBerlin
 import net.dankito.banking.fints.messages.datenelemente.abgeleiteteformate.Datum
 import net.dankito.banking.fints.messages.datenelemente.abgeleiteteformate.Uhrzeit
-import net.dankito.utils.multiplatform.Date
 
 
 open class FinTsUtils {
 
 
     open fun formatDateToday(): String {
-        return formatDate(Date())
+        return formatDate(LocalDate.todayAtEuropeBerlin())
     }
 
-    open fun formatDate(date: Date): String {
+    open fun formatDate(date: LocalDate): String {
         return Datum.format(date)
     }
 
@@ -20,16 +23,16 @@ open class FinTsUtils {
         return convertToInt(formatDateToday())
     }
 
-    open fun formatDateAsInt(date: Date): Int {
+    open fun formatDateAsInt(date: LocalDate): Int {
         return convertToInt(formatDate(date))
     }
 
 
     open fun formatTimeNow(): String {
-        return formatTime(Date())
+        return formatTime(LocalDateTime.nowAtEuropeBerlin())
     }
 
-    open fun formatTime(time: Date): String {
+    open fun formatTime(time: LocalDateTime): String {
         return Uhrzeit.format(time)
     }
 
@@ -37,7 +40,7 @@ open class FinTsUtils {
         return convertToInt(formatTimeNow())
     }
 
-    open fun formatTimeAsInt(time: Date): Int {
+    open fun formatTimeAsInt(time: LocalDateTime): Int {
         return convertToInt(formatTime(time))
     }
 

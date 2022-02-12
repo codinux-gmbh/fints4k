@@ -1,6 +1,6 @@
 package net.dankito.banking.fints.model
 
-import net.dankito.utils.multiplatform.Date
+import kotlinx.datetime.LocalDate
 
 
 open class RetrievedAccountData(
@@ -9,8 +9,8 @@ open class RetrievedAccountData(
     open val balance: Money?,
     open var bookedTransactions: Collection<AccountTransaction>,
     open var unbookedTransactions: Collection<Any>,
-    open val retrievedTransactionsFrom: Date?,
-    open val retrievedTransactionsTo: Date?,
+    open val retrievedTransactionsFrom: LocalDate?,
+    open val retrievedTransactionsTo: LocalDate?,
     open val errorMessage: String? = null
 ) {
 

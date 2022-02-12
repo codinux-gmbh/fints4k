@@ -1,7 +1,9 @@
 package net.dankito.utils.multiplatform
 
+import kotlinx.datetime.*
 import java.text.DateFormat
 import java.text.SimpleDateFormat
+import java.time.format.DateTimeFormatter
 
 
 fun DateFormatStyle.convert(): Int {
@@ -14,7 +16,10 @@ fun DateFormatStyle.convert(): Int {
 }
 
 
-actual class DateFormatter actual constructor(val pattern: String): SimpleDateFormat(pattern) {
+actual class DateFormatter actual constructor(pattern: String) {
+
+    private val formatter = DateTimeFormatter.ofPattern(pattern)
+
 
     actual constructor(dateStyle: DateFormatStyle)
             : this((DateFormat.getDateInstance(dateStyle.convert()) as? SimpleDateFormat)?.toPattern() ?: "")
@@ -23,16 +28,16 @@ actual class DateFormatter actual constructor(val pattern: String): SimpleDateFo
             : this((DateFormat.getDateTimeInstance(dateStyle.convert(), timeStyle.convert()) as? SimpleDateFormat)?.toPattern() ?: "")
 
 
-    actual fun format(date: Date): String {
-        return super.format(date)
+    actual fun format(date: LocalDateTime): String {
+        return formatter.format(date.toJavaLocalDateTime())
     }
 
-    actual override fun parse(dateString: String): Date? {
-        super.parse(dateString)?.let { javaDate ->
-            return Date(javaDate.time)
-        }
+    actual fun parseDate(dateString: String): LocalDate? {
+        return java.time.LocalDate.parse(dateString, formatter)?.toKotlinLocalDate()
+    }
 
-        return null
+    actual fun parse(dateString: String): LocalDateTime? {
+        return java.time.LocalDateTime.parse(dateString, formatter)?.toKotlinLocalDateTime()
     }
 
 }

@@ -1,7 +1,7 @@
 package net.dankito.banking.fints.transactions.mt940.model
 
+import kotlinx.datetime.LocalDate
 import net.dankito.banking.fints.model.Amount
-import net.dankito.utils.multiplatform.Date
 
 
 open class StatementLine(
@@ -25,14 +25,14 @@ open class StatementLine(
      *
      * Length = 6
      */
-    val valueDate: Date,
+    val valueDate: LocalDate,
 
     /**
      * MMTT
      *
      * Length = 4
      */
-    val bookingDate: Date?,
+    val bookingDate: LocalDate?,
 
     /**
      * dritte Stelle der Währungsbezeichnung, falls sie zur Unterscheidung notwendig ist

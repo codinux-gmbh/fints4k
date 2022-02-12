@@ -1,5 +1,6 @@
 package net.dankito.banking.fints.messages
 
+import net.dankito.utils.multiplatform.extensions.randomWithSeed
 import net.dankito.banking.fints.messages.datenelemente.implementierte.Aufsetzpunkt
 import net.dankito.banking.fints.messages.datenelemente.implementierte.KundensystemID
 import net.dankito.banking.fints.messages.datenelemente.implementierte.Synchronisierungsmodus
@@ -22,9 +23,7 @@ import net.dankito.banking.fints.model.*
 import net.dankito.banking.fints.response.InstituteSegmentId
 import net.dankito.banking.fints.response.segments.*
 import net.dankito.banking.fints.util.FinTsUtils
-import net.dankito.utils.multiplatform.Date
 import kotlin.math.absoluteValue
-import kotlin.random.Random
 
 
 /**
@@ -453,7 +452,7 @@ open class MessageBuilder(protected val generator: ISegmentNumberGenerator = Seg
     }
 
     protected open fun createControlReference(): String {
-        return Random(Date().millisSinceEpoch).nextInt().absoluteValue.toString()
+        return randomWithSeed().nextInt().absoluteValue.toString()
     }
 
 

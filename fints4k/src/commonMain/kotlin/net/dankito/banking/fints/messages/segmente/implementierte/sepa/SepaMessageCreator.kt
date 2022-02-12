@@ -1,6 +1,7 @@
 package net.dankito.banking.fints.messages.segmente.implementierte.sepa
 
-import net.dankito.utils.multiplatform.Date
+import kotlinx.datetime.LocalDateTime
+import net.dankito.utils.multiplatform.extensions.nowAtUtc
 import net.dankito.utils.multiplatform.DateFormatter
 
 
@@ -131,8 +132,8 @@ open class SepaMessageCreator : ISepaMessageCreator {
     override fun createXmlFile(messageTemplate: PaymentInformationMessages, replacementStrings: Map<String, String>): String {
         var xmlFile = messageTemplate.xmlTemplate
 
-        val now = Date()
-        val nowInIsoDate = IsoDateFormat.format(now)
+        val now = LocalDateTime.nowAtUtc()
+        val nowInIsoDate = now.toString() // applies formatting to ISO date time string
 
         if (replacementStrings.containsKey(MessageIdKey) == false) {
             xmlFile = replacePlaceholderWithValue(xmlFile, MessageIdKey, nowInIsoDate)

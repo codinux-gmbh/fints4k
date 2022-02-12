@@ -2,13 +2,15 @@ package net.dankito.banking.fints
 
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.datetime.*
 import net.dankito.banking.fints.callback.FinTsClientCallback
+import net.dankito.utils.multiplatform.extensions.minusDays
+import net.dankito.utils.multiplatform.extensions.todayAtEuropeBerlin
 import net.dankito.banking.fints.messages.datenelemente.implementierte.tan.*
 import net.dankito.banking.fints.model.*
 import net.dankito.banking.fints.response.BankResponse
 import net.dankito.banking.fints.response.client.*
 import net.dankito.banking.fints.response.segments.*
-import net.dankito.utils.multiplatform.Date
 import kotlin.jvm.JvmOverloads
 
 
@@ -144,7 +146,8 @@ open class FinTsClient @JvmOverloads constructor(
     }
 
     protected open fun createGetAccountTransactionsOfLast90DaysParameter(bank: BankData, account: AccountData): GetAccountTransactionsParameter {
-        val ninetyDaysAgo = Date.today.addDays(-90)
+        // Europe/Berlin: we're communicating with German bank servers, so we have to use their time zone
+        val ninetyDaysAgo = LocalDate.todayAtEuropeBerlin().minusDays(90)
 
         return GetAccountTransactionsParameter(bank, account, account.supportsRetrievingBalance, ninetyDaysAgo, abortIfTanIsRequired = true)
     }

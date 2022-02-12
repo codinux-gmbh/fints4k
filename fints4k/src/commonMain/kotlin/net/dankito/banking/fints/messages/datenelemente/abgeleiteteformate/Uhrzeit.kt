@@ -1,9 +1,10 @@
 package net.dankito.banking.fints.messages.datenelemente.abgeleiteteformate
 
+import kotlinx.datetime.LocalDateTime
+import net.dankito.utils.multiplatform.extensions.of
 import net.dankito.banking.fints.messages.Existenzstatus
 import net.dankito.banking.fints.messages.datenelemente.basisformate.ZiffernDatenelement
-import net.dankito.utils.multiplatform.Date
-import net.dankito.utils.multiplatform.DateFormatter
+import net.dankito.utils.multiplatform.extensions.toStringWithTwoDigits
 import net.dankito.utils.multiplatform.log.LoggerFactory
 
 
@@ -18,17 +19,15 @@ open class Uhrzeit(time: Int?, existenzstatus: Existenzstatus) : ZiffernDatenele
     companion object {
         const val HbciTimeFormatString = "HHmmss"
 
-        val HbciTimeFormat = DateFormatter(HbciTimeFormatString)
-
 
         private val log = LoggerFactory.getLogger(Uhrzeit::class)
 
 
-        fun format(time: Date): String {
-            return HbciTimeFormat.format(time) // TODO: is this correct?
+        fun format(time: LocalDateTime): String { // parse to HbciTimeFormatString
+            return time.hour.toStringWithTwoDigits() + time.minute.toStringWithTwoDigits() + time.second.toStringWithTwoDigits() // TODO: is this correct?
         }
 
-        fun parse(timeString: String): Date {
+        fun parse(timeString: String): LocalDateTime {
             // do not use DateFormatter as Java DateFormat is not thread safe, resulting in a lot of curious errors in parallel execution
 
             if (timeString.length == 6) {
@@ -37,18 +36,18 @@ open class Uhrzeit(time: Int?, existenzstatus: Existenzstatus) : ZiffernDatenele
                     val minute = timeString.substring(2, 4)
                     val second = timeString.substring(4, 6)
 
-                    return Date(0, 0, 0, hour.toInt(), minute.toInt(), second.toInt())
+                    return LocalDateTime.of(hour.toInt(), minute.toInt(), second.toInt())
                 } catch (e: Exception) {
                     log.error(e) { "Could not parse time string '$timeString' to HBCI time" }
                 }
             }
 
-            throw IllegalArgumentException("Cannot parse '$timeString' to HBCI Time. Only times in format '${Uhrzeit.HbciTimeFormatString}' are allowed in HBCI / FinTS.")
+            throw IllegalArgumentException("Cannot parse '$timeString' to HBCI Time. Only times in format '${HbciTimeFormatString}' are allowed in HBCI / FinTS.")
         }
     }
 
 
-    constructor(time: Date?, existenzstatus: Existenzstatus)
+    constructor(time: LocalDateTime?, existenzstatus: Existenzstatus)
             : this(time?.let { format(time).toInt() }, existenzstatus)
 
 }

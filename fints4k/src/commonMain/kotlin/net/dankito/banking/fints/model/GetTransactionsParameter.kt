@@ -1,14 +1,14 @@
 package net.dankito.banking.fints.model
 
-import net.dankito.utils.multiplatform.Date
+import kotlinx.datetime.LocalDate
 import kotlin.jvm.JvmOverloads
 
 
 open class GetTransactionsParameter @JvmOverloads constructor(
     open val bank: BankData,
     open val alsoRetrieveBalance: Boolean = true,
-    open val fromDate: Date? = null,
-    open val toDate: Date? = null,
+    open val fromDate: LocalDate? = null,
+    open val toDate: LocalDate? = null,
 
     /**
      * Be aware this is by far not supported by all banks.

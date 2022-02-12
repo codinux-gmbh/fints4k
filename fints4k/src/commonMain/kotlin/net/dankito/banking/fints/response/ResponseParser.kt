@@ -1,5 +1,8 @@
 package net.dankito.banking.fints.response
 
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.atTime
 import net.dankito.banking.fints.log.IMessageLogAppender
 import net.dankito.banking.fints.messages.Separators
 import net.dankito.banking.fints.messages.datenelemente.abgeleiteteformate.Datum
@@ -20,7 +23,6 @@ import net.dankito.banking.fints.model.CreditCardTransaction
 import net.dankito.banking.fints.model.Money
 import net.dankito.banking.fints.response.segments.*
 import net.dankito.banking.fints.util.MessageUtils
-import net.dankito.utils.multiplatform.Date
 import net.dankito.utils.multiplatform.extensions.getAllExceptionMessagesJoined
 import net.dankito.utils.multiplatform.log.LoggerFactory
 
@@ -674,13 +676,13 @@ open class ResponseParser(
         var currency: String? = null
 
         var dateIndex = 2
-        var date: Date? = parseNullableDate(dataElements[dateIndex]) // in older versions dateElements[2] was the currency
+        var date: LocalDate? = parseNullableDate(dataElements[dateIndex]) // in older versions dateElements[2] was the currency
         if (date == null) {
             currency = parseString(dataElements[dateIndex])
             date = parseDate(dataElements[++dateIndex])
         }
 
-        var time: Date? = null
+        var time: LocalDateTime? = null
         if (dataElements.size > dateIndex + 1) {
             try {
                 time = parseTime(dataElements[dateIndex + 1])
@@ -969,13 +971,13 @@ open class ResponseParser(
         return Amount(adjustedAmountString)
     }
 
-    protected open fun parseNullableDateTime(dataElementGroup: String): Date? {
+    protected open fun parseNullableDateTime(dataElementGroup: String): LocalDateTime? {
         val dataElements = getDataElements(dataElementGroup)
 
         if (dataElements.size >= 2) {
             parseNullableDate(dataElements[0])?.let { date ->
                 parseNullableTime(dataElements[1])?.let { time ->
-                    return Date(date.millisSinceEpoch + time.millisSinceEpoch) // TODO: is this correct?
+                    return date.atTime(time.hour, time.minute, time.second) // TODO: is this correct?
                 }
             }
         }
@@ -983,11 +985,11 @@ open class ResponseParser(
         return null
     }
 
-    protected open fun parseDate(dateString: String): Date {
+    protected open fun parseDate(dateString: String): LocalDate {
         return Datum.parse(dateString)
     }
 
-    protected open fun parseNullableDate(dateString: String): Date? {
+    protected open fun parseNullableDate(dateString: String): LocalDate? {
         try {
             return parseDate(dateString)
         } catch (ignored: Exception) { }
@@ -995,11 +997,11 @@ open class ResponseParser(
         return null
     }
 
-    protected open fun parseTime(timeString: String): Date {
+    protected open fun parseTime(timeString: String): LocalDateTime {
         return Uhrzeit.parse(timeString)
     }
 
-    protected open fun parseNullableTime(timeString: String): Date? {
+    protected open fun parseNullableTime(timeString: String): LocalDateTime? {
         try {
             return parseTime(timeString)
         } catch (ignored: Exception) { }

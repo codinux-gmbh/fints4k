@@ -46,7 +46,7 @@ kotlin {
     sourceSets {
         commonMain {
             dependencies {
-
+                implementation "org.jetbrains.kotlinx:kotlinx-datetime:0.3.2"
             }
         }
 
@@ -85,6 +85,21 @@ kotlin {
             }
 
         }
+
+
+//        jsMain {
+//            dependencies {
+//                implementation npm("@js-joda/timezone", "2.3.0")
+//                implementation "io.ktor:ktor-client-js:$ktorVersion"
+//            }
+//         }
+        /* Plus:
+@JsModule("@js-joda/timezone")
+@JsNonModule
+external object JsJodaTimeZoneModule
+
+private val jsJodaTz = JsJodaTimeZoneModule
+         */
 
 
         iosMain {

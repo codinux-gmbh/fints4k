@@ -1,15 +1,15 @@
 package net.dankito.banking.fints.model
 
-import net.dankito.utils.multiplatform.Date
-import net.dankito.utils.multiplatform.format
+import kotlinx.datetime.LocalDate
+import net.dankito.utils.multiplatform.extensions.format
 
 
 open class CreditCardTransaction(
     open val amount: Money,
     open val transactionDescriptionBase: String?,
     open val transactionDescriptionSupplement: String?,
-    open val bookingDate: Date,
-    open val valueDate: Date,
+    open val bookingDate: LocalDate,
+    open val valueDate: LocalDate,
     open val isCleared: Boolean
 ) {
 

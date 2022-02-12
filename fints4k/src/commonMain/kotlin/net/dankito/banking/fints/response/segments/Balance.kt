@@ -1,14 +1,15 @@
 package net.dankito.banking.fints.response.segments
 
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalDateTime
 import net.dankito.banking.fints.model.Amount
-import net.dankito.utils.multiplatform.Date
 
 
 open class Balance(
     val amount: Amount,
     val currency: String?,
-    val date: Date,
-    val time: Date?
+    val date: LocalDate,
+    val time: LocalDateTime?
 ) {
 
     override fun toString(): String {

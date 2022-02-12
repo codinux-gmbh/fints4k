@@ -2,7 +2,9 @@ package net.dankito.banking.fints.util
 
 import ch.tutteli.atrium.api.fluent.en_GB.toBe
 import ch.tutteli.atrium.api.verbs.expect
-import net.dankito.utils.multiplatform.Date
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalDateTime
+import net.dankito.utils.multiplatform.extensions.of
 import kotlin.test.Test
 
 class FinTsUtilsTest {
@@ -14,7 +16,7 @@ class FinTsUtilsTest {
     fun formatDate() {
 
         // given
-        val date = Date(1988, 3, 27)
+        val date = LocalDate(1988, 3, 27)
 
         // when
         val result = underTest.formatDate(date)
@@ -27,7 +29,7 @@ class FinTsUtilsTest {
     fun formatDateAsInt() {
 
         // given
-        val date = Date(1988, 3, 27)
+        val date = LocalDate(1988, 3, 27)
 
         // when
         val result = underTest.formatDateAsInt(date)
@@ -41,7 +43,7 @@ class FinTsUtilsTest {
     fun formatTime_AM() {
 
         // given
-        val time = Date(0, 0, 0, 8, 2, 1)
+        val time = LocalDateTime.of(8, 2, 1)
 
         // when
         val result = underTest.formatTime(time)
@@ -54,7 +56,7 @@ class FinTsUtilsTest {
     fun formatTime_PM() {
 
         // given
-        val time = Date(0, 0, 0, 18, 22, 51)
+        val time = LocalDateTime.of(18, 22, 51)
 
         // when
         val result = underTest.formatTime(time)
@@ -67,7 +69,7 @@ class FinTsUtilsTest {
     fun formatTimeAsInt_AM() {
 
         // given
-        val time = Date(0, 0, 0, 8, 2, 1)
+        val time = LocalDateTime.of(8, 2, 1)
 
         // when
         val result = underTest.formatTimeAsInt(time)
@@ -80,7 +82,7 @@ class FinTsUtilsTest {
     fun formatTimeAsInt_PM() {
 
         // given
-        val time = Date(0, 0, 0, 18, 22, 51)
+        val time = LocalDateTime.of(18, 22, 51)
 
         // when
         val result = underTest.formatTimeAsInt(time)

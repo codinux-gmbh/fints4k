@@ -13,10 +13,10 @@ import net.dankito.banking.fints.messages.segmente.id.ISegmentId
 import net.dankito.banking.fints.messages.segmente.id.MessageSegmentId
 import net.dankito.banking.fints.response.segments.*
 import ch.tutteli.atrium.api.verbs.expect
+import kotlinx.datetime.LocalDate
 import net.dankito.banking.fints.extensions.isFalse
 import net.dankito.banking.fints.extensions.isTrue
 import net.dankito.banking.fints.model.Amount
-import net.dankito.utils.multiplatform.Date
 import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.fail
@@ -1094,7 +1094,7 @@ class ResponseParserTest : FinTsTestBase() {
 
         // given
         val balance = "1234,56"
-        val date = Date(1988, 3, 27)
+        val date = LocalDate(1988, 3, 27)
         val bankCode = "12345678"
         val accountId = "0987654321"
         val accountProductName = "Sichteinlagen"
@@ -1121,7 +1121,7 @@ class ResponseParserTest : FinTsTestBase() {
 
         // given
         val balance = Amount.Zero
-        val date = Date(2020, 6, 11)
+        val date = LocalDate(2020, 6, 11)
         val bankCode = "12345678"
         val accountId = "0987654321"
         val accountProductName = "Girokonto"
@@ -1148,7 +1148,7 @@ class ResponseParserTest : FinTsTestBase() {
 
         // given
         val balance = Amount.Zero
-        val date = Date(2020, 6, 11)
+        val date = LocalDate(2020, 6, 11)
         val bankCode = "12345678"
         val accountId = "0987654321"
         val accountProductName = "Girokonto"
@@ -1231,14 +1231,14 @@ class ResponseParserTest : FinTsTestBase() {
 
         result.getFirstSegmentById<ReceivedCreditCardTransactionsAndBalance>(InstituteSegmentId.CreditCardTransactions)?.let { segment ->
             expect(segment.balance.amount.string).toBe(balance)
-            expect(segment.balance.date).toBe(Date(2020, 9, 23))
+            expect(segment.balance.date).toBe(LocalDate(2020, 9, 23))
             expect(segment.balance.time).notToBeNull()
             expect(segment.transactions.size).toBe(2)
 
             segment.transactions.forEach { transaction ->
                 expect(transaction.transactionDescriptionBase).toBe(otherPartyName)
-                expect(transaction.bookingDate).toBe(Date(2020, 8, 19))
-                expect(transaction.valueDate).toBe(Date(2020, 8, 20))
+                expect(transaction.bookingDate).toBe(LocalDate(2020, 8, 19))
+                expect(transaction.valueDate).toBe(LocalDate(2020, 8, 20))
                 expect(transaction.amount.amount.string).toBe("-" + amount)
                 expect(transaction.amount.currency.code).toBe("EUR")
                 expect(transaction.isCleared).isTrue()
@@ -1264,7 +1264,7 @@ class ResponseParserTest : FinTsTestBase() {
 
         result.getFirstSegmentById<ReceivedCreditCardTransactionsAndBalance>(InstituteSegmentId.CreditCardTransactions)?.let { segment ->
             expect(segment.balance.amount.string).toBe(balance)
-            expect(segment.balance.date).toBe(Date(2020, 9, 23))
+            expect(segment.balance.date).toBe(LocalDate(2020, 9, 23))
             expect(segment.balance.time).notToBeNull()
 
             expect(segment.transactions).isEmpty()
