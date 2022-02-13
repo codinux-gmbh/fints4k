@@ -1,3 +1,4 @@
+import net.dankito.utils.multiplatform.extensions.ensureMinStringLength
 import net.dankito.utils.multiplatform.extensions.numberOfDigits
 import net.dankito.utils.multiplatform.extensions.toStringWithMinDigits
 import kotlin.test.Test
@@ -81,6 +82,14 @@ class NumberExtensionsTest {
     val result = 1234567890.numberOfDigits
 
     assertEquals(10, result)
+  }
+
+
+  @Test
+  fun ensureMinStringLength() {
+    val result = "123,45 EUR".ensureMinStringLength(12, " ")
+
+    assertEquals("  123,45 EUR", result)
   }
 
 }

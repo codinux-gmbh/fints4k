@@ -6,10 +6,18 @@ fun Int.toStringWithTwoDigits(): String {
 }
 
 fun Int.toStringWithMinDigits(minimumCountDigits: Int): String {
-  val countDigitsToAdd = minimumCountDigits - this.numberOfDigits
-  val prefix = if (countDigitsToAdd > 0) "0".repeat(countDigitsToAdd) else ""
+  return toStringWithMinDigits(minimumCountDigits, "0")
+}
 
-  return prefix + this.toString()
+fun Int.toStringWithMinDigits(minimumCountDigits: Int, fillerString: String): String {
+  return this.toString().ensureMinStringLength(minimumCountDigits, fillerString)
+}
+
+fun String.ensureMinStringLength(minimumStringLength: Int, fillerString: String): String {
+  val countDigitsToAdd = minimumStringLength - this.length
+  val prefix = if (countDigitsToAdd > 0) fillerString.repeat(countDigitsToAdd) else ""
+
+  return prefix + this
 }
 
 val Int.numberOfDigits: Int
