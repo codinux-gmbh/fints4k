@@ -95,6 +95,10 @@ abstract class LoggerBase(
     }
 
     open fun createMessage(exception: Throwable?, message: String, vararg arguments: Any): String {
+        if (exception != null) {
+            return "$message: $exception\n${exception.stackTraceToString()}"
+        }
+
         return message // really, there's not String.format() ?! // TODO: add arguments and exception
     }
 
