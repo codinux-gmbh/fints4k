@@ -1,6 +1,6 @@
 import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.LocalDate
-import net.dankito.banking.fints.FinTsClient
+import net.dankito.banking.fints.FinTsClientDeprecated
 import net.dankito.banking.fints.FinTsJobExecutor
 import net.dankito.banking.fints.RequestExecutor
 import net.dankito.banking.fints.callback.SimpleFinTsClientCallback
@@ -25,7 +25,7 @@ class Application {
 
   fun retrieveAccountData(bankCode: String, customerId: String, pin: String, finTs3ServerAddress: String) {
     runBlocking {
-      val client = FinTsClient(SimpleFinTsClientCallback(), FinTsJobExecutor(RequestExecutor(webClient = BlockingKtorWebClient())))
+      val client = FinTsClientDeprecated(SimpleFinTsClientCallback(), FinTsJobExecutor(RequestExecutor(webClient = BlockingKtorWebClient())))
 
       client.addAccountAsync(AddAccountParameter(bankCode, customerId, pin, finTs3ServerAddress)) { response ->
         println("Retrieved response from ${response.bank.bankName} for ${response.bank.customerName}")

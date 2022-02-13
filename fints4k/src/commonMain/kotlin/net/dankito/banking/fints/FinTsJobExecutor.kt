@@ -27,7 +27,7 @@ import net.dankito.utils.multiplatform.extensions.todayAtSystemDefaultTimeZone
 /**
  * Low level class that executes concrete business transactions (= FinTS Geschäftsvorfälle).
  *
- * In almost all cases you want to use [FinTsClient] which wraps these business transactions to a higher level API.
+ * In almost all cases you want to use [FinTsClientDeprecated] which wraps these business transactions to a higher level API.
  */
 open class FinTsJobExecutor(
     protected open val requestExecutor: RequestExecutor = RequestExecutor(),
