@@ -19,7 +19,7 @@ open class KtorWebClient : IWebClient {
     }
 
 
-    protected val client = HttpClient() {
+    protected val client = HttpClient {
 
     }
 
@@ -37,20 +37,24 @@ open class KtorWebClient : IWebClient {
 
     override fun post(url: String, body: String, contentType: String, userAgent: String, callback: (WebClientResponse) -> Unit) {
         GlobalScope.async {
-            try {
-                val clientResponse = client.post(url) {
-                    contentType(ContentType.Application.OctetStream)
-                    setBody(body)
-                }
+            postInCoroutine(url, body, contentType, userAgent, callback)
+        }
+    }
 
-                val responseBody = clientResponse.bodyAsText()
-
-                callback(WebClientResponse(clientResponse.status.value == 200, clientResponse.status.value, body = responseBody))
-            } catch (e: Exception) {
-                log.error(e) { "Could not send request to url '$url'" }
-
-                callback(WebClientResponse(false, error = e))
+    protected open suspend fun postInCoroutine(url: String, body: String, contentType: String, userAgent: String, callback: (WebClientResponse) -> Unit) {
+        try {
+            val clientResponse = client.post(url) {
+                contentType(ContentType.Application.OctetStream)
+                setBody(body)
             }
+
+            val responseBody = clientResponse.bodyAsText()
+
+            callback(WebClientResponse(clientResponse.status.value == 200, clientResponse.status.value, body = responseBody))
+        } catch (e: Exception) {
+            log.error(e) { "Could not send request to url '$url'" }
+
+            callback(WebClientResponse(false, error = e))
         }
     }
 
