@@ -1,5 +1,6 @@
 package net.dankito.banking.fints.model
 
+import co.touchlab.stately.concurrency.AtomicInt
 import net.dankito.banking.fints.callback.FinTsClientCallback
 import net.dankito.banking.fints.log.IMessageLogAppender
 import net.dankito.banking.fints.log.MessageContext
@@ -26,7 +27,7 @@ open class JobContext(
 ) : MessageBaseData(bank, product), IMessageLogAppender {
 
     companion object {
-        private var JobCount = 0 // this is not thread safe so job number may not be 100 % accurate
+        private var JobCount = AtomicInt(0) // this variable is accessed from multiple threads, so make it thread safe
     }
 
 
@@ -47,14 +48,14 @@ open class JobContext(
         get() = ArrayList(_dialogs) // create a copy
 
 
-    protected open val jobNumber: Int = ++JobCount
+    protected open val jobNumber: Int = JobCount.incrementAndGet()
 
     protected open var dialogNumber: Int = 0
 
 
     open fun startNewDialog(closeDialog: Boolean = true, dialogId: String = DialogContext.InitialDialogId,
-                            versionOfSecurityProcedure: VersionDesSicherheitsverfahrens = VersionDesSicherheitsverfahrens.Version_2,
-                            chunkedResponseHandler: ((BankResponse) -> Unit)? = dialog.chunkedResponseHandler) : DialogContext {
+                       versionOfSecurityProcedure: VersionDesSicherheitsverfahrens = VersionDesSicherheitsverfahrens.Version_2,
+                       chunkedResponseHandler: ((BankResponse) -> Unit)? = dialog.chunkedResponseHandler) : DialogContext {
 
         val newDialogContext = DialogContext(closeDialog, dialogId, chunkedResponseHandler)
 
