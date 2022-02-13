@@ -176,7 +176,7 @@ open class FinTsJobExecutor(
 
     open fun getTransactionsAsync(context: JobContext, parameter: GetAccountTransactionsParameter, callback: (GetAccountTransactionsResponse) -> Unit) {
 
-        val dialogContext = context.startNewDialog()
+        val dialogContext = context.startNewDialog() // TODO: initDialogWithStrongCustomerAuthentication() also starts a new dialog in initDialogWithStrongCustomerAuthenticationAfterSuccessfulPreconditionChecks()
 
         initDialogWithStrongCustomerAuthentication(context) { initDialogResponse ->
 
@@ -296,7 +296,7 @@ open class FinTsJobExecutor(
     protected open fun getTanMediaList(context: JobContext, tanMediaKind: TanMedienArtVersion = TanMedienArtVersion.Alle, tanMediumClass: TanMediumKlasse = TanMediumKlasse.AlleMedien,
                              preferredTanMedium: String? = null, callback: (GetTanMediaListResponse) -> Unit) {
 
-        sendMessageAndHandleResponse(context, CustomerSegmentId.TanMediaList, false, {
+        sendMessageInNewDialogAndHandleResponse(context, CustomerSegmentId.TanMediaList, false, {
             messageBuilder.createGetTanMediaListMessage(context, tanMediaKind, tanMediumClass)
         }) { response ->
             handleGetTanMediaListResponse(context, response, preferredTanMedium, callback)
@@ -344,7 +344,7 @@ open class FinTsJobExecutor(
     protected open fun sendChangeTanMediumMessage(context: JobContext, newActiveTanMedium: TanGeneratorTanMedium, enteredAtc: EnterTanGeneratorAtcResult?,
                                                   callback: (BankResponse) -> Unit) {
 
-        sendMessageAndHandleResponse(context, null, true, {
+        sendMessageInNewDialogAndHandleResponse(context, null, true, {
             messageBuilder.createChangeTanMediumMessage(context, newActiveTanMedium, enteredAtc?.tan, enteredAtc?.atc)
         }, callback)
     }
@@ -352,7 +352,7 @@ open class FinTsJobExecutor(
 
     open fun doBankTransferAsync(context: JobContext, bankTransferData: BankTransferData, callback: (FinTsClientResponse) -> Unit) {
 
-        sendMessageAndHandleResponse(context, null, true, {
+        sendMessageInNewDialogAndHandleResponse(context, null, true, {
             val updatedAccount = getUpdatedAccount(context, context.account!!)
             messageBuilder.createBankTransferMessage(context, bankTransferData, updatedAccount)
         }) { response ->
@@ -521,8 +521,8 @@ open class FinTsJobExecutor(
     }
 
 
-    protected open fun sendMessageAndHandleResponse(context: JobContext, segmentForNonStrongCustomerAuthenticationTwoStepTanProcess: CustomerSegmentId? = null,
-                                                    closeDialog: Boolean = true, createMessage: () -> MessageBuilderResult, callback: (BankResponse) -> Unit) {
+    protected open fun sendMessageInNewDialogAndHandleResponse(context: JobContext, segmentForNonStrongCustomerAuthenticationTwoStepTanProcess: CustomerSegmentId? = null,
+                                                               closeDialog: Boolean = true, createMessage: () -> MessageBuilderResult, callback: (BankResponse) -> Unit) {
 
         context.startNewDialog(closeDialog)
 

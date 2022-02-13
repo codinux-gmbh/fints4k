@@ -70,7 +70,8 @@ open class FinTsClientDeprecated @JvmOverloads constructor(
                 return@retrieveBasicDataLikeUsersTanMethods
             }
 
-            /*      Second dialog: some banks require that in order to initialize a dialog with strong customer authorization TAN media is required       */
+            /*      Second dialog, executed in retrieveBasicDataLikeUsersTanMethods() if required: some banks require that in order to initialize a dialog with
+            strong customer authorization TAN media is required       */
 
             addAccountGetAccountsAndTransactions(context, parameter, callback)
         }
