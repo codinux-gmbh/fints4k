@@ -5,8 +5,8 @@ import net.dankito.banking.fints.model.MessageLogEntry
 import net.dankito.banking.fints.model.MessageLogEntryType
 import net.dankito.utils.multiplatform.log.Logger
 import net.dankito.utils.multiplatform.log.LoggerFactory
-import net.dankito.utils.multiplatform.StackTraceHelper
 import net.dankito.utils.multiplatform.extensions.getInnerException
+import net.dankito.utils.multiplatform.extensions.nthIndexOf
 import net.dankito.utils.multiplatform.extensions.toStringWithTwoDigits
 import kotlin.reflect.KClass
 
@@ -32,9 +32,6 @@ open class MessageLogCollector {
         get() = ArrayList(messageLog)
 
 
-    protected open val stackTraceHelper = StackTraceHelper()
-
-
     open fun addMessageLog(type: MessageLogEntryType, message: String, context: MessageContext) {
         val messageToLog = createMessage(type, prettyPrintHbciMessage(message), context, true)
 
@@ -50,7 +47,7 @@ open class MessageLogCollector {
         if (e != null) {
             getLogger(loggingClass).error(e) { messageToLog }
         } else {
-            getLogger(loggingClass).error(messageToLog)
+            getLogger(loggingClass).error { messageToLog }
         }
 
         val errorStackTrace = if (e != null) NewLine + getStackTrace(e) else ""
@@ -145,7 +142,10 @@ open class MessageLogCollector {
     protected open fun getStackTrace(e: Exception): String {
         val innerException = e.getInnerException()
 
-        return stackTraceHelper.getStackTrace(innerException, MaxCountStackTraceElements)
+        val stackTraceString = innerException.stackTraceToString()
+        val indexOf16thLine = stackTraceString.nthIndexOf("\n", MaxCountStackTraceElements)
+
+        return if (indexOf16thLine < 0) stackTraceString else stackTraceString.substring(0, indexOf16thLine)
     }
 
     protected open fun getLogger(loggingClass: KClass<*>): Logger {
