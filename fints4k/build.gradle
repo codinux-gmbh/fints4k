@@ -75,8 +75,6 @@ kotlin {
             dependencies {
                 api project(":multiplatform-utils")
 
-                implementation "org.jetbrains.kotlinx:kotlinx-datetime:0.3.2"
-
                 implementation "co.touchlab:stately-concurrency:1.2.0"
 
                 implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion"

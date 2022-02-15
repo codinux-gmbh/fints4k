@@ -54,6 +54,9 @@ open class AccountTransaction(
         null, "", "", null, null, "", null)
 
 
+    open val showOtherPartyName: Boolean
+        get() = otherPartyName.isNullOrBlank() == false /* && type != "ENTGELTABSCHLUSS" && type != "AUSZAHLUNG" */ // TODO
+
     val reference: String
         get() = sepaReference ?: unparsedReference
 
