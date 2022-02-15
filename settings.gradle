@@ -11,3 +11,9 @@ rootProject.name = "fints4kProject"
 include ":fints4k"
 
 include ":multiplatform-utils"
+
+
+// Sample applications
+
+include("SampleApplications:AndroidApp")
+findProject(":SampleApplications:AndroidApp")?.name = "AndroidApp"
