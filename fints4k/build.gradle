@@ -26,13 +26,32 @@ kotlin {
         }
     }
 
-//    js(BOTH) {
-//        browser {
-//            commonWebpackConfig {
-//                cssSupport.enabled = true
-//            }
-//        }
-//    }
+    js(IR) {
+        binaries.executable()
+        browser {
+            commonWebpackConfig {
+                cssSupport.enabled = true
+            }
+            testTask {
+                useKarma {
+                    // we cannot assume that Chrome and Firefox are installed on all systems
+                    // useChromeHeadless()
+                    // useFirefox()
+                    enabled = false
+                }
+            }
+        }
+        nodejs {
+            testTask {
+                useMocha {
+                    enabled = true
+                }
+                testLogging {
+                    events "failed"
+                }
+            }
+        }
+    }
 
     ios {
         binaries {
@@ -101,23 +120,11 @@ kotlin {
         }
 
 
-//        jsMain {
-//            dependencies {
-//                implementation npm("@js-joda/timezone", "2.3.0")
-//                implementation "io.ktor:ktor-client-js:$ktorVersion"
-//            }
-        /* Plus:
-@JsModule("@js-joda/timezone")
-@JsNonModule
-external object JsJodaTimeZoneModule
-
-private val jsJodaTz = JsJodaTimeZoneModule
-         */
-//        }
-//
-//        jsTest {
-//
-//        }
+        jsMain {
+            dependencies {
+                implementation "io.ktor:ktor-client-js:$ktorVersion"
+            }
+        }
 
 
         iosMain {

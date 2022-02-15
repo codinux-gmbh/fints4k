@@ -9,6 +9,8 @@ enum class OsType {
 
     iOS,
 
+    JavaScript, // TODO: differenciate between Browser and NodeJS
+
     Native // TODO: get if running on Linux, Windows or macOs
 
 }

@@ -31,7 +31,7 @@ class SepaMessageCreatorTest {
     }
 
     @Test
-    fun `containsOnlyAllowedCharacters colon is a legal character`() {
+    fun containsOnlyAllowedCharacters_ColonIsALegalCharacter() {
 
         // when
         val result = underTest.containsOnlyAllowedCharacters(":")
@@ -41,7 +41,7 @@ class SepaMessageCreatorTest {
     }
 
     @Test
-    fun `containsOnlyAllowedCharacters ! is an illegal character`() {
+    fun containsOnlyAllowedCharacters_ExclamationMarkIsAnIllegalCharacter() {
 
         // when
         val result = underTest.containsOnlyAllowedCharacters("!")
@@ -51,7 +51,7 @@ class SepaMessageCreatorTest {
     }
 
     @Test
-    fun `containsOnlyAllowedCharacters € is an illegal character`() {
+    fun containsOnlyAllowedCharacters_EuroSignIsAnIllegalCharacter() {
 
         // when
         val result = underTest.containsOnlyAllowedCharacters("€")
@@ -61,7 +61,7 @@ class SepaMessageCreatorTest {
     }
 
     @Test
-    fun `containsOnlyAllowedCharacters at sign is an illegal character`() {
+    fun containsOnlyAllowedCharacters_AtSignIsAnIllegalCharacter() {
 
         // when
         val result = underTest.containsOnlyAllowedCharacters("@")
@@ -71,7 +71,7 @@ class SepaMessageCreatorTest {
     }
 
     @Test
-    fun `containsOnlyAllowedCharacters ö is an illegal character`() {
+    fun containsOnlyAllowedCharacters_ÖIsAnIllegalCharacter() {
 
         // when
         val result = underTest.containsOnlyAllowedCharacters("ö")

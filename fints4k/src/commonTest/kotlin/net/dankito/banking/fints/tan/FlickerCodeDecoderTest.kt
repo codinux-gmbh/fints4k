@@ -69,7 +69,7 @@ class FlickerCodeDecoderTest {
 
 
     @Test
-    fun `decode HHD 1_4 Get transactions`() {
+    fun decodeHHD1_4_GetTransactions() {
 
         // given
         val challenge = "0388A01239230124622DE26123456780987654321"
@@ -82,7 +82,7 @@ class FlickerCodeDecoderTest {
     }
 
     @Test
-    fun `decode HHD 1_4 Money Transfer`() {
+    fun decodeHHD1_4_TransferMoney() {
 
         // given
         val challenge = "0438701109374422DE2612345678098765432106100,00"

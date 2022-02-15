@@ -129,7 +129,7 @@ class Mt940ParserTest : FinTsTestBase() {
     }
 
     @Test
-    fun `Fix annual jump from booking date to value date`() {
+    fun fixAnnualJumpFromBookingDateToValueDate() {
 
         val transactionsString = ":20:STARTUMSE\n" +
                 ":25:$BankCode/$CustomerId\n" +
@@ -164,7 +164,7 @@ class Mt940ParserTest : FinTsTestBase() {
     }
 
     @Test
-    fun `Fix line starts with dash but is not a statement separator`() {
+    fun fixLineStartsWithDashButIsNotASstatementSeparator() {
 
         // given
         val transactionsString = "\n" +
@@ -227,7 +227,7 @@ class Mt940ParserTest : FinTsTestBase() {
     }
 
     @Test
-    fun `Fix that time got detected as field code`() {
+    fun fixThatTimeGotDetectedAsFieldCode() {
 
         // given
         val transactionsString = "\n" +
@@ -276,7 +276,7 @@ class Mt940ParserTest : FinTsTestBase() {
     }
 
     @Test
-    fun `Fix that questionmark, gets detected as field code`() {
+    fun fixThat_QuestionMarkComma_GetsDetectedAsFieldCode() {
         val transactionsString = """
             :20:STARTUMS
             :25:$BankCode/$CustomerId

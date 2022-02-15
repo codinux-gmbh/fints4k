@@ -5,12 +5,9 @@ import kotlinx.datetime.*
 
 actual class DateFormatter actual constructor(pattern: String) {
 
+    actual constructor(dateStyle: DateFormatStyle) : this("")
 
-    actual constructor(dateStyle: DateFormatStyle)
-            : this("")
-
-    actual constructor(dateStyle: DateFormatStyle, timeStyle: DateFormatStyle)
-            : this("")
+    actual constructor(dateStyle: DateFormatStyle, timeStyle: DateFormatStyle) : this("")
 
 
     // TODO: implement for Logger, get current time formatted as string

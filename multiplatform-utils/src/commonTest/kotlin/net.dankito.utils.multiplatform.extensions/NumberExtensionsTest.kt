@@ -1,6 +1,5 @@
-import net.dankito.utils.multiplatform.extensions.ensureMinStringLength
-import net.dankito.utils.multiplatform.extensions.numberOfDigits
-import net.dankito.utils.multiplatform.extensions.toStringWithMinDigits
+package net.dankito.utils.multiplatform.extensions
+
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

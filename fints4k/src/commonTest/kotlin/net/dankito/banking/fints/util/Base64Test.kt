@@ -55,7 +55,7 @@ class Base64Test {
 
     @Test
     fun testRandomStrings() {
-        val steps = 1000000
+        val steps = 10_000 // 1_000_000 have been too much for JavaScript
         val random = randomWithSeed()
 
         for (count in 0 until steps) {
