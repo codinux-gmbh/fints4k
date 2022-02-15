@@ -1,7 +1,6 @@
 package net.dankito.utils.multiplatform
 
-import kotlinx.datetime.LocalDate
-import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.*
 import platform.Foundation.*
 
 
@@ -36,20 +35,19 @@ actual class DateFormatter actual constructor(val pattern: String): NSDateFormat
 
 
     actual fun format(date: LocalDateTime): String {
-        return stringFromDate(date) // TODO: convert to NSDate when back on Mac
+        val instant = date.toInstant(TimeZone.currentSystemDefault())
+        val nsDate = instant.toNSDate()
+
+        return this.stringFromDate(nsDate)
     }
 
     actual fun parseDate(dateString: String): LocalDate? {
-        super.dateFromString(dateString)?.let { nsDate ->
-            return LocalDate(nsDate) // TODO: convert to NSDate when back on Mac
-        }
-
-        return null
+        return parse(dateString)?.date
     }
 
     actual fun parse(dateString: String): LocalDateTime? {
-        super.dateFromString(dateString)?.let { nsDate ->
-            return LocalDateTime(nsDate) // TODO: convert to NSDate when back on Mac
+        this.dateFromString(dateString)?.let { nsDate ->
+            return nsDate.toKotlinInstant().toLocalDateTime(TimeZone.currentSystemDefault())
         }
 
         return null
