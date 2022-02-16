@@ -19,7 +19,7 @@ import kotlin.jvm.JvmOverloads
  * This is the high level FinTS client that groups single low level jobs of [FinTsJobExecutor] to senseful units e.g.
  * [addAccountAsync] gets user's TAN methods, user's TAN media, user's bank accounts and may even current balance and account transactions of last 90 days.
  */
-open class FinTsClientDeprecated @JvmOverloads constructor(
+open class FinTsClientDeprecated(
     open var callback: FinTsClientCallback,
     protected open val jobExecutor: FinTsJobExecutor = FinTsJobExecutor(),
     protected open val product: ProductData = ProductData("15E53C26816138699C7B6A3E8", "1.0.0") // TODO: get version dynamically
