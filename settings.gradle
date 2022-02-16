@@ -15,5 +15,11 @@ include ":multiplatform-utils"
 
 // Sample applications
 
-include("SampleApplications:AndroidApp")
-findProject(":SampleApplications:AndroidApp")?.name = "AndroidApp"
+include "AndroidApp"
+findProject(":AndroidApp")?.projectDir = file("SampleApplications/AndroidApp")
+findProject(":AndroidApp")?.name = "AndroidApp"
+
+include "WebApp"
+findProject(":WebApp")?.projectDir = file("SampleApplications/WebApp")
+findProject(":WebApp")?.name = "WebApp"
+
