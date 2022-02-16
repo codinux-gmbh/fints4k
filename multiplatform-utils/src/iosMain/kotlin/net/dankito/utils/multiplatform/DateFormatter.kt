@@ -1,6 +1,8 @@
 package net.dankito.utils.multiplatform
 
 import kotlinx.datetime.*
+import net.dankito.utils.multiplatform.extensions.toLocalDateTime
+import net.dankito.utils.multiplatform.extensions.toNSDate
 import platform.Foundation.*
 
 
@@ -34,9 +36,12 @@ actual class DateFormatter actual constructor(val pattern: String): NSDateFormat
     }
 
 
+    actual fun format(date: LocalDate): String {
+        return format(date.toLocalDateTime())
+    }
+
     actual fun format(date: LocalDateTime): String {
-        val instant = date.toInstant(TimeZone.currentSystemDefault())
-        val nsDate = instant.toNSDate()
+        val nsDate = date.toNSDate()
 
         return this.stringFromDate(nsDate)
     }

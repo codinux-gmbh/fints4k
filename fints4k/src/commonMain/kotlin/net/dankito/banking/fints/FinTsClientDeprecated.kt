@@ -11,6 +11,7 @@ import net.dankito.banking.fints.model.*
 import net.dankito.banking.fints.response.BankResponse
 import net.dankito.banking.fints.response.client.*
 import net.dankito.banking.fints.response.segments.*
+import net.dankito.banking.fints.webclient.IWebClient
 import kotlin.jvm.JvmOverloads
 
 
@@ -27,6 +28,11 @@ open class FinTsClientDeprecated @JvmOverloads constructor(
     companion object {
         val SupportedAccountTypes = listOf(AccountType.Girokonto, AccountType.Festgeldkonto, AccountType.Kreditkartenkonto)
     }
+
+
+    constructor(callback: FinTsClientCallback) : this(callback, FinTsJobExecutor()) // Swift does not support default parameter values -> create constructor overloads
+
+    constructor(callback: FinTsClientCallback, webClient: IWebClient) : this(callback, FinTsJobExecutor(RequestExecutor(webClient = webClient)))
 
 
     /**

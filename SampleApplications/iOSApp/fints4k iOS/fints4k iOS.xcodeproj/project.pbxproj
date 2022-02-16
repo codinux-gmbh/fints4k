@@ -11,6 +11,9 @@
 		36266AD727BC6F72008F3B00 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36266AD627BC6F72008F3B00 /* ContentView.swift */; };
 		36266AD927BC6F74008F3B00 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 36266AD827BC6F74008F3B00 /* Assets.xcassets */; };
 		36266ADC27BC6F74008F3B00 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 36266ADB27BC6F74008F3B00 /* Preview Assets.xcassets */; };
+		36266AE427BC7776008F3B00 /* Presenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36266AE327BC7776008F3B00 /* Presenter.swift */; };
+		36266AE727BC7801008F3B00 /* ViewExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36266AE627BC7801008F3B00 /* ViewExtensions.swift */; };
+		36266AEA27BC85D8008F3B00 /* UrlSessionWebClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36266AE927BC85D8008F3B00 /* UrlSessionWebClient.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -19,6 +22,9 @@
 		36266AD627BC6F72008F3B00 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		36266AD827BC6F74008F3B00 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		36266ADB27BC6F74008F3B00 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		36266AE327BC7776008F3B00 /* Presenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Presenter.swift; sourceTree = "<group>"; };
+		36266AE627BC7801008F3B00 /* ViewExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewExtensions.swift; sourceTree = "<group>"; };
+		36266AE927BC85D8008F3B00 /* UrlSessionWebClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UrlSessionWebClient.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -51,8 +57,11 @@
 		36266AD327BC6F72008F3B00 /* fints4k iOS */ = {
 			isa = PBXGroup;
 			children = (
+				36266AE827BC85C9008F3B00 /* service */,
+				36266AE527BC77E1008F3B00 /* ui */,
 				36266AD427BC6F72008F3B00 /* fints4k_iOSApp.swift */,
 				36266AD627BC6F72008F3B00 /* ContentView.swift */,
+				36266AE327BC7776008F3B00 /* Presenter.swift */,
 				36266AD827BC6F74008F3B00 /* Assets.xcassets */,
 				36266ADA27BC6F74008F3B00 /* Preview Content */,
 			);
@@ -67,6 +76,22 @@
 			path = "Preview Content";
 			sourceTree = "<group>";
 		};
+		36266AE527BC77E1008F3B00 /* ui */ = {
+			isa = PBXGroup;
+			children = (
+				36266AE627BC7801008F3B00 /* ViewExtensions.swift */,
+			);
+			path = ui;
+			sourceTree = "<group>";
+		};
+		36266AE827BC85C9008F3B00 /* service */ = {
+			isa = PBXGroup;
+			children = (
+				36266AE927BC85D8008F3B00 /* UrlSessionWebClient.swift */,
+			);
+			path = service;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -74,6 +99,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 36266ADF27BC6F74008F3B00 /* Build configuration list for PBXNativeTarget "fints4k iOS" */;
 			buildPhases = (
+				36266AE227BC7189008F3B00 /* ShellScript */,
 				36266ACD27BC6F72008F3B00 /* Sources */,
 				36266ACE27BC6F72008F3B00 /* Frameworks */,
 				36266ACF27BC6F72008F3B00 /* Resources */,
@@ -132,12 +158,35 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		36266AE227BC7189008F3B00 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\ncd ../../..\n./gradlew fints4k:embedAndSignAppleFrameworkForXcode\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		36266ACD27BC6F72008F3B00 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				36266AE427BC7776008F3B00 /* Presenter.swift in Sources */,
 				36266AD727BC6F72008F3B00 /* ContentView.swift in Sources */,
+				36266AEA27BC85D8008F3B00 /* UrlSessionWebClient.swift in Sources */,
+				36266AE727BC7801008F3B00 /* ViewExtensions.swift in Sources */,
 				36266AD527BC6F72008F3B00 /* fints4k_iOSApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -271,6 +320,10 @@
 				DEVELOPMENT_ASSET_PATHS = "\"fints4k iOS/Preview Content\"";
 				DEVELOPMENT_TEAM = 7WVYN7QA7Z;
 				ENABLE_PREVIEWS = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"../../../fints4k/build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)",
+					"/../fints4k/build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)",
+				);
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -282,6 +335,11 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-framework",
+					fints4k,
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = "net.codinux.banking.fints.fints4k-iOS";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -300,6 +358,10 @@
 				DEVELOPMENT_ASSET_PATHS = "\"fints4k iOS/Preview Content\"";
 				DEVELOPMENT_TEAM = 7WVYN7QA7Z;
 				ENABLE_PREVIEWS = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"../../../fints4k/build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)",
+					"/../fints4k/build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)",
+				);
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -311,6 +373,11 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-framework",
+					fints4k,
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = "net.codinux.banking.fints.fints4k-iOS";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;

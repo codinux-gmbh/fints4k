@@ -2,6 +2,7 @@ package net.dankito.utils.multiplatform
 
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
+import net.dankito.utils.multiplatform.extensions.toLocalDateTime
 
 actual class DateFormatter actual constructor(pattern: String) {
 
@@ -9,6 +10,10 @@ actual class DateFormatter actual constructor(pattern: String) {
 
   actual constructor(dateStyle: DateFormatStyle, timeStyle: DateFormatStyle) : this("")
 
+
+  actual fun format(date: LocalDate): String {
+    return format(date.toLocalDateTime())
+  }
 
   // TODO: implement for Logger, get current time formatted as string
   actual fun format(date: LocalDateTime): String {

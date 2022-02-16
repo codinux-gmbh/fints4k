@@ -15,6 +15,8 @@ expect class DateFormatter constructor(pattern: String) {
 
     fun format(date: LocalDateTime): String
 
+    fun format(date: LocalDate): String
+
     fun parseDate(dateString: String): LocalDate?
 
     fun parse(dateString: String): LocalDateTime?

@@ -10,6 +10,11 @@ open class SimpleFinTsClientCallback(
     protected val askUserForTanMethod: ((supportedTanMethods: List<TanMethod>, suggestedTanMethod: TanMethod?) -> TanMethod?)? = null
 ) : FinTsClientCallback {
 
+    constructor() : this(null) // Swift does not support default parameter values -> create constructor overloads
+
+    constructor(enterTan: ((bank: BankData, tanChallenge: TanChallenge) -> EnterTanResult)?) : this(enterTan, null)
+
+
     override fun askUserForTanMethod(supportedTanMethods: List<TanMethod>,
                                      suggestedTanMethod: TanMethod?, callback: (TanMethod?) -> Unit) {
 

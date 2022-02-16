@@ -55,7 +55,11 @@ val LocalDate.millisSinceEpochAtEuropeBerlin: Long
   get() = this.toEpochMillisecondsAt(TimeZone.europeBerlin)
 
 fun LocalDate.toEpochMillisecondsAt(timeZone: TimeZone): Long {
-  return this.atTime(0, 0).toInstant(timeZone).toEpochMilliseconds()
+  return this.toLocalDateTime().toInstant(timeZone).toEpochMilliseconds()
+}
+
+fun LocalDate.toLocalDateTime(): LocalDateTime {
+  return this.atTime(0, 0)
 }
 
 
