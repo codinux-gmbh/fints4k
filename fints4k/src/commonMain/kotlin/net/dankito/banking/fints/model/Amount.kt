@@ -6,11 +6,13 @@ open class Amount(
 ) {
 
     companion object {
-        val Zero = Amount("0,")
+        val ZeroString = "0,"
+
+        val Zero = Amount(ZeroString)
     }
 
 
-    internal constructor() : this("") // for object deserializers
+    internal constructor() : this(ZeroString) // for object deserializers
 
 
     override fun equals(other: Any?): Boolean {
