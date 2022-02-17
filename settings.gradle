@@ -23,3 +23,7 @@ include "WebApp"
 findProject(":WebApp")?.projectDir = file("SampleApplications/WebApp")
 findProject(":WebApp")?.name = "WebApp"
 
+include "CorsProxy"
+findProject(":CorsProxy")?.projectDir = file("SampleApplications/CorsProxy")
+findProject(":CorsProxy")?.name = "CorsProxy"
+

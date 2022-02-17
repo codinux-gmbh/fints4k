@@ -1,0 +1,12 @@
+plugins {
+    id 'org.jetbrains.kotlin.jvm'
+}
+
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib"
+
+    implementation "com.squareup.okhttp3:okhttp:4.9.3"
+
+    implementation "org.slf4j:slf4j-simple:1.7.32"
+}

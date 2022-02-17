@@ -75,10 +75,23 @@ fints4k uses slf4j as logging facade.
 
 So you can use any logger that supports slf4j, like Logback and log4j, to configure and get fints4k's log output.
 
+
+## Sample applications
+
+### WebApp
+
+Directly requesting bank servers is forbidden in browsers due to CORS.
+
+In order to use fints4k directly in browser you need a CORS proxy like the one from CorsProxy 
+[Application.kt](SampleApplications/CorsProxy/src/main/kotlin/net/codinux/web/cors/Application.kt) or https://github.com/Rob--W/cors-anywhere.
+
+Set CORS proxy's URL in WebApp [main.kt](SampleApplications/WebApp/src/main/kotlin/main.kt).
+
+Start sample WebApp then with
+```shell
+ ./gradlew WebApp:run --continuous
+```
+
 ## License
 
-fints4k is dual licensed as [AGPL](LICENSE.md) / commercial software.
-
-AGPL is a free open source software license.
-
-If you want to use it in closed source applications [contact](mailto:sales@dankito.net) us.
+Not free for commercial applications. More details to follow or [contact](mailto:sales@codinux.net) us.
