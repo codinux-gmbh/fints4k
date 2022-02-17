@@ -6,6 +6,7 @@ build/
 out/
 **/out
 /captures
+**/kotlin-js-store
 
 .gradle
 

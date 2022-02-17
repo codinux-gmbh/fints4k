@@ -3,12 +3,6 @@ plugins {
 }
 
 
-repositories {
-    mavenCentral()
-    google()
-}
-
-
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-js"
 
