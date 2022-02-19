@@ -14,6 +14,7 @@
 		36266AE427BC7776008F3B00 /* Presenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36266AE327BC7776008F3B00 /* Presenter.swift */; };
 		36266AE727BC7801008F3B00 /* ViewExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36266AE627BC7801008F3B00 /* ViewExtensions.swift */; };
 		36266AEA27BC85D8008F3B00 /* UrlSessionWebClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36266AE927BC85D8008F3B00 /* UrlSessionWebClient.swift */; };
+		36266AEC27C19146008F3B00 /* EnterTanDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36266AEB27C19146008F3B00 /* EnterTanDialog.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -25,6 +26,7 @@
 		36266AE327BC7776008F3B00 /* Presenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Presenter.swift; sourceTree = "<group>"; };
 		36266AE627BC7801008F3B00 /* ViewExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewExtensions.swift; sourceTree = "<group>"; };
 		36266AE927BC85D8008F3B00 /* UrlSessionWebClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UrlSessionWebClient.swift; sourceTree = "<group>"; };
+		36266AEB27C19146008F3B00 /* EnterTanDialog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnterTanDialog.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -80,6 +82,7 @@
 			isa = PBXGroup;
 			children = (
 				36266AE627BC7801008F3B00 /* ViewExtensions.swift */,
+				36266AEB27C19146008F3B00 /* EnterTanDialog.swift */,
 			);
 			path = ui;
 			sourceTree = "<group>";
@@ -183,6 +186,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				36266AEC27C19146008F3B00 /* EnterTanDialog.swift in Sources */,
 				36266AE427BC7776008F3B00 /* Presenter.swift in Sources */,
 				36266AD727BC6F72008F3B00 /* ContentView.swift in Sources */,
 				36266AEA27BC85D8008F3B00 /* UrlSessionWebClient.swift in Sources */,

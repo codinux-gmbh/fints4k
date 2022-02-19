@@ -18,7 +18,7 @@ interface FinTsClientCallback {
      */
     suspend fun askUserForTanMethod(supportedTanMethods: List<TanMethod>, suggestedTanMethod: TanMethod?): TanMethod?
 
-    suspend fun enterTan(bank: BankData, tanChallenge: TanChallenge): EnterTanResult
+    suspend fun enterTan(tanChallenge: TanChallenge)
 
     /**
      * This method gets called for chipTan TAN generators when the bank asks the customer to synchronize her/his TAN generator.

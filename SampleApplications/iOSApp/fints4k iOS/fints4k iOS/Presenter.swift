@@ -1,11 +1,21 @@
 import SwiftUI
 import fints4k
 
-class Presenter {
+class Presenter : ObservableObject {
     
-    private let fintsClient = FinTsClientDeprecated(callback: SimpleFinTsClientCallback(), webClient: UrlSessionWebClient())
+//    var enterTanCallback: ((TanChallenge) -> Void)? = nil
+    
+    // Swift, you're so stupid! It seems to be impossible to initialize SimpleFinTsClientCallback here so that enterTanCallback gets called if set
+    private var fintsClient = iOSFinTsClient(callback: SimpleFinTsClientCallback(), webClient: UrlSessionWebClient())
     
     private let formatter = DateFormatter()
+    
+    
+    func setEnterTanCallback(enterTanCallback: @escaping (TanChallenge) -> Void) {
+        self.fintsClient.callback = SimpleFinTsClientCallback( enterTan: { tanChallenge in
+            enterTanCallback(tanChallenge)
+        })
+    }
     
     
     func retrieveTransactions(_ bankCode: String, _ customerId: String, _ pin: String, _ finTs3ServerAddress: String, _ callback: @escaping (AddAccountResponse) -> Void) {

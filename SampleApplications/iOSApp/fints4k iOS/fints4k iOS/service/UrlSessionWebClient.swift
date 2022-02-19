@@ -3,10 +3,10 @@ import fints4k
 
 class UrlSessionWebClient : IWebClient {
     
-    func post(url: String, body: String, contentType: String, userAgent: String, callback: @escaping (WebClientResponse) -> Void) {
+    func post(url: String, body: String, contentType: String, userAgent: String, completionHandler: @escaping (WebClientResponse?, Error?) -> Void) {
         let request = requestFor(url, "POST", body)
         
-        executeRequestAsync(request, callback)
+        executeRequestAsync(request) { response in completionHandler(response, nil) }
     }
     
     func getAsync(_ url: String, callback: @escaping (WebClientResponse) -> Void) {

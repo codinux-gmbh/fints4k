@@ -6,7 +6,7 @@ struct ContentView: View {
     
     @State var transactions: [AccountTransaction] = []
     
-    private let presenter = Presenter()
+    @EnvironmentObject private var presenter: Presenter
     
     
     var body: some View {

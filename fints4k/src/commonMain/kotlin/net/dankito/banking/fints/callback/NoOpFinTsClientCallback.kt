@@ -10,8 +10,8 @@ open class NoOpFinTsClientCallback : FinTsClientCallback {
         return suggestedTanMethod
     }
 
-    override suspend fun enterTan(bank: BankData, tanChallenge: TanChallenge): EnterTanResult {
-        return EnterTanResult.userDidNotEnterTan()
+    override suspend fun enterTan(tanChallenge: TanChallenge) {
+        return tanChallenge.userDidNotEnterTan()
     }
 
     override suspend fun enterTanGeneratorAtc(bank: BankData, tanMedium: TanGeneratorTanMedium): EnterTanGeneratorAtcResult {

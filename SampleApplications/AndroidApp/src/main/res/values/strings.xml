@@ -9,4 +9,10 @@
 
     <string name="hello_first_fragment">Hello first fragment</string>
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
+
+
+    <string name="dialog_enter_tan_tan_description_label">Hint from your bank:</string>
+    <string name="dialog_enter_tan_enter_tan">Enter TAN:</string>
+    <string name="dialog_enter_tan_error_could_not_decode_tan_image">Could not decode flicker code or QR code / PhotoTan. Most likely an internal error:\n%s.</string>
+
 </resources>

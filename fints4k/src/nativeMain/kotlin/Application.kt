@@ -4,6 +4,7 @@ import net.dankito.banking.fints.FinTsClientDeprecated
 import net.dankito.banking.fints.callback.SimpleFinTsClientCallback
 import net.dankito.banking.fints.model.AddAccountParameter
 import net.dankito.banking.fints.model.RetrievedAccountData
+import net.dankito.banking.fints.model.TanChallenge
 import net.dankito.banking.fints.response.client.AddAccountResponse
 import net.dankito.utils.multiplatform.extensions.*
 import platform.posix.exit
@@ -22,7 +23,7 @@ class Application {
 
   fun retrieveAccountData(bankCode: String, customerId: String, pin: String, finTs3ServerAddress: String) {
     runBlocking {
-      val client = FinTsClientDeprecated(SimpleFinTsClientCallback())
+      val client = FinTsClientDeprecated(SimpleFinTsClientCallback { tanChallenge -> enterTan(tanChallenge) })
 
       val response = client.addAccountAsync(AddAccountParameter(bankCode, customerId, pin, finTs3ServerAddress))
 
@@ -31,6 +32,23 @@ class Application {
       displayRetrievedAccountData(response)
     }
   }
+
+
+  private fun enterTan(tanChallenge: TanChallenge) {
+    println("A TAN is required:")
+    println(tanChallenge.messageToShowToUser)
+    println()
+
+    print("TAN: ")
+    val enteredTan = readLine()
+
+    if (enteredTan.isNullOrBlank()) {
+      tanChallenge.userDidNotEnterTan()
+    } else {
+      tanChallenge.userEnteredTan(enteredTan)
+    }
+  }
+
 
   private fun displayRetrievedAccountData(response: AddAccountResponse) {
     if (response.retrievedData.isEmpty()) {

@@ -20,6 +20,10 @@ open class TanMethod(
 
 
 
+    open val isNumericTan: Boolean
+        get() = allowedTanFormat == AllowedTanFormat.Numeric
+
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is TanMethod) return false

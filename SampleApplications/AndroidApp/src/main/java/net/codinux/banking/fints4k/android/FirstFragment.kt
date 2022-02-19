@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import net.codinux.banking.fints4k.android.adapter.AccountTransactionsListRecyclerAdapter
 import net.codinux.banking.fints4k.android.databinding.FragmentFirstBinding
+import net.codinux.banking.fints4k.android.dialogs.EnterTanDialog
 
 /**
  * A simple [Fragment] subclass as the default destination in the navigation.
@@ -24,14 +25,10 @@ class FirstFragment : Fragment() {
     // onDestroyView.
     private val binding get() = _binding!!
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
 
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentFirstBinding.inflate(inflater, container, false)
         return binding.root
-
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -43,8 +40,14 @@ class FirstFragment : Fragment() {
             adapter = accountTransactionsAdapter
         }
 
+        val presenter = Presenter() // TODO: inject
+
+        presenter.enterTanCallback = { tanChallenge ->
+            EnterTanDialog().show(tanChallenge, activity!!)
+        }
+
         // TODO: set your credentials here
-        Presenter().retrieveAccountData("", "", "", "") { response ->
+        presenter.retrieveAccountData("", "", "", "") { response ->
             if (response.successful) {
                 accountTransactionsAdapter.items = response.retrievedData.flatMap { it.bookedTransactions }
             }

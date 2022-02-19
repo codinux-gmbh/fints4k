@@ -1,5 +1,6 @@
 package net.dankito.banking.fints
 
+import kotlinx.coroutines.delay
 import kotlinx.datetime.LocalDate
 import net.dankito.banking.fints.messages.MessageBuilder
 import net.dankito.banking.fints.messages.MessageBuilderResult
@@ -17,7 +18,6 @@ import net.dankito.banking.fints.tan.FlickerCodeDecoder
 import net.dankito.banking.fints.tan.TanImageDecoder
 import net.dankito.banking.fints.util.TanMethodSelector
 import net.dankito.utils.multiplatform.log.LoggerFactory
-import net.dankito.utils.multiplatform.ObjectReference
 import net.dankito.utils.multiplatform.extensions.millisSinceEpochAtEuropeBerlin
 import net.dankito.utils.multiplatform.extensions.minusDays
 import net.dankito.utils.multiplatform.extensions.todayAtEuropeBerlin
@@ -376,17 +376,25 @@ open class FinTsJobExecutor(
 
     protected open suspend fun handleEnteringTanRequired(context: JobContext, tanResponse: TanResponse, response: BankResponse): BankResponse {
         val bank = context.bank // TODO: copy required data to TanChallenge
-        val tanChallenge = createTanChallenge(tanResponse, bank)
 
-        val userDidCancelEnteringTan = ObjectReference(false)
+        // on all platforms run on Dispatchers.Main, but on iOS skip this (or wrap in withContext(Dispatchers.IO) )
+//        val enteredTanResult = GlobalScope.async {
+            val tanChallenge = createTanChallenge(tanResponse, bank)
 
-        val enteredTanResult =  context.callback.enterTan(bank, tanChallenge)
-        userDidCancelEnteringTan.value = true
+            context.callback.enterTan(tanChallenge)
+
+            while (tanChallenge.enterTanResult == null) {
+                delay(250)
+
+                mayRetrieveAutomaticallyIfUserEnteredDecoupledTan(context, tanChallenge, tanResponse)
+
+                // TODO: add a timeout of e.g. 30 min
+            }
+
+        val enteredTanResult = tanChallenge.enterTanResult!!
+//        }
 
         return handleEnterTanResult(context, enteredTanResult, tanResponse, response)
-
-        // TODO:
-//        mayRetrieveAutomaticallyIfUserEnteredDecoupledTan(context, tanChallenge, tanResponse, userDidCancelEnteringTan)
     }
 
     protected open fun createTanChallenge(tanResponse: TanResponse, bank: BankData): TanChallenge {
@@ -409,17 +417,15 @@ open class FinTsJobExecutor(
         }
     }
 
-    protected open fun mayRetrieveAutomaticallyIfUserEnteredDecoupledTan(context: JobContext, tanChallenge: TanChallenge, tanResponse: TanResponse,
-                                                                         userDidCancelEnteringTan: ObjectReference<Boolean>
-    ) {
+    protected open fun mayRetrieveAutomaticallyIfUserEnteredDecoupledTan(context: JobContext, tanChallenge: TanChallenge, tanResponse: TanResponse) {
         context.bank.selectedTanMethod.decoupledParameters?.let { decoupledTanMethodParameters ->
             if (tanResponse.tanProcess == TanProcess.AppTan && decoupledTanMethodParameters.periodicStateRequestsAllowed) {
-                automaticallyRetrieveIfUserEnteredDecoupledTan(context, tanChallenge, userDidCancelEnteringTan)
+                automaticallyRetrieveIfUserEnteredDecoupledTan(context, tanChallenge)
             }
         }
     }
 
-    protected open fun automaticallyRetrieveIfUserEnteredDecoupledTan(context: JobContext, tanChallenge: TanChallenge, userDidCancelEnteringTan: ObjectReference<Boolean>) {
+    protected open fun automaticallyRetrieveIfUserEnteredDecoupledTan(context: JobContext, tanChallenge: TanChallenge) {
         log.info("automaticallyRetrieveIfUserEnteredDecoupledTan() called for $tanChallenge")
     }
 
