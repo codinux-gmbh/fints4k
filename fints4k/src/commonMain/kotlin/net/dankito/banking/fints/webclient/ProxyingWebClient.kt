@@ -10,8 +10,8 @@ class ProxyingWebClient(proxyUrl: String, private val delegate: IWebClient) : IW
   private val proxyUrl = if (proxyUrl.endsWith("/")) proxyUrl else proxyUrl + "/"
 
 
-  override fun post(url: String, body: String, contentType: String, userAgent: String, callback: (WebClientResponse) -> Unit) {
-    delegate.post(proxyUrl + url, body, contentType, userAgent, callback)
+  override suspend fun post(url: String, body: String, contentType: String, userAgent: String): WebClientResponse {
+    return delegate.post(proxyUrl + url, body, contentType, userAgent)
   }
 
 }

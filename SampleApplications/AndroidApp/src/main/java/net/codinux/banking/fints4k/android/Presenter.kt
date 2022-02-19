@@ -3,6 +3,7 @@ package net.codinux.banking.fints4k.android
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.datetime.LocalDate
 import net.dankito.banking.fints.FinTsClientDeprecated
 import net.dankito.banking.fints.callback.SimpleFinTsClientCallback
@@ -27,10 +28,11 @@ class Presenter {
 
 
     fun retrieveAccountData(bankCode: String, customerId: String, pin: String, finTs3ServerAddress: String, retrievedResult: (AddAccountResponse) -> Unit) {
-        fintsClient.addAccountAsync(AddAccountParameter(bankCode, customerId, pin, finTs3ServerAddress)) { response ->
+        GlobalScope.launch(Dispatchers.IO) {
+            val response = fintsClient.addAccountAsync(AddAccountParameter(bankCode, customerId, pin, finTs3ServerAddress))
             log.info("Retrieved response from ${response.bank.bankName} for ${response.bank.customerName}")
 
-            GlobalScope.launch(Dispatchers.Main) {
+            withContext(Dispatchers.Main) {
                 retrievedResult(response)
             }
         }

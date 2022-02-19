@@ -21,79 +21,78 @@ open class RequestExecutor(
 ) {
 
     companion object {
-        private val log = LoggerFactory.getLogger(FinTsJobExecutor::class)
+        private val log = LoggerFactory.getLogger(RequestExecutor::class)
     }
 
 
-    open fun getAndHandleResponseForMessage(message: MessageBuilderResult, context: JobContext,
-                                            tanRequiredCallback: (TanResponse, BankResponse, callback: (BankResponse) -> Unit) -> Unit, callback: (BankResponse) -> Unit) {
+    open suspend fun getAndHandleResponseForMessage(message: MessageBuilderResult, context: JobContext, tanRequiredCallback: suspend (TanResponse, BankResponse) -> BankResponse): BankResponse {
         if (message.createdMessage == null) {
             log.error("Could not create FinTS message to be sent to bank. isJobAllowed ${message.isJobAllowed}, isJobVersionSupported = ${message.isJobVersionSupported}," +
               "allowedVersions = ${message.allowedVersions}, supportedVersions = ${message.supportedVersions}.")
-            callback(BankResponse(false, messageThatCouldNotBeCreated = message, internalError = "Could not create FinTS message to be sent to bank")) // TODO: translate
+            return BankResponse(false, messageThatCouldNotBeCreated = message, internalError = "Could not create FinTS message to be sent to bank") // TODO: translate
         }
         else {
-            getAndHandleResponseForMessage(context, message.createdMessage) { response ->
-                handleMayRequiresTan(context, response, tanRequiredCallback) { handledResponse ->
-                    // if there's a Aufsetzpunkt (continuationId) set, then response is not complete yet, there's more information to fetch by sending this Aufsetzpunkt
-                    handledResponse.aufsetzpunkt?.let { continuationId ->
-                        if (handledResponse.followUpResponse == null) { // for re-sent messages followUpResponse is already set and dialog already closed -> would be overwritten with an error response that dialog is closed
-                            if (message.isSendEnteredTanMessage() == false) { // for sending TAN no follow up message can be created -> filter out, otherwise chunkedResponseHandler would get called twice for same response
-                                context.dialog.chunkedResponseHandler?.invoke(handledResponse)
-                            }
+            val response = getAndHandleResponseForMessage(context, message.createdMessage)
 
-                            getFollowUpMessageForContinuationId(context, handledResponse, continuationId, message, tanRequiredCallback) { followUpResponse ->
-                                handledResponse.followUpResponse = followUpResponse
-                                handledResponse.hasFollowUpMessageButCouldNotReceiveIt = handledResponse.followUpResponse == null
+            val handledResponse = handleMayRequiresTan(context, response, tanRequiredCallback)
 
-                                callback(handledResponse)
-                            }
-                        }
-                        else {
-                            callback(handledResponse)
-                        }
+            // if there's a Aufsetzpunkt (continuationId) set, then response is not complete yet, there's more information to fetch by sending this Aufsetzpunkt
+            handledResponse.aufsetzpunkt?.let { continuationId ->
+                if (handledResponse.followUpResponse == null) { // for re-sent messages followUpResponse is already set and dialog already closed -> would be overwritten with an error response that dialog is closed
+                    if (message.isSendEnteredTanMessage() == false) { // for sending TAN no follow up message can be created -> filter out, otherwise chunkedResponseHandler would get called twice for same response
+                        context.dialog.chunkedResponseHandler?.invoke(handledResponse)
                     }
-                    ?: run {
-                        // e.g. response = enter TAN response, but handledResponse is then response after entering TAN, e.g. account transactions
-                        // -> chunkedResponseHandler would get called for same handledResponse multiple times
-                        if (response == handledResponse) {
-                            context.dialog.chunkedResponseHandler?.invoke(handledResponse)
-                        }
 
-                        callback(handledResponse)
-                    }
+                    val followUpResponse = getFollowUpMessageForContinuationId(context, handledResponse, continuationId, message, tanRequiredCallback)
+
+                    handledResponse.followUpResponse = followUpResponse
+                    handledResponse.hasFollowUpMessageButCouldNotReceiveIt = handledResponse.followUpResponse == null
+
+                    return handledResponse
+                }
+                else {
+                    return handledResponse
                 }
             }
+                ?: run {
+                    // e.g. response = enter TAN response, but handledResponse is then response after entering TAN, e.g. account transactions
+                    // -> chunkedResponseHandler would get called for same handledResponse multiple times
+                    if (response == handledResponse) {
+                        context.dialog.chunkedResponseHandler?.invoke(handledResponse)
+                    }
+
+                    return handledResponse
+                }
         }
     }
 
-    protected open fun getAndHandleResponseForMessage(context: JobContext, requestBody: String, callback: (BankResponse) -> Unit) {
+    protected open suspend fun getAndHandleResponseForMessage(context: JobContext, requestBody: String): BankResponse {
         addMessageLog(context, MessageLogEntryType.Sent, requestBody)
 
-        getResponseForMessage(requestBody, context.bank.finTs3ServerAddress) { webResponse ->
-            val response = handleResponse(context, webResponse)
+        val webResponse = getResponseForMessage(requestBody, context.bank.finTs3ServerAddress)
 
-            val dialog = context.dialog
-            dialog.response = response
+        val response = handleResponse(context, webResponse)
 
-            response.messageHeader?.let { header -> dialog.dialogId = header.dialogId }
-            dialog.didBankCloseDialog = response.didBankCloseDialog
+        val dialog = context.dialog
+        dialog.response = response
 
-            callback(response)
-        }
+        response.messageHeader?.let { header -> dialog.dialogId = header.dialogId }
+        dialog.didBankCloseDialog = response.didBankCloseDialog
+
+        return response
     }
 
-    protected open fun getResponseForMessage(requestBody: String, finTs3ServerAddress: String, callback: (WebClientResponse) -> Unit) {
+    protected open suspend fun getResponseForMessage(requestBody: String, finTs3ServerAddress: String): WebClientResponse {
         val encodedRequestBody = base64Service.encode(requestBody)
 
-        webClient.post(finTs3ServerAddress, encodedRequestBody, "application/octet-stream", IWebClient.DefaultUserAgent, callback)
+        return webClient.post(finTs3ServerAddress, encodedRequestBody, "application/octet-stream", IWebClient.DefaultUserAgent)
     }
 
-    open fun fireAndForgetMessage(context: JobContext, message: MessageBuilderResult) {
+    open suspend fun fireAndForgetMessage(context: JobContext, message: MessageBuilderResult) {
         message.createdMessage?.let { requestBody ->
             addMessageLog(context, MessageLogEntryType.Sent, requestBody)
 
-            getResponseForMessage(requestBody, context.bank.finTs3ServerAddress) { }
+            getResponseForMessage(requestBody, context.bank.finTs3ServerAddress)
 
             // if really needed add received response to message log here
         }
@@ -129,34 +128,30 @@ open class RequestExecutor(
     }
 
 
-    protected open fun getFollowUpMessageForContinuationId(context: JobContext, response: BankResponse, continuationId: String, message: MessageBuilderResult,
-                                                           tanRequiredCallback: (TanResponse, BankResponse, callback: (BankResponse) -> Unit) -> Unit,
-                                                           callback: (BankResponse?) -> Unit) {
+    protected open suspend fun getFollowUpMessageForContinuationId(context: JobContext, response: BankResponse, continuationId: String, message: MessageBuilderResult,
+                                                           tanRequiredCallback: suspend (TanResponse, BankResponse) -> BankResponse): BankResponse? {
 
         messageBuilder.rebuildMessageWithContinuationId(context, message, continuationId)?.let { followUpMessage ->
-            getAndHandleResponseForMessage(followUpMessage, context, tanRequiredCallback, callback)
+            return getAndHandleResponseForMessage(followUpMessage, context, tanRequiredCallback)
         }
-        ?: run { callback(null) }
+
+        return null
     }
 
 
-    protected open fun handleMayRequiresTan(context: JobContext, response: BankResponse,
-                                            tanRequiredCallback: (TanResponse, BankResponse, callback: (BankResponse) -> Unit) -> Unit,
-                                            callback: (BankResponse) -> Unit) { // TODO: use response from DialogContext
+    protected open suspend fun handleMayRequiresTan(context: JobContext, response: BankResponse,
+                                            tanRequiredCallback: suspend (TanResponse, BankResponse) -> BankResponse): BankResponse { // TODO: use response from DialogContext
 
         if (response.isStrongAuthenticationRequired) {
             if (context.dialog.abortIfTanIsRequired) {
                 response.tanRequiredButWeWereToldToAbortIfSo = true
 
-                callback(response)
-                return
+                return response
             }
             else if (response.tanResponse != null) {
                 response.tanResponse?.let { tanResponse ->
-                    tanRequiredCallback(tanResponse, response, callback)
+                    return tanRequiredCallback(tanResponse, response)
                 }
-
-                return
             }
         }
 
@@ -167,7 +162,7 @@ open class RequestExecutor(
         // TODO: also check '9931 Sperrung des Kontos nach %1 Fehlversuchen' -> if %1 == 3 synchronize TAN generator
         //  as it's quite unrealistic that user entered TAN wrong three times, in most cases TAN generator is not synchronized
 
-        callback(response)
+        return response
     }
 
 

@@ -1,3 +1,5 @@
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import net.dankito.banking.fints.FinTsClientDeprecated
 import net.dankito.banking.fints.model.AccountTransaction
 import net.dankito.banking.fints.model.AddAccountParameter
@@ -23,7 +25,8 @@ class AccountTransactionsView(props: AccountTransactionsViewProps) : RComponent<
 
     // due to CORS your bank's servers can not be requested directly from browser -> set a CORS proxy url in main.kt
     // TODO: set your credentials here
-    props.client.addAccountAsync(AddAccountParameter("", "", "", "")) { response ->
+    GlobalScope.launch {
+      val response = props.client.addAccountAsync(AddAccountParameter("", "", "", ""))
       if (response.successful) {
         val balance = response.retrievedData.sumOf { it.balance?.amount?.string?.replace(',', '.')?.toDoubleOrNull() ?: 0.0 } // i know, double is not an appropriate data type for amounts
 

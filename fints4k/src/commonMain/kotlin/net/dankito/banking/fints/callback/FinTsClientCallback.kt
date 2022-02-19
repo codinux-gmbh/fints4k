@@ -16,15 +16,15 @@ interface FinTsClientCallback {
      * If you do not support an enter tan dialog or if your enter tan dialog supports selecting a TAN method, it's
      * best returning [suggestedTanMethod] and to not show an extra select TAN method dialog.
      */
-    fun askUserForTanMethod(supportedTanMethods: List<TanMethod>, suggestedTanMethod: TanMethod?, callback: (TanMethod?) -> Unit)
+    suspend fun askUserForTanMethod(supportedTanMethods: List<TanMethod>, suggestedTanMethod: TanMethod?): TanMethod?
 
-    fun enterTan(bank: BankData, tanChallenge: TanChallenge, callback: (EnterTanResult) -> Unit)
+    suspend fun enterTan(bank: BankData, tanChallenge: TanChallenge): EnterTanResult
 
     /**
      * This method gets called for chipTan TAN generators when the bank asks the customer to synchronize her/his TAN generator.
      *
      * If you do not support entering TAN generator ATC, return [EnterTanGeneratorAtcResult.userDidNotEnterAtc]
      */
-    fun enterTanGeneratorAtc(bank: BankData, tanMedium: TanGeneratorTanMedium, callback: (EnterTanGeneratorAtcResult) -> Unit)
+    suspend fun enterTanGeneratorAtc(bank: BankData, tanMedium: TanGeneratorTanMedium): EnterTanGeneratorAtcResult
 
 }

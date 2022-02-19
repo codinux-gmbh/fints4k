@@ -6,18 +6,16 @@ import net.dankito.banking.fints.model.*
 
 open class NoOpFinTsClientCallback : FinTsClientCallback {
 
-    override fun askUserForTanMethod(supportedTanMethods: List<TanMethod>,
-                                     suggestedTanMethod: TanMethod?, callback: (TanMethod?) -> Unit) {
-
-        callback(suggestedTanMethod)
+    override suspend fun askUserForTanMethod(supportedTanMethods: List<TanMethod>, suggestedTanMethod: TanMethod?): TanMethod? {
+        return suggestedTanMethod
     }
 
-    override fun enterTan(bank: BankData, tanChallenge: TanChallenge, callback: (EnterTanResult) -> Unit) {
-        callback(EnterTanResult.userDidNotEnterTan())
+    override suspend fun enterTan(bank: BankData, tanChallenge: TanChallenge): EnterTanResult {
+        return EnterTanResult.userDidNotEnterTan()
     }
 
-    override fun enterTanGeneratorAtc(bank: BankData, tanMedium: TanGeneratorTanMedium, callback: (EnterTanGeneratorAtcResult) -> Unit) {
-        callback(EnterTanGeneratorAtcResult.userDidNotEnterAtc())
+    override suspend fun enterTanGeneratorAtc(bank: BankData, tanMedium: TanGeneratorTanMedium): EnterTanGeneratorAtcResult {
+        return EnterTanGeneratorAtcResult.userDidNotEnterAtc()
     }
 
 }

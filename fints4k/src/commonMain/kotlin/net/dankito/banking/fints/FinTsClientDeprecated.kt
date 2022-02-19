@@ -44,7 +44,7 @@ open class FinTsClientDeprecated(
     open fun getAnonymousBankInfoAsync(bank: BankData, callback: (FinTsClientResponse) -> Unit) {
 
         GlobalScope.launch {
-            getAnonymousBankInfo(bank, callback)
+            callback(getAnonymousBankInfo(bank))
         }
     }
 
@@ -54,90 +54,74 @@ open class FinTsClientDeprecated(
      *
      * On success [bank] parameter is updated afterwards.
      */
-    open fun getAnonymousBankInfo(bank: BankData, callback: (FinTsClientResponse) -> Unit) {
+    open suspend fun getAnonymousBankInfo(bank: BankData): FinTsClientResponse {
         val context = JobContext(JobContextType.AnonymousBankInfo, this.callback, product, bank)
 
-        jobExecutor.getAnonymousBankInfo(context) { response ->
-            callback(FinTsClientResponse(context, response))
-        }
+        val response =  jobExecutor.getAnonymousBankInfo(context)
+        return FinTsClientResponse(context, response)
     }
 
 
-    open fun addAccountAsync(parameter: AddAccountParameter, callback: (AddAccountResponse) -> Unit) {
+    open suspend fun addAccountAsync(parameter: AddAccountParameter): AddAccountResponse {
         val bank = parameter.bank
         val context = JobContext(JobContextType.AddAccount, this.callback, product, bank)
 
         /*      First dialog: Get user's basic data like BPD, customer system ID and her TAN methods     */
 
-        jobExecutor.retrieveBasicDataLikeUsersTanMethods(context, parameter.preferredTanMethods, parameter.preferredTanMedium) { newUserInfoResponse ->
+        val newUserInfoResponse = jobExecutor.retrieveBasicDataLikeUsersTanMethods(context, parameter.preferredTanMethods, parameter.preferredTanMedium)
 
-            if (newUserInfoResponse.successful == false) { // bank parameter (FinTS server address, ...) already seem to be wrong
-                callback(AddAccountResponse(context, newUserInfoResponse))
-                return@retrieveBasicDataLikeUsersTanMethods
-            }
-
-            /*      Second dialog, executed in retrieveBasicDataLikeUsersTanMethods() if required: some banks require that in order to initialize a dialog with
-            strong customer authorization TAN media is required       */
-
-            addAccountGetAccountsAndTransactions(context, parameter, callback)
+        if (newUserInfoResponse.successful == false) { // bank parameter (FinTS server address, ...) already seem to be wrong
+            return AddAccountResponse(context, newUserInfoResponse)
         }
+
+        /*      Second dialog, executed in retrieveBasicDataLikeUsersTanMethods() if required: some banks require that in order to initialize a dialog with
+        strong customer authorization TAN media is required       */
+
+        return addAccountGetAccountsAndTransactions(context, parameter)
     }
 
-    protected open fun addAccountGetAccountsAndTransactions(context: JobContext, parameter: AddAccountParameter,
-                                                            callback: (AddAccountResponse) -> Unit) {
+    protected open suspend fun addAccountGetAccountsAndTransactions(context: JobContext, parameter: AddAccountParameter): AddAccountResponse {
 
         /*      Third dialog: Now we can initialize our first dialog with strong customer authorization. Use it to get UPD and customer's accounts        */
 
-        jobExecutor.getAccounts(context) { getAccountsResponse ->
+        val getAccountsResponse = jobExecutor.getAccounts(context)
 
-            if (getAccountsResponse.successful == false) {
-                callback(AddAccountResponse(context, getAccountsResponse))
-                return@getAccounts
-            }
+        if (getAccountsResponse.successful == false) {
+            return AddAccountResponse(context, getAccountsResponse)
+        }
 
-            /*      Fourth dialog (if requested): Try to retrieve account balances and transactions of last 90 days without TAN     */
+        /*      Fourth dialog (if requested): Try to retrieve account balances and transactions of last 90 days without TAN     */
 
-            if (parameter.fetchBalanceAndTransactions) {
-                addAccountGetAccountBalancesAndTransactions(context, getAccountsResponse, callback)
-            }
-            else {
-                addAccountDone(context, getAccountsResponse, listOf(), callback)
-            }
+        if (parameter.fetchBalanceAndTransactions) {
+            return addAccountGetAccountBalancesAndTransactions(context, getAccountsResponse)
+        }
+        else {
+            return addAccountDone(context, getAccountsResponse, listOf())
         }
     }
 
-    protected open fun addAccountGetAccountBalancesAndTransactions(context: JobContext, getAccountsResponse: BankResponse,
-                                                                   callback: (AddAccountResponse) -> Unit) {
+    protected open suspend fun addAccountGetAccountBalancesAndTransactions(context: JobContext, getAccountsResponse: BankResponse): AddAccountResponse {
 
         val bank = context.bank
         val retrievedTransactionsResponses = mutableListOf<GetAccountTransactionsResponse>()
 
         val accountsSupportingRetrievingTransactions = bank.accounts.filter { it.supportsRetrievingBalance || it.supportsRetrievingAccountTransactions }
-        val countAccountsSupportingRetrievingTransactions = accountsSupportingRetrievingTransactions.size
-        var countRetrievedAccounts = 0
 
-        if (countAccountsSupportingRetrievingTransactions == 0) {
-            addAccountDone(context, getAccountsResponse, retrievedTransactionsResponses, callback)
-            return // not necessary just to make it clearer that code below doesn't get called
+        if (accountsSupportingRetrievingTransactions.isEmpty()) {
+            return addAccountDone(context, getAccountsResponse, retrievedTransactionsResponses)
         }
 
         accountsSupportingRetrievingTransactions.forEach { account ->
-            tryGetAccountTransactionsOfLast90DaysWithoutTan(bank, account) { response ->
-                retrievedTransactionsResponses.add(response)
-
-                countRetrievedAccounts++
-                if (countRetrievedAccounts == countAccountsSupportingRetrievingTransactions) {
-                    addAccountDone(context, getAccountsResponse, retrievedTransactionsResponses, callback)
-                }
-            }
+            retrievedTransactionsResponses.add(tryGetAccountTransactionsOfLast90DaysWithoutTan(bank, account))
         }
+
+        return addAccountDone(context, getAccountsResponse, retrievedTransactionsResponses)
     }
 
     protected open fun addAccountDone(context: JobContext, getAccountsResponse: BankResponse,
-                                      retrievedTransactionsResponses: List<GetAccountTransactionsResponse>,
-                                      callback: (AddAccountResponse) -> Unit) {
+                                      retrievedTransactionsResponses: List<GetAccountTransactionsResponse>): AddAccountResponse {
 
-        callback(AddAccountResponse(context, getAccountsResponse, retrievedTransactionsResponses))
+        return AddAccountResponse(context, getAccountsResponse, retrievedTransactionsResponses)
     }
 
 
@@ -147,9 +131,9 @@ open class FinTsClientDeprecated(
      *
      * Check if bank supports this.
      */
-    open fun tryGetAccountTransactionsOfLast90DaysWithoutTan(bank: BankData, account: AccountData, callback: (GetAccountTransactionsResponse) -> Unit) {
+    open suspend fun tryGetAccountTransactionsOfLast90DaysWithoutTan(bank: BankData, account: AccountData): GetAccountTransactionsResponse {
 
-        getAccountTransactionsAsync(createGetAccountTransactionsOfLast90DaysParameter(bank, account), callback)
+        return getAccountTransactionsAsync(createGetAccountTransactionsOfLast90DaysParameter(bank, account))
     }
 
     protected open fun createGetAccountTransactionsOfLast90DaysParameter(bank: BankData, account: AccountData): GetAccountTransactionsParameter {
@@ -159,36 +143,35 @@ open class FinTsClientDeprecated(
         return GetAccountTransactionsParameter(bank, account, account.supportsRetrievingBalance, ninetyDaysAgo, abortIfTanIsRequired = true)
     }
 
-    open fun getAccountTransactionsAsync(parameter: GetAccountTransactionsParameter, callback: (GetAccountTransactionsResponse) -> Unit) {
+    open suspend fun getAccountTransactionsAsync(parameter: GetAccountTransactionsParameter): GetAccountTransactionsResponse {
 
         val context = JobContext(JobContextType.GetTransactions, this.callback, product, parameter.bank, parameter.account)
 
-        jobExecutor.getTransactionsAsync(context, parameter, callback)
+        return jobExecutor.getTransactionsAsync(context, parameter)
     }
 
 
-    open fun getTanMediaList(bank: BankData, tanMediaKind: TanMedienArtVersion = TanMedienArtVersion.Alle,
-                             tanMediumClass: TanMediumKlasse = TanMediumKlasse.AlleMedien, callback: (GetTanMediaListResponse) -> Unit) {
+    open suspend fun getTanMediaList(bank: BankData, tanMediaKind: TanMedienArtVersion = TanMedienArtVersion.Alle,
+                             tanMediumClass: TanMediumKlasse = TanMediumKlasse.AlleMedien): GetTanMediaListResponse {
 
         val context = JobContext(JobContextType.GetTanMedia, this.callback, product, bank)
 
-        jobExecutor.getTanMediaList(context, tanMediaKind, tanMediumClass, callback)
+        return jobExecutor.getTanMediaList(context, tanMediaKind, tanMediumClass)
     }
 
 
-    open fun changeTanMedium(newActiveTanMedium: TanGeneratorTanMedium, bank: BankData, callback: (FinTsClientResponse) -> Unit) {
+    open suspend fun changeTanMedium(newActiveTanMedium: TanGeneratorTanMedium, bank: BankData): FinTsClientResponse {
         val context = JobContext(JobContextType.ChangeTanMedium, this.callback, product, bank)
 
-        jobExecutor.changeTanMedium(context, newActiveTanMedium) { response ->
-            callback(FinTsClientResponse(context, response))
-        }
+        val response = jobExecutor.changeTanMedium(context, newActiveTanMedium)
+        return FinTsClientResponse(context, response)
     }
 
 
-    open fun doBankTransferAsync(bankTransferData: BankTransferData, bank: BankData, account: AccountData, callback: (FinTsClientResponse) -> Unit) {
+    open suspend fun doBankTransferAsync(bankTransferData: BankTransferData, bank: BankData, account: AccountData): FinTsClientResponse {
         val context = JobContext(JobContextType.TransferMoney, this.callback, product, bank, account)
 
-        jobExecutor.doBankTransferAsync(context, bankTransferData, callback)
+        return jobExecutor.doBankTransferAsync(context, bankTransferData)
     }
 
 }
