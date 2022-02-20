@@ -7,7 +7,7 @@ open class Money(
 ) {
 
     companion object {
-        val Zero = Money(Amount.Zero, "EUR")
+        val Zero = Money(Amount.Zero, Currency.DefaultCurrencyCode)
     }
 
 

@@ -5,6 +5,11 @@ open class Currency(
     val code: String
 ) {
 
+    companion object {
+        const val DefaultCurrencyCode = "EUR"
+    }
+
+
     internal constructor() : this("") // for object deserializers
 
 

@@ -1,6 +1,7 @@
 package net.dankito.banking.client.model
 
 import kotlinx.datetime.LocalDate
+import net.dankito.banking.fints.model.Currency
 import net.dankito.banking.fints.model.Money
 
 
@@ -11,7 +12,7 @@ open class BankAccount(
     val accountHolderName: String,
     val type: BankAccountType = BankAccountType.CheckingAccount,
     val productName: String? = null,
-    val currency: String = "EUR", // TODO: may parse to a value object
+    val currency: String = Currency.DefaultCurrencyCode, // TODO: may parse to a value object
     val accountLimit: String? = null,
     // TODO: create an enum AccountCapabilities [ RetrieveBalance, RetrieveTransactions, TransferMoney / MoneyTransfer(?), InstantPayment ]
     val supportsRetrievingTransactions: Boolean = false,
