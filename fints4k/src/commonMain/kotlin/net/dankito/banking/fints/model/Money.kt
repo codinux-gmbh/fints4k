@@ -6,6 +6,11 @@ open class Money(
     val currency: Currency
 ) {
 
+    companion object {
+        val Zero = Money(Amount.Zero, "EUR")
+    }
+
+
 
     constructor(amount: Amount, currencyCode: String) : this(amount, Currency(currencyCode))
 

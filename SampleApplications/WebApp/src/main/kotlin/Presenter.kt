@@ -2,11 +2,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import net.dankito.banking.fints.FinTsClientDeprecated
+import net.dankito.banking.client.model.parameter.GetAccountDataParameter
+import net.dankito.banking.client.model.response.GetAccountDataResponse
+import net.dankito.banking.fints.FinTsClient
 import net.dankito.banking.fints.callback.SimpleFinTsClientCallback
-import net.dankito.banking.fints.model.AddAccountParameter
 import net.dankito.banking.fints.model.TanChallenge
-import net.dankito.banking.fints.response.client.AddAccountResponse
+import net.dankito.banking.fints.model.TanMethod
+import net.dankito.banking.fints.model.TanMethodType
 import net.dankito.banking.fints.webclient.KtorWebClient
 import net.dankito.banking.fints.webclient.ProxyingWebClient
 import net.dankito.utils.multiplatform.log.LoggerFactory
@@ -20,7 +22,7 @@ open class Presenter {
 
   // to circumvent CORS we have to use a CORS proxy like the SampleApplications.CorsProxy Application.kt or
   // https://github.com/Rob--W/cors-anywhere. Set CORS proxy's URL here
-  protected open val fintsClient = FinTsClientDeprecated(SimpleFinTsClientCallback { challenge -> enterTan(challenge) },
+  protected open val fintsClient = FinTsClient(SimpleFinTsClientCallback { challenge -> enterTan(challenge) },
     ProxyingWebClient("http://localhost:8082/", KtorWebClient()))
 
   open var enterTanCallback: ((TanChallenge) -> Unit)? = null
@@ -30,11 +32,11 @@ open class Presenter {
   }
 
 
-  open fun retrieveAccountData(bankCode: String, customerId: String, pin: String, finTs3ServerAddress: String, retrievedResult: (AddAccountResponse) -> Unit) {
+  open fun retrieveAccountData(bankCode: String, customerId: String, pin: String, finTs3ServerAddress: String, retrievedResult: (GetAccountDataResponse) -> Unit) {
     GlobalScope.launch(Dispatchers.Unconfined) {
-      val response = fintsClient.addAccountAsync(AddAccountParameter(bankCode, customerId, pin, finTs3ServerAddress))
+      val response = fintsClient.getAccountData(GetAccountDataParameter(bankCode, customerId, pin, finTs3ServerAddress))
 
-      log.info("Retrieved response from ${response.bank.bankName} for ${response.bank.customerName}")
+      log.info("Retrieved response from ${response.customerAccount?.bankName} for ${response.customerAccount?.customerName}")
 
       withContext(Dispatchers.Main) {
         retrievedResult(response)

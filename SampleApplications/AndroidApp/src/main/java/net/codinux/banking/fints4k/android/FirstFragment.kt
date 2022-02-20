@@ -48,8 +48,8 @@ class FirstFragment : Fragment() {
 
         // TODO: set your credentials here
         presenter.retrieveAccountData("", "", "", "") { response ->
-            if (response.successful) {
-                accountTransactionsAdapter.items = response.retrievedData.flatMap { it.bookedTransactions }
+            response.customerAccount?.let { customer ->
+                accountTransactionsAdapter.items = customer.accounts.flatMap { it.bookedTransactions }
             }
         }
     }

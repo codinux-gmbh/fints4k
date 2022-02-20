@@ -1,6 +1,7 @@
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import net.dankito.banking.fints.model.*
+import net.dankito.banking.client.model.AccountTransaction
+import net.dankito.banking.fints.model.TanChallenge
 import react.RBuilder
 import react.RComponent
 import react.Props
@@ -27,10 +28,10 @@ class AccountTransactionsView(props: AccountTransactionsViewProps) : RComponent<
     // TODO: set your credentials here
     GlobalScope.launch {
       props.presenter.retrieveAccountData("", "", "", "") { response ->
-        if (response.successful) {
-          val balance = response.retrievedData.sumOf { it.balance?.amount?.string?.replace(',', '.')?.toDoubleOrNull() ?: 0.0 } // i know, double is not an appropriate data type for amounts
+        response.customerAccount?.let { customer ->
+          val balance = customer.accounts.sumOf { it.balance?.amount?.string?.replace(',', '.')?.toDoubleOrNull() ?: 0.0 } // i know, double is not an appropriate data type for amounts
 
-          setState(AccountTransactionsViewState(balance.toString() + " " + (response.retrievedData.firstOrNull()?.balance?.currency ?: ""), response.retrievedData.flatMap { it.bookedTransactions }, state.enterTanChallenge))
+          setState(AccountTransactionsViewState(balance.toString() + " " + (customer.accounts.firstOrNull()?.balance?.currency ?: ""), customer.accounts.flatMap { it.bookedTransactions }, state.enterTanChallenge))
         }
       }
     }

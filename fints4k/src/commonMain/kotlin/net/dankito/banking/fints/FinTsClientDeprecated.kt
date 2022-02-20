@@ -25,11 +25,6 @@ open class FinTsClientDeprecated(
     protected open val product: ProductData = ProductData("15E53C26816138699C7B6A3E8", "1.0.0") // TODO: get version dynamically
 ) {
 
-    companion object {
-        val SupportedAccountTypes = listOf(AccountType.Girokonto, AccountType.Festgeldkonto, AccountType.Kreditkartenkonto)
-    }
-
-
     constructor(callback: FinTsClientCallback) : this(callback, FinTsJobExecutor()) // Swift does not support default parameter values -> create constructor overloads
 
     constructor(callback: FinTsClientCallback, webClient: IWebClient) : this(callback, FinTsJobExecutor(RequestExecutor(webClient = webClient)))

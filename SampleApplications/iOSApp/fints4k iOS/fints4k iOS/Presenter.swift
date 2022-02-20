@@ -18,8 +18,8 @@ class Presenter : ObservableObject {
     }
     
     
-    func retrieveTransactions(_ bankCode: String, _ customerId: String, _ pin: String, _ finTs3ServerAddress: String, _ callback: @escaping (AddAccountResponse) -> Void) {
-        self.fintsClient.addAccountAsync(parameter: AddAccountParameter(bankCode: bankCode, customerId: customerId, pin: pin, finTs3ServerAddress: finTs3ServerAddress), callback: callback)
+    func getAccountData(_ bankCode: String, _ customerId: String, _ pin: String, _ finTs3ServerAddress: String, _ callback: @escaping (GetAccountDataResponse) -> Void) {
+        self.fintsClient.getAccountData(parameter: GetAccountDataParameter(bankCode: bankCode, customerId: customerId, pin: pin, finTs3ServerAddress: finTs3ServerAddress), callback: callback)
     }
     
     

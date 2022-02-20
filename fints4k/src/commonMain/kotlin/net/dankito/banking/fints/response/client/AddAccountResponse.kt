@@ -8,12 +8,10 @@ open class AddAccountResponse(
     context: JobContext,
     getAccountsResponse: BankResponse,
     open val retrievedTransactionsResponses: List<GetAccountTransactionsResponse> = listOf()
-) : FinTsClientResponse(context, getAccountsResponse) {
-
-    open val bank: BankData = context.bank
+) : GetAccountInfoResponse(context, getAccountsResponse) {
 
     override val successful: Boolean
-        get() = super.successful && bank.accounts.isNotEmpty()
+        get() = super.successful
                 && bank.accounts.size == retrievedTransactionsResponses.size
                 && retrievedTransactionsResponses.none { it.noTanMethodSelected }
                 && retrievedTransactionsResponses.none { it.isPinLocked }

@@ -1,11 +1,11 @@
 import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.LocalDate
-import net.dankito.banking.fints.FinTsClientDeprecated
+import net.dankito.banking.client.model.AccountTransaction
+import net.dankito.banking.client.model.CustomerAccount
+import net.dankito.banking.client.model.parameter.GetAccountDataParameter
+import net.dankito.banking.fints.FinTsClient
 import net.dankito.banking.fints.callback.SimpleFinTsClientCallback
-import net.dankito.banking.fints.model.AddAccountParameter
-import net.dankito.banking.fints.model.RetrievedAccountData
 import net.dankito.banking.fints.model.TanChallenge
-import net.dankito.banking.fints.response.client.AddAccountResponse
 import net.dankito.utils.multiplatform.extensions.*
 import platform.posix.exit
 
@@ -23,13 +23,19 @@ class Application {
 
   fun retrieveAccountData(bankCode: String, customerId: String, pin: String, finTs3ServerAddress: String) {
     runBlocking {
-      val client = FinTsClientDeprecated(SimpleFinTsClientCallback { tanChallenge -> enterTan(tanChallenge) })
+      val client = FinTsClient(SimpleFinTsClientCallback { tanChallenge -> enterTan(tanChallenge) })
 
-      val response = client.addAccountAsync(AddAccountParameter(bankCode, customerId, pin, finTs3ServerAddress))
+      val response = client.getAccountData(GetAccountDataParameter(bankCode, customerId, pin, finTs3ServerAddress))
 
-      println("Retrieved response from ${response.bank.bankName} for ${response.bank.customerName}")
+      if (response.error != null) {
+        println("An error occurred: ${response.error}${response.errorMessage?.let { " $it" }}")
+      }
 
-      displayRetrievedAccountData(response)
+      response.customerAccount?.let { account ->
+        println("Retrieved response from ${account.bankName} for ${account.customerName}")
+
+        displayRetrievedAccountData(account)
+      }
     }
   }
 
@@ -50,36 +56,34 @@ class Application {
   }
 
 
-  private fun displayRetrievedAccountData(response: AddAccountResponse) {
-    if (response.retrievedData.isEmpty()) {
+  private fun displayRetrievedAccountData(customer: CustomerAccount) {
+    if (customer.accounts.isEmpty()) {
       println()
-
-      if (response.bank.accounts.isEmpty()) {
-        println("No data retrieved")
-      } else {
-        println("No transactions retrieved for accounts:")
-        response.bank.accounts.forEach { account -> println("- $account") }
-      }
+      println("No account data retrieved")
+    } else if (customer.accounts.flatMap { it.bookedTransactions }.isEmpty()) {
+      println()
+      println("No transactions retrieved for accounts:")
+      customer.accounts.forEach { println("- $it") }
     }
 
-    response.retrievedData.forEach { data ->
+    customer.accounts.forEach { account ->
       println()
-      println("${data.account}:")
+      println("${account}:")
       println()
 
-      if (data.bookedTransactions.isEmpty()) {
+      if (account.bookedTransactions.isEmpty()) {
         println("No transactions retrieved for this account")
       } else {
-        displayTransactions(data)
+        displayTransactions(account.bookedTransactions)
       }
     }
   }
 
-  private fun displayTransactions(data: RetrievedAccountData) {
-    val countTransactionsDigits = data.bookedTransactions.size.numberOfDigits
-    val largestAmountDigits = data.bookedTransactions.maxByOrNull { it.amount.displayString.length }?.amount?.displayString?.length ?: 0
+  private fun displayTransactions(bookedTransactions: List<AccountTransaction>) {
+    val countTransactionsDigits = bookedTransactions.size.numberOfDigits
+    val largestAmountDigits = bookedTransactions.maxByOrNull { it.amount.displayString.length }?.amount?.displayString?.length ?: 0
 
-    data.bookedTransactions.sortedByDescending { it.valueDate }.forEachIndexed { transactionIndex, transaction ->
+    bookedTransactions.sortedByDescending { it.valueDate }.forEachIndexed { transactionIndex, transaction ->
       println("${(transactionIndex + 1).toStringWithMinDigits(countTransactionsDigits, " ")}. ${formatDate(transaction.valueDate)} " +
         "${transaction.amount.displayString.ensureMinStringLength(largestAmountDigits, " ")} ${transaction.otherPartyName ?: ""} - ${transaction.reference}")
     }

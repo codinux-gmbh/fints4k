@@ -51,22 +51,20 @@ struct ContentView: View {
     
     private func retrieveTransactions() {
         // TODO: set your credentials here
-        self.presenter.retrieveTransactions("", "", "", "", self.handleRetrieveTransactionsResult)
+        self.presenter.getAccountData("", "", "", "", self.handleGetAccountDataResponse)
     }
     
-    private func handleRetrieveTransactionsResult(_ result: AddAccountResponse) {
-        NSLog("Retrieved response: \(result.retrievedTransactionsResponses)")
+    private func handleGetAccountDataResponse(_ response: GetAccountDataResponse) {
+        NSLog("Retrieved response: \(response.retrievedTransactions)")
         
-        if (result.successful) {
+        if (response.successful) {
             var allTransactions: [AccountTransaction] = []
             
-            for accountResponse in result.retrievedTransactionsResponses {
-                if let transactions = accountResponse.retrievedData?.bookedTransactions as? Set<AccountTransaction> { // it's a Set
-                    allTransactions.append(contentsOf: transactions)
-                }
-                if let transactions = accountResponse.retrievedData?.bookedTransactions as? [AccountTransaction] {
-                    allTransactions.append(contentsOf: transactions)
-                }
+            if let transactions = response.retrievedTransactions as? Set<AccountTransaction> { // it's a Set
+                allTransactions.append(contentsOf: transactions)
+            }
+            if let transactions = response.retrievedTransactions as? [AccountTransaction] {
+                allTransactions.append(contentsOf: transactions)
             }
             
             self.transactions = allTransactions

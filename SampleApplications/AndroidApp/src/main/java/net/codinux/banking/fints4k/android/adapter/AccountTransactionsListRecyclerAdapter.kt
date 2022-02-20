@@ -4,7 +4,7 @@ import android.view.View
 import net.codinux.banking.fints4k.android.Presenter
 import net.codinux.banking.fints4k.android.R
 import net.codinux.banking.fints4k.android.adapter.viewholder.AccountTransactionsViewHolder
-import net.dankito.banking.fints.model.AccountTransaction
+import net.dankito.banking.client.model.AccountTransaction
 import net.dankito.banking.fints.util.toBigDecimal
 import net.dankito.utils.android.extensions.setTextColorToColorResource
 import net.dankito.utils.android.ui.adapter.ListRecyclerAdapter

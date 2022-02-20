@@ -5,11 +5,11 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.LocalDate
-import net.dankito.banking.fints.FinTsClientDeprecated
+import net.dankito.banking.client.model.parameter.GetAccountDataParameter
+import net.dankito.banking.client.model.response.GetAccountDataResponse
+import net.dankito.banking.fints.FinTsClient
 import net.dankito.banking.fints.callback.SimpleFinTsClientCallback
-import net.dankito.banking.fints.model.AddAccountParameter
 import net.dankito.banking.fints.model.TanChallenge
-import net.dankito.banking.fints.response.client.AddAccountResponse
 import net.dankito.utils.multiplatform.extensions.millisSinceEpochAtSystemDefaultTimeZone
 import org.slf4j.LoggerFactory
 import java.math.BigDecimal
@@ -24,7 +24,7 @@ open class Presenter {
         private val log = LoggerFactory.getLogger(Presenter::class.java)
     }
 
-    private val fintsClient = FinTsClientDeprecated(SimpleFinTsClientCallback { challenge -> enterTan(challenge) })
+    private val fintsClient = FinTsClient(SimpleFinTsClientCallback { challenge -> enterTan(challenge) })
 
     open var enterTanCallback: ((TanChallenge) -> Unit)? = null
 
@@ -34,10 +34,10 @@ open class Presenter {
 
 
 
-    open fun retrieveAccountData(bankCode: String, customerId: String, pin: String, finTs3ServerAddress: String, retrievedResult: (AddAccountResponse) -> Unit) {
+    open fun retrieveAccountData(bankCode: String, customerId: String, pin: String, finTs3ServerAddress: String, retrievedResult: (GetAccountDataResponse) -> Unit) {
         GlobalScope.launch(Dispatchers.IO) {
-            val response = fintsClient.addAccountAsync(AddAccountParameter(bankCode, customerId, pin, finTs3ServerAddress))
-            log.info("Retrieved response from ${response.bank.bankName} for ${response.bank.customerName}")
+            val response = fintsClient.getAccountData(GetAccountDataParameter(bankCode, customerId, pin, finTs3ServerAddress))
+            log.info("Retrieved response from ${response.customerAccount?.bankName} for ${response.customerAccount?.customerName}")
 
             withContext(Dispatchers.Main) {
                 retrievedResult(response)
