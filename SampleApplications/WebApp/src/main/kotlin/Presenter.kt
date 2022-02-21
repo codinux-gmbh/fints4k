@@ -32,9 +32,9 @@ open class Presenter {
   }
 
 
-  open fun retrieveAccountData(bankCode: String, customerId: String, pin: String, finTs3ServerAddress: String, retrievedResult: (GetAccountDataResponse) -> Unit) {
+  open fun retrieveAccountData(bankCode: String, loginName: String, password: String, retrievedResult: (GetAccountDataResponse) -> Unit) {
     GlobalScope.launch(Dispatchers.Unconfined) {
-      val response = fintsClient.getAccountData(GetAccountDataParameter(bankCode, customerId, pin, finTs3ServerAddress))
+      val response = fintsClient.getAccountData(GetAccountDataParameter(bankCode, loginName, password))
 
       log.info("Retrieved response from ${response.customerAccount?.bankName} for ${response.customerAccount?.customerName}")
 

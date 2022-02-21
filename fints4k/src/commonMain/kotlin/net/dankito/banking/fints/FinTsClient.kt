@@ -12,6 +12,7 @@ import net.dankito.banking.fints.response.client.FinTsClientResponse
 import net.dankito.banking.fints.response.client.GetAccountInfoResponse
 import net.dankito.banking.fints.response.client.GetAccountTransactionsResponse
 import net.dankito.banking.fints.response.segments.AccountType
+import net.dankito.banking.fints.util.FinTsServerAddressFinder
 import net.dankito.banking.fints.webclient.IWebClient
 import net.dankito.utils.multiplatform.extensions.minusDays
 import net.dankito.utils.multiplatform.extensions.todayAtEuropeBerlin
@@ -21,6 +22,7 @@ import kotlin.jvm.JvmOverloads
 open class FinTsClient @JvmOverloads constructor(
   open var callback: FinTsClientCallback,
   protected open val jobExecutor: FinTsJobExecutor = FinTsJobExecutor(),
+  protected open val finTsServerAddressFinder: FinTsServerAddressFinder = FinTsServerAddressFinder(),
   protected open val product: ProductData = ProductData("15E53C26816138699C7B6A3E8", "1.0.0") // TODO: get version dynamically
 ) {
 
@@ -29,16 +31,19 @@ open class FinTsClient @JvmOverloads constructor(
   }
 
 
-  constructor(callback: FinTsClientCallback) : this(callback, FinTsJobExecutor()) // Swift does not support default parameter values -> create constructor overloads
-
-  constructor(callback: FinTsClientCallback, webClient: IWebClient) : this(callback, FinTsJobExecutor(RequestExecutor(webClient = webClient)))
+  constructor(callback: FinTsClientCallback, webClient: IWebClient) : this(callback, FinTsJobExecutor(RequestExecutor(webClient = webClient))) // Swift does not support default parameter values -> create constructor overloads
 
 
   protected open val mapper = FinTsModelMapper()
 
 
   open suspend fun getAccountData(param: GetAccountDataParameter): GetAccountDataResponse {
-    val bank = BankData(param.bankCode, param.loginName, param.password, param.finTsServerAddress, "")
+    val finTsServerAddress = finTsServerAddressFinder.findFinTsServerAddress(param.bankCode)
+    if (finTsServerAddress.isNullOrBlank()) {
+      return GetAccountDataResponse(ErrorCode.BankDoesNotSupportFinTs3, "Either bank does not FinTS 3.0 or we don't know its FinTS server address", null, listOf())
+    }
+
+    val bank = BankData(param.bankCode, param.loginName, param.password, finTsServerAddress, "")
     val accounts = param.accounts
 
     if (accounts.isNullOrEmpty() || param.retrieveOnlyAccountInfo) { // then first retrieve customer's bank accounts

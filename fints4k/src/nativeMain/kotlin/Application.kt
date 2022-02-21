@@ -10,22 +10,22 @@ import net.dankito.utils.multiplatform.extensions.*
 import platform.posix.exit
 
 fun main(args: Array<String>) {
-  if (args.size < 4) {
-    println("Bitte geben Sie Ihre Bankzugangsdaten ein in der Reihenfolge: <Bankleitzahl> <Login name> <Password> <FinTS Serveradresse der Bank>\r\n" +
-      "Z. B.: ./fints4k.kexe 10050000 \"Mein Loginname\" GeheimesPasswort \"https://banking-be3.s-fints-pt-be.de/fints30\"")
+  if (args.size < 3) {
+    println("Bitte geben Sie Ihre Bankzugangsdaten ein in der Reihenfolge: <Bankleitzahl> <Login name> <Password>\r\n" +
+      "Z. B.: ./fints4k.kexe 10050000 \"Mein Loginname\" GeheimesPasswort")
     exit(0)
   }
 
-  Application().retrieveAccountData(args[0], args[1], args[2], args[3])
+  Application().retrieveAccountData(args[0], args[1], args[2])
 }
 
 class Application {
 
-  fun retrieveAccountData(bankCode: String, customerId: String, pin: String, finTs3ServerAddress: String) {
+  fun retrieveAccountData(bankCode: String, loginName: String, password: String) {
     runBlocking {
       val client = FinTsClient(SimpleFinTsClientCallback { tanChallenge -> enterTan(tanChallenge) })
 
-      val response = client.getAccountData(GetAccountDataParameter(bankCode, customerId, pin, finTs3ServerAddress))
+      val response = client.getAccountData(GetAccountDataParameter(bankCode, loginName, password))
 
       if (response.error != null) {
         println("An error occurred: ${response.error}${response.errorMessage?.let { " $it" }}")

@@ -47,7 +47,7 @@ class FirstFragment : Fragment() {
         }
 
         // TODO: set your credentials here
-        presenter.retrieveAccountData("", "", "", "") { response ->
+        presenter.retrieveAccountData("", "", "") { response ->
             response.customerAccount?.let { customer ->
                 accountTransactionsAdapter.items = customer.accounts.flatMap { it.bookedTransactions }
             }

@@ -10,7 +10,6 @@ open class GetAccountDataParameter(
     bankCode: String,
     loginName: String,
     password: String,
-    finTsServerAddress: String, // TODO: get rid of this
     /**
      * Optionally specify for which bank account to retrieve the account data.
      * If not set the data for all bank accounts of this account will be retrieved.
@@ -25,7 +24,7 @@ open class GetAccountDataParameter(
     preferredTanMedium: String? = null,
     abortIfTanIsRequired: Boolean = false,
     finTsModel: BankData? = null
-) : FinTsClientParameter(bankCode, loginName, password, finTsServerAddress, preferredTanMethods, preferredTanMedium, abortIfTanIsRequired, finTsModel) {
+) : FinTsClientParameter(bankCode, loginName, password, preferredTanMethods, preferredTanMedium, abortIfTanIsRequired, finTsModel) {
 
     open val retrieveOnlyAccountInfo: Boolean
         get() = retrieveBalance == false && retrieveTransactions == RetrieveTransactions.No

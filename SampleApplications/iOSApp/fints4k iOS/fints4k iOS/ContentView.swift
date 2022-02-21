@@ -51,7 +51,7 @@ struct ContentView: View {
     
     private func retrieveTransactions() {
         // TODO: set your credentials here
-        self.presenter.getAccountData("", "", "", "", self.handleGetAccountDataResponse)
+        self.presenter.getAccountData("", "", "", self.handleGetAccountDataResponse)
     }
     
     private func handleGetAccountDataResponse(_ response: GetAccountDataResponse) {

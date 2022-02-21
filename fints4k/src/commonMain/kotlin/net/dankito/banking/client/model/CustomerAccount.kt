@@ -11,7 +11,7 @@ open class CustomerAccount(
     override var bankCode: String,
     override var loginName: String,
     override var password: String,
-    override var finTsServerAddress: String,
+    open var finTsServerAddress: String,
     open var bankName: String,
     open var bic: String,
 
@@ -25,7 +25,7 @@ open class CustomerAccount(
     open var selectedTanMethod: TanMethod? = null,
     open var tanMedia: List<TanMedium> = listOf(),
     open var selectedTanMedium: TanMedium? = null,
-) : CustomerCredentials(bankCode, loginName, password, finTsServerAddress) {
+) : CustomerCredentials(bankCode, loginName, password) {
 
 
     override fun toString(): String {

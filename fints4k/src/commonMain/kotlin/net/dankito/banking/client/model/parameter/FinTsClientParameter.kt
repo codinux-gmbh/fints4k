@@ -10,10 +10,9 @@ open class FinTsClientParameter(
   bankCode: String,
   loginName: String,
   password: String,
-  finTsServerAddress: String, // TODO: get rid of this
 
   open val preferredTanMethods: List<TanMethodType>? = null,
   open val preferredTanMedium: String? = null, // the ID of the medium
   open val abortIfTanIsRequired: Boolean = false,
   open val finTsModel: BankData? = null
-) : CustomerCredentials(bankCode, loginName, password, finTsServerAddress)
+) : CustomerCredentials(bankCode, loginName, password)

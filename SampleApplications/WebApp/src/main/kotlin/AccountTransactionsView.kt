@@ -27,7 +27,7 @@ class AccountTransactionsView(props: AccountTransactionsViewProps) : RComponent<
     // due to CORS your bank's servers can not be requested directly from browser -> set a CORS proxy url in main.kt
     // TODO: set your credentials here
     GlobalScope.launch {
-      props.presenter.retrieveAccountData("", "", "", "") { response ->
+      props.presenter.retrieveAccountData("", "", "") { response ->
         response.customerAccount?.let { customer ->
           val balance = customer.accounts.sumOf { it.balance?.amount?.string?.replace(',', '.')?.toDoubleOrNull() ?: 0.0 } // i know, double is not an appropriate data type for amounts
 
