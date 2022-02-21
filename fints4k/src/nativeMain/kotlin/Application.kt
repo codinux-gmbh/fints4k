@@ -5,6 +5,7 @@ import net.dankito.banking.client.model.CustomerAccount
 import net.dankito.banking.client.model.parameter.GetAccountDataParameter
 import net.dankito.banking.fints.FinTsClient
 import net.dankito.banking.fints.callback.SimpleFinTsClientCallback
+import net.dankito.banking.fints.getAccountData
 import net.dankito.banking.fints.model.TanChallenge
 import net.dankito.utils.multiplatform.extensions.*
 import platform.posix.exit
@@ -22,20 +23,18 @@ fun main(args: Array<String>) {
 class Application {
 
   fun retrieveAccountData(bankCode: String, loginName: String, password: String) {
-    runBlocking {
-      val client = FinTsClient(SimpleFinTsClientCallback { tanChallenge -> enterTan(tanChallenge) })
+    val client = FinTsClient(SimpleFinTsClientCallback { tanChallenge -> enterTan(tanChallenge) })
 
-      val response = client.getAccountData(GetAccountDataParameter(bankCode, loginName, password))
+    val response = client.getAccountData(GetAccountDataParameter(bankCode, loginName, password))
 
-      if (response.error != null) {
-        println("An error occurred: ${response.error}${response.errorMessage?.let { " $it" }}")
-      }
+    if (response.error != null) {
+      println("An error occurred: ${response.error}${response.errorMessage?.let { " $it" }}")
+    }
 
-      response.customerAccount?.let { account ->
-        println("Retrieved response from ${account.bankName} for ${account.customerName}")
+    response.customerAccount?.let { account ->
+      println("Retrieved response from ${account.bankName} for ${account.customerName}")
 
-        displayRetrievedAccountData(account)
-      }
+      displayRetrievedAccountData(account)
     }
   }
 

@@ -20,9 +20,9 @@ open class iOSFinTsClient(
         }
 
 
-    open fun getAccountData(parameter: GetAccountDataParameter, callback: (GetAccountDataResponse) -> Unit) {
+    open fun getAccountDataAsync(parameter: GetAccountDataParameter, callback: (GetAccountDataResponse) -> Unit) {
         GlobalScope.launch(Dispatchers.Main) { // do not block UI thread as with runBlocking { } but stay on UI thread as passing mutable state between threads currently doesn't work in Kotlin/Native
-            callback(fintsClient.getAccountData(parameter))
+            callback(fintsClient.getAccountDataAsync(parameter))
         }
     }
 

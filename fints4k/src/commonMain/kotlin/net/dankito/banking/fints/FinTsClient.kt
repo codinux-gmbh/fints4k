@@ -37,11 +37,11 @@ open class FinTsClient @JvmOverloads constructor(
   protected open val mapper = FinTsModelMapper()
 
 
-  open suspend fun getAccountData(bankCode: String, loginName: String, password: String): GetAccountDataResponse {
-    return getAccountData(GetAccountDataParameter(bankCode, loginName, password))
+  open suspend fun getAccountDataAsync(bankCode: String, loginName: String, password: String): GetAccountDataResponse {
+    return getAccountDataAsync(GetAccountDataParameter(bankCode, loginName, password))
   }
 
-  open suspend fun getAccountData(param: GetAccountDataParameter): GetAccountDataResponse {
+  open suspend fun getAccountDataAsync(param: GetAccountDataParameter): GetAccountDataResponse {
     val finTsServerAddress = finTsServerAddressFinder.findFinTsServerAddress(param.bankCode)
     if (finTsServerAddress.isNullOrBlank()) {
       return GetAccountDataResponse(ErrorCode.BankDoesNotSupportFinTs3, "Either bank does not FinTS 3.0 or we don't know its FinTS server address", null, listOf())
