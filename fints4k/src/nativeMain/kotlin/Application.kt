@@ -68,6 +68,7 @@ class Application {
     customer.accounts.forEach { account ->
       println()
       println("${account}:")
+      println("${account.balance}")
       println()
 
       if (account.bookedTransactions.isEmpty()) {
