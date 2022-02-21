@@ -37,6 +37,10 @@ open class FinTsClient @JvmOverloads constructor(
   protected open val mapper = FinTsModelMapper()
 
 
+  open suspend fun getAccountData(bankCode: String, loginName: String, password: String): GetAccountDataResponse {
+    return getAccountData(GetAccountDataParameter(bankCode, loginName, password))
+  }
+
   open suspend fun getAccountData(param: GetAccountDataParameter): GetAccountDataResponse {
     val finTsServerAddress = finTsServerAddressFinder.findFinTsServerAddress(param.bankCode)
     if (finTsServerAddress.isNullOrBlank()) {
