@@ -1,4 +1,3 @@
-import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.LocalDate
 import net.dankito.banking.client.model.AccountTransaction
 import net.dankito.banking.client.model.CustomerAccount
@@ -8,24 +7,18 @@ import net.dankito.banking.fints.callback.SimpleFinTsClientCallback
 import net.dankito.banking.fints.getAccountData
 import net.dankito.banking.fints.model.TanChallenge
 import net.dankito.utils.multiplatform.extensions.*
-import platform.posix.exit
 
-fun main(args: Array<String>) {
-  if (args.size < 3) {
-    println("Bitte geben Sie Ihre Bankzugangsdaten ein in der Reihenfolge: <Bankleitzahl> <Login name> <Password>\r\n" +
-      "Z. B.: ./fints4k.kexe 10050000 \"Mein Loginname\" GeheimesPasswort")
-    exit(0)
-  }
 
-  Application().retrieveAccountData(args[0], args[1], args[2])
-}
-
-class Application {
+class NativeApp {
 
   fun retrieveAccountData(bankCode: String, loginName: String, password: String) {
+    retrieveAccountData(GetAccountDataParameter(bankCode, loginName, password))
+  }
+
+  fun retrieveAccountData(param: GetAccountDataParameter) {
     val client = FinTsClient(SimpleFinTsClientCallback { tanChallenge -> enterTan(tanChallenge) })
 
-    val response = client.getAccountData(GetAccountDataParameter(bankCode, loginName, password))
+    val response = client.getAccountData(param)
 
     if (response.error != null) {
       println("An error occurred: ${response.error}${response.errorMessage?.let { " $it" }}")

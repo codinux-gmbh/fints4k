@@ -142,6 +142,8 @@ kotlin {
 
                 // requires cURL to be installed on your system
                 implementation "io.ktor:ktor-client-curl:$ktorVersion"
+
+                implementation "com.github.ajalt.clikt:clikt:3.4.0"
             }
         }
 
