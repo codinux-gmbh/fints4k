@@ -2,10 +2,14 @@ import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.options.*
 import com.github.ajalt.clikt.parameters.types.enum
+import com.github.ajalt.clikt.parameters.types.int
+import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.minus
 import net.dankito.banking.client.model.parameter.GetAccountDataParameter
 import net.dankito.banking.client.model.parameter.RetrieveTransactions
 import net.dankito.banking.fints.model.TanMethodType
+import net.dankito.utils.multiplatform.extensions.todayAtEuropeBerlin
 
 class fints4kCommandLineInterface : CliktCommand(name = "fints", printHelpOnEmptyArgs = true) {
   init {
@@ -21,17 +25,24 @@ class fints4kCommandLineInterface : CliktCommand(name = "fints", printHelpOnEmpt
   val retrieveTransactions by option("-t", "--transactions", help = "Die Kontoumsätze abrufen. Default: OfLast90Days. As most banks don't afford a TAN to get transactions of last 90 days")
     .enum<RetrieveTransactions>().default(RetrieveTransactions.OfLast90Days)
 
-  val retrieveTransactionsFrom by option("--from", help = "The day as ISO date from which transactions should be retrieved like 2022-02-22. If set sets 'retrieveTransactions' to '${RetrieveTransactions.AccordingToRetrieveFromAndTo}'")
+  val retrieveTransactionsFrom by option("--from", help = "The day as ISO date from which transactions should be retrieved like 2022-02-22. If set 'retrieveTransactions' gets set to '${RetrieveTransactions.AccordingToRetrieveFromAndTo}'")
     .validate { it.isNullOrBlank() || LocalDate.parse(it) != null }
-  val retrieveTransactionsTo by option("--to", help = "The day as ISO date up to which account transactions are to be received like 2022-02-22. If set sets 'retrieveTransactions' to '${RetrieveTransactions.AccordingToRetrieveFromAndTo}'")
+  val retrieveTransactionsTo by option("--to", help = "The day as ISO date up to which account transactions are to be received like 2022-02-22. If set 'retrieveTransactions' gets set to '${RetrieveTransactions.AccordingToRetrieveFromAndTo}'")
     .validate { it.isNullOrBlank() || LocalDate.parse(it) != null }
+  val retrieveTransactionsForLastNDays by option("-l", "--last-n-days", help = "Retrieve transactions for last n days. If set 'retrieveTransactions' gets set to '${RetrieveTransactions.AccordingToRetrieveFromAndTo}' and 'retrieveTransactionsFrom' will be ignored.").int()
 
   val preferredTanMethod by option("-m", "--tan-method", help = "Your preferred TAN methods to use if action affords a TAN. Can be repeated like '-m AppTan -m SmsTan'").enum<TanMethodType>().multiple()
 
   val abortIfRequiresTan by option("-a", "--abort-if-requires-tan", help = "If actions should be aborted if it affords a TAN. Defaults to false").flag(default = false)
 
+
   override fun run() {
-    val retrieveTransactionsFromDate = if (retrieveTransactionsFrom.isNullOrBlank()) null else LocalDate.parse(retrieveTransactionsFrom!!)
+    val retrieveTransactionsFromDate = when { // retrieveTransactionsForLastNDays takes precedence over retrieveTransactionsFrom
+      retrieveTransactionsForLastNDays != null -> LocalDate.todayAtEuropeBerlin().minus(retrieveTransactionsForLastNDays!!, DateTimeUnit.DAY)
+      retrieveTransactionsFrom.isNullOrBlank() -> null
+      else -> LocalDate.parse(retrieveTransactionsFrom!!) // retrieveTransactionsFrom must then be != null
+    }
+
     val retrieveTransactionsToDate = if (retrieveTransactionsTo.isNullOrBlank()) null else LocalDate.parse(retrieveTransactionsTo!!)
     val effectiveRetrieveTransactions = if (retrieveTransactionsFromDate != null || retrieveTransactionsToDate != null) RetrieveTransactions.AccordingToRetrieveFromAndTo
                                           else retrieveTransactions
