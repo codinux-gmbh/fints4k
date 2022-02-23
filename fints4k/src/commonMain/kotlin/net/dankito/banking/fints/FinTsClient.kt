@@ -147,13 +147,23 @@ open class FinTsClient @JvmOverloads constructor(
 
   protected open suspend fun transferMoneyAsync(param: TransferMoneyParameter, recipientBankIdentifier: String, bank: BankData, accounts: List<AccountData>, previousJobResponse: FinTsClientResponse?): TransferMoneyResponse {
     val accountsSupportingTransfer = accounts.filter { it.supportsTransferringMoney }
+    val accountToUse: AccountData
+
     if (accountsSupportingTransfer.isEmpty()) {
       return TransferMoneyResponse(ErrorCode.NoAccountSupportsMoneyTransfer, "None of the accounts $accounts supports money transfer", previousJobResponse?.messageLogWithoutSensitiveData ?: listOf(), bank)
-    } else if (accountsSupportingTransfer.size > 1) {
-      return TransferMoneyResponse(ErrorCode.MoreThanOneAccountSupportsMoneyTransfer, "More than one of the accounts $accountsSupportingTransfer supports money transfer, so we cannot clearly determine which one to use for this transfer", previousJobResponse?.messageLogWithoutSensitiveData ?: listOf(), bank)
+    } else if (accountsSupportingTransfer.size == 1) {
+      accountToUse = accountsSupportingTransfer.first()
+    } else {
+      val selectedAccount = param.selectAccountToUseForTransfer?.invoke(accountsSupportingTransfer)
+
+      if (selectedAccount == null) {
+        return TransferMoneyResponse(ErrorCode.MoreThanOneAccountSupportsMoneyTransfer, "More than one of the accounts $accountsSupportingTransfer supports money transfer, so we cannot clearly determine which one to use for this transfer", previousJobResponse?.messageLogWithoutSensitiveData ?: listOf(), bank)
+      }
+
+      accountToUse = selectedAccount
     }
 
-    val context = JobContext(JobContextType.TransferMoney, this.callback, product, bank, accountsSupportingTransfer.first())
+    val context = JobContext(JobContextType.TransferMoney, this.callback, product, bank, accountToUse)
 
     val response = jobExecutor.transferMoneyAsync(context, BankTransferData(param.recipientName, param.recipientAccountIdentifier, recipientBankIdentifier,
       param.amount, param.reference, param.instantPayment))

@@ -1,6 +1,7 @@
 package net.dankito.banking.client.model.parameter
 
 import net.dankito.banking.client.model.BankAccountIdentifier
+import net.dankito.banking.fints.model.AccountData
 import net.dankito.banking.fints.model.BankData
 import net.dankito.banking.fints.model.Money
 import net.dankito.banking.fints.model.TanMethodType
@@ -35,6 +36,8 @@ open class TransferMoneyParameter(
   preferredTanMethods: List<TanMethodType>? = null,
   preferredTanMedium: String? = null,
   abortIfTanIsRequired: Boolean = false,
-  finTsModel: BankData? = null
+  finTsModel: BankData? = null,
+
+  open val selectAccountToUseForTransfer: ((List<AccountData>) -> AccountData?)? = null // TODO: use BankAccount instead of AccountData
 
 ) : FinTsClientParameter(bankCode, loginName, password, preferredTanMethods, preferredTanMedium, abortIfTanIsRequired, finTsModel)
