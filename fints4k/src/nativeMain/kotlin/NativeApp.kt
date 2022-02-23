@@ -16,11 +16,11 @@ class NativeApp {
   private val client = FinTsClient(SimpleFinTsClientCallback { tanChallenge -> enterTan(tanChallenge) })
 
 
-  fun retrieveAccountData(bankCode: String, loginName: String, password: String) {
-    retrieveAccountData(GetAccountDataParameter(bankCode, loginName, password))
+  fun getAccountData(bankCode: String, loginName: String, password: String) {
+    getAccountData(GetAccountDataParameter(bankCode, loginName, password))
   }
 
-  fun retrieveAccountData(param: GetAccountDataParameter) {
+  fun getAccountData(param: GetAccountDataParameter) {
     val response = client.getAccountData(param)
 
     if (response.error != null) {

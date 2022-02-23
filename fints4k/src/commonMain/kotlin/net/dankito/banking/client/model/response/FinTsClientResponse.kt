@@ -16,6 +16,6 @@ open class FinTsClientResponse(
     get() = error == null
 
   open val errorCodeAndMessage: String
-    get() = "$error${errorMessage?.let { " $it" }}}"
+    get() = "$error${errorMessage?.let { " $it" }}"
 
 }
