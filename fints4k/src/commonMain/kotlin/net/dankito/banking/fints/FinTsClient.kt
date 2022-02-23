@@ -15,6 +15,7 @@ import net.dankito.banking.fints.response.client.FinTsClientResponse
 import net.dankito.banking.fints.response.client.GetAccountInfoResponse
 import net.dankito.banking.fints.response.client.GetAccountTransactionsResponse
 import net.dankito.banking.fints.response.segments.AccountType
+import net.dankito.banking.fints.util.BicFinder
 import net.dankito.banking.fints.util.FinTsServerAddressFinder
 import net.dankito.banking.fints.webclient.IWebClient
 import net.dankito.utils.multiplatform.extensions.minusDays
@@ -39,6 +40,8 @@ open class FinTsClient @JvmOverloads constructor(
 
   protected open val mapper = FinTsModelMapper()
 
+  protected open val bicFinder = BicFinder()
+
 
   open suspend fun getAccountDataAsync(bankCode: String, loginName: String, password: String): GetAccountDataResponse {
     return getAccountDataAsync(GetAccountDataParameter(bankCode, loginName, password))
@@ -50,7 +53,7 @@ open class FinTsClient @JvmOverloads constructor(
       return GetAccountDataResponse(ErrorCode.BankDoesNotSupportFinTs3, "Either bank does not FinTS 3.0 or we don't know its FinTS server address", null, listOf())
     }
 
-    val bank = BankData(param.bankCode, param.loginName, param.password, finTsServerAddress, "")
+    val bank = mapper.mapToBankData(param, finTsServerAddress)
     val accounts = param.accounts
 
     if (accounts.isNullOrEmpty() || param.retrieveOnlyAccountInfo) { // then first retrieve customer's bank accounts
@@ -118,8 +121,14 @@ open class FinTsClient @JvmOverloads constructor(
     if (finTsServerAddress.isNullOrBlank()) {
       return TransferMoneyResponse(ErrorCode.BankDoesNotSupportFinTs3, "Either bank does not FinTS 3.0 or we don't know its FinTS server address", listOf(), null)
     }
+    val recipientBankIdentifier = getRecipientBankCode(param)
+    if (recipientBankIdentifier == null) {
+      return TransferMoneyResponse(ErrorCode.CanNotDetermineBicForIban, "We can only determine recipient's BIC automatically for German IBANs. If it's a German IBAN, either we " +
+        "cannot extract the bank code from IBAN ${param.recipientAccountIdentifier} (fourth to twelfth position) or don't know the BIC to this bank code. Please specify recipient's IBAN explicitly.", listOf())
+    }
 
-    val bank = BankData(param.bankCode, param.loginName, param.password, finTsServerAddress, "")
+
+    val bank = mapper.mapToBankData(param, finTsServerAddress)
     val remittanceAccount = param.remittanceAccount
 
     if (remittanceAccount == null) { // then first retrieve customer's bank accounts
@@ -129,14 +138,14 @@ open class FinTsClient @JvmOverloads constructor(
         return TransferMoneyResponse(mapper.mapErrorCode(getAccountInfoResponse), mapper.mapErrorMessages(getAccountInfoResponse),
           getAccountInfoResponse.messageLogWithoutSensitiveData, bank)
       } else {
-        return transferMoneyAsync(param, getAccountInfoResponse.bank, getAccountInfoResponse.bank.accounts, getAccountInfoResponse)
+        return transferMoneyAsync(param, recipientBankIdentifier, getAccountInfoResponse.bank, getAccountInfoResponse.bank.accounts, getAccountInfoResponse)
       }
     } else {
-      return transferMoneyAsync(param, bank, listOf(mapper.mapToAccountData(remittanceAccount, param)), null)
+      return transferMoneyAsync(param, recipientBankIdentifier, bank, listOf(mapper.mapToAccountData(remittanceAccount, param)), null)
     }
   }
 
-  protected open suspend fun transferMoneyAsync(param: TransferMoneyParameter, bank: BankData, accounts: List<AccountData>, previousJobResponse: FinTsClientResponse?): TransferMoneyResponse {
+  protected open suspend fun transferMoneyAsync(param: TransferMoneyParameter, recipientBankIdentifier: String, bank: BankData, accounts: List<AccountData>, previousJobResponse: FinTsClientResponse?): TransferMoneyResponse {
     val accountsSupportingTransfer = accounts.filter { it.supportsTransferringMoney }
     if (accountsSupportingTransfer.isEmpty()) {
       return TransferMoneyResponse(ErrorCode.NoAccountSupportsMoneyTransfer, "None of the accounts $accounts supports money transfer", previousJobResponse?.messageLogWithoutSensitiveData ?: listOf(), bank)
@@ -144,12 +153,25 @@ open class FinTsClient @JvmOverloads constructor(
       return TransferMoneyResponse(ErrorCode.MoreThanOneAccountSupportsMoneyTransfer, "More than one of the accounts $accountsSupportingTransfer supports money transfer, so we cannot clearly determine which one to use for this transfer", previousJobResponse?.messageLogWithoutSensitiveData ?: listOf(), bank)
     }
 
-    val recipientBankIdentifier = param.recipientBankIdentifier ?: "" // TODO: determine BIC from recipientBankCode if it's a German bank
     val context = JobContext(JobContextType.TransferMoney, this.callback, product, bank, accountsSupportingTransfer.first())
 
-    val response = jobExecutor.transferMoneyAsync(context, BankTransferData(param.recipientName, param.recipientAccountIdentifier, recipientBankIdentifier, param.amount, param.reference, param.instantPayment))
+    val response = jobExecutor.transferMoneyAsync(context, BankTransferData(param.recipientName, param.recipientAccountIdentifier, recipientBankIdentifier,
+      param.amount, param.reference, param.instantPayment))
 
     return TransferMoneyResponse(mapper.mapErrorCode(response), mapper.mapErrorMessages(response), mapper.mergeMessageLog(previousJobResponse, response), bank)
+  }
+
+  private fun getRecipientBankCode(param: TransferMoneyParameter): String? {
+    param.recipientBankIdentifier?.let { return it }
+
+    val probablyIban = param.recipientAccountIdentifier.replace(" ", "")
+    if (probablyIban.length > 12) {
+      val bankCode = probablyIban.substring(4, 4 + 8) // extract bank code from IBAN. For German IBAN bank code starts at fourth position and has 8 digits
+
+      bicFinder.findBic(bankCode)?.let { return it }
+    }
+
+    return null
   }
 
   protected open suspend fun getAccountInfo(param: FinTsClientParameter, bank: BankData): GetAccountInfoResponse {

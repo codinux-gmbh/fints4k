@@ -23,6 +23,8 @@ enum class ErrorCode {
 
   DidNotRetrieveAllAccountData,
 
+  CanNotDetermineBicForIban,
+
   NoAccountSupportsMoneyTransfer,
 
   MoreThanOneAccountSupportsMoneyTransfer

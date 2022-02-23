@@ -10,9 +10,17 @@ import net.dankito.banking.fints.model.*
 import net.dankito.banking.fints.response.client.FinTsClientResponse
 import net.dankito.banking.fints.response.client.GetAccountTransactionsResponse
 import net.dankito.banking.fints.response.segments.AccountType
+import net.dankito.banking.fints.util.BicFinder
 
 
 open class FinTsModelMapper {
+
+  protected open val bicFinder = BicFinder()
+
+
+  open fun mapToBankData(param: FinTsClientParameter, finTsServerAddress: String): BankData {
+    return BankData(param.bankCode, param.loginName, param.password, finTsServerAddress, bicFinder.findBic(param.bankCode) ?: "")
+  }
 
   open fun mapToAccountData(credentials: BankAccountIdentifier, param: FinTsClientParameter): AccountData {
     val accountData = AccountData(credentials.identifier, credentials.subAccountNumber, Laenderkennzeichen.Germany, param.bankCode,
