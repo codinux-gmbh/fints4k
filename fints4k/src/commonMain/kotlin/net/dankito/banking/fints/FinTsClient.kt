@@ -1,12 +1,15 @@
 package net.dankito.banking.fints
 
 import kotlinx.datetime.LocalDate
+import net.dankito.banking.client.model.parameter.FinTsClientParameter
 import net.dankito.banking.fints.callback.FinTsClientCallback
 import net.dankito.banking.fints.model.*
 import net.dankito.banking.client.model.parameter.GetAccountDataParameter
 import net.dankito.banking.client.model.parameter.RetrieveTransactions
+import net.dankito.banking.client.model.parameter.TransferMoneyParameter
 import net.dankito.banking.client.model.response.ErrorCode
 import net.dankito.banking.client.model.response.GetAccountDataResponse
+import net.dankito.banking.client.model.response.TransferMoneyResponse
 import net.dankito.banking.fints.mapper.FinTsModelMapper
 import net.dankito.banking.fints.response.client.FinTsClientResponse
 import net.dankito.banking.fints.response.client.GetAccountInfoResponse
@@ -109,7 +112,52 @@ open class FinTsClient @JvmOverloads constructor(
     return LocalDate.todayAtEuropeBerlin().minusDays(90)
   }
 
-  protected open suspend fun getAccountInfo(param: GetAccountDataParameter, bank: BankData): GetAccountInfoResponse {
+
+  open suspend fun transferMoneyAsync(param: TransferMoneyParameter): TransferMoneyResponse {
+    val finTsServerAddress = finTsServerAddressFinder.findFinTsServerAddress(param.bankCode)
+    if (finTsServerAddress.isNullOrBlank()) {
+      return TransferMoneyResponse(ErrorCode.BankDoesNotSupportFinTs3, "Either bank does not FinTS 3.0 or we don't know its FinTS server address", listOf(), null)
+    }
+
+    val bank = BankData(param.bankCode, param.loginName, param.password, finTsServerAddress, "")
+    val remittanceAccount = param.remittanceAccount
+
+    if (remittanceAccount == null) { // then first retrieve customer's bank accounts
+      val getAccountInfoResponse = getAccountInfo(param, bank)
+
+      if (getAccountInfoResponse.successful == false) {
+        return TransferMoneyResponse(mapper.mapErrorCode(getAccountInfoResponse), mapper.mapErrorMessages(getAccountInfoResponse),
+          getAccountInfoResponse.messageLogWithoutSensitiveData, bank)
+      } else {
+        return transferMoneyAsync(param, getAccountInfoResponse.bank, getAccountInfoResponse.bank.accounts, getAccountInfoResponse)
+      }
+    } else {
+      return transferMoneyAsync(param, bank, listOf(mapper.mapToAccountData(remittanceAccount, param)), null)
+    }
+  }
+
+  protected open suspend fun transferMoneyAsync(param: TransferMoneyParameter, bank: BankData, accounts: List<AccountData>, previousJobResponse: FinTsClientResponse?): TransferMoneyResponse {
+    val accountsSupportingTransfer = accounts.filter { it.supportsTransferringMoney }
+    if (accountsSupportingTransfer.isEmpty()) {
+      return TransferMoneyResponse(ErrorCode.NoAccountSupportsMoneyTransfer, "None of the accounts $accounts supports money transfer", previousJobResponse?.messageLogWithoutSensitiveData ?: listOf(), bank)
+    } else if (accountsSupportingTransfer.size > 1) {
+      return TransferMoneyResponse(ErrorCode.MoreThanOneAccountSupportsMoneyTransfer, "More than one of the accounts $accountsSupportingTransfer supports money transfer, so we cannot clearly determine which one to use for this transfer", previousJobResponse?.messageLogWithoutSensitiveData ?: listOf(), bank)
+    }
+
+    val recipientBankIdentifier = param.recipientBankIdentifier ?: "" // TODO: determine BIC from recipientBankCode if it's a German bank
+    val context = JobContext(JobContextType.TransferMoney, this.callback, product, bank, accountsSupportingTransfer.first())
+
+    val response = jobExecutor.transferMoneyAsync(context, BankTransferData(param.recipientName, param.recipientAccountIdentifier, recipientBankIdentifier, param.amount, param.reference, param.instantPayment))
+
+    return TransferMoneyResponse(mapper.mapErrorCode(response), mapper.mapErrorMessages(response), mapper.mergeMessageLog(previousJobResponse, response), bank)
+  }
+
+  protected open suspend fun getAccountInfo(param: FinTsClientParameter, bank: BankData): GetAccountInfoResponse {
+    param.finTsModel?.let {
+      // TODO: implement
+//      return GetAccountInfoResponse(it)
+    }
+
     val context = JobContext(JobContextType.AddAccount, this.callback, product, bank) // TODO: add / change JobContextType
 
     /*      First dialog: Get user's basic data like BPD, customer system ID and her TAN methods     */

@@ -2,6 +2,7 @@ package net.dankito.banking.fints.mapper
 
 import net.dankito.banking.client.model.*
 import net.dankito.banking.client.model.AccountTransaction
+import net.dankito.banking.client.model.parameter.FinTsClientParameter
 import net.dankito.banking.client.model.parameter.GetAccountDataParameter
 import net.dankito.banking.client.model.response.ErrorCode
 import net.dankito.banking.fints.messages.datenelemente.abgeleiteteformate.Laenderkennzeichen
@@ -13,13 +14,15 @@ import net.dankito.banking.fints.response.segments.AccountType
 
 open class FinTsModelMapper {
 
-  open fun mapToAccountData(credentials: BankAccountIdentifier, param: GetAccountDataParameter): AccountData {
+  open fun mapToAccountData(credentials: BankAccountIdentifier, param: FinTsClientParameter): AccountData {
     val accountData = AccountData(credentials.identifier, credentials.subAccountNumber, Laenderkennzeichen.Germany, param.bankCode,
       credentials.iban, param.loginName, null, null, "", null, null, listOf(), listOf())
 
     // TODO: where to know from if account supports retrieving balance and transactions?
     accountData.setSupportsFeature(AccountFeature.RetrieveBalance, true)
     accountData.setSupportsFeature(AccountFeature.RetrieveAccountTransactions, true)
+    accountData.setSupportsFeature(AccountFeature.TransferMoney, true)
+    accountData.setSupportsFeature(AccountFeature.RealTimeTransfer, true)
 
     return accountData
   }

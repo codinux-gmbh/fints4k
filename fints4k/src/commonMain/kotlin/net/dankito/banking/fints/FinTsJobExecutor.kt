@@ -342,7 +342,7 @@ open class FinTsJobExecutor(
     }
 
 
-    open suspend fun doBankTransferAsync(context: JobContext, bankTransferData: BankTransferData): FinTsClientResponse {
+    open suspend fun transferMoneyAsync(context: JobContext, bankTransferData: BankTransferData): FinTsClientResponse {
 
         val response = sendMessageInNewDialogAndHandleResponse(context, null, true) {
             val updatedAccount = getUpdatedAccount(context, context.account!!)

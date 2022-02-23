@@ -3,12 +3,12 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.dankito.banking.client.model.parameter.GetAccountDataParameter
+import net.dankito.banking.client.model.parameter.TransferMoneyParameter
 import net.dankito.banking.client.model.response.GetAccountDataResponse
+import net.dankito.banking.client.model.response.TransferMoneyResponse
 import net.dankito.banking.fints.FinTsClient
 import net.dankito.banking.fints.callback.SimpleFinTsClientCallback
-import net.dankito.banking.fints.model.TanChallenge
-import net.dankito.banking.fints.model.TanMethod
-import net.dankito.banking.fints.model.TanMethodType
+import net.dankito.banking.fints.model.*
 import net.dankito.banking.fints.webclient.KtorWebClient
 import net.dankito.banking.fints.webclient.ProxyingWebClient
 import net.dankito.utils.multiplatform.log.LoggerFactory
@@ -40,6 +40,25 @@ open class Presenter {
 
       withContext(Dispatchers.Main) {
         retrievedResult(response)
+      }
+    }
+  }
+
+  open fun transferMoney(recipientName: String, recipientAccountIdentifier: String, recipientBankIdentifier: String?, reference: String?,
+                    amount: String, instantPayment: Boolean = false, response: (TransferMoneyResponse) -> Unit) {
+    GlobalScope.launch(Dispatchers.Unconfined) {
+      // TODO: set your credentials here
+      val transferMoneyResponse = fintsClient.transferMoneyAsync(TransferMoneyParameter("", "", "", null, recipientName,
+        recipientAccountIdentifier, recipientBankIdentifier, Money(Amount(amount), Currency.DefaultCurrencyCode), reference, instantPayment))
+
+      if (transferMoneyResponse.successful) {
+        log.info("Successfully transferred $amount to $recipientName")
+      } else {
+        log.error("Could not transfer $amount to $recipientName: ${transferMoneyResponse.error} ${transferMoneyResponse.errorMessage}")
+      }
+
+      withContext(Dispatchers.Main) {
+        response(transferMoneyResponse)
       }
     }
   }

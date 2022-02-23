@@ -21,6 +21,10 @@ enum class ErrorCode {
 
   NoneOfTheAccountsSupportsRetrievingData,
 
-  DidNotRetrieveAllAccountData
+  DidNotRetrieveAllAccountData,
+
+  NoAccountSupportsMoneyTransfer,
+
+  MoreThanOneAccountSupportsMoneyTransfer
 
 }

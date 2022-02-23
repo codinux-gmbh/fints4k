@@ -32,7 +32,7 @@ open class SepaBankTransferBase(
         "RecipientIban" to data.recipientAccountId.replace(" ", ""),
         "RecipientBic" to data.recipientBankCode.replace(" ", ""),
         "Amount" to data.amount.amount.string.replace(',', '.'), // TODO: check if ',' or '.' should be used as decimal separator
-        "Reference" to if (data.reference.isEmpty()) " " else messageCreator.convertDiacriticsAndReservedXmlCharacters(data.reference),
+        "Reference" to if (data.reference.isNullOrBlank()) " " else messageCreator.convertDiacriticsAndReservedXmlCharacters(data.reference),
         "RequestedExecutionDate" to RequestedExecutionDateValueForNotScheduledTransfers
     ),
     messageCreator

@@ -10,9 +10,7 @@ import net.dankito.banking.fints.messages.datenelemente.implementierte.tan.*
 import net.dankito.banking.fints.model.*
 import net.dankito.banking.fints.response.BankResponse
 import net.dankito.banking.fints.response.client.*
-import net.dankito.banking.fints.response.segments.*
 import net.dankito.banking.fints.webclient.IWebClient
-import kotlin.jvm.JvmOverloads
 
 
 /**
@@ -166,7 +164,7 @@ open class FinTsClientDeprecated(
     open suspend fun doBankTransferAsync(bankTransferData: BankTransferData, bank: BankData, account: AccountData): FinTsClientResponse {
         val context = JobContext(JobContextType.TransferMoney, this.callback, product, bank, account)
 
-        return jobExecutor.doBankTransferAsync(context, bankTransferData)
+        return jobExecutor.transferMoneyAsync(context, bankTransferData)
     }
 
 }

@@ -6,6 +6,6 @@ open class BankTransferData(
     val recipientAccountId: String,
     val recipientBankCode: String,
     val amount: Money,
-    val reference: String,
+    val reference: String?,
     val realTimeTransfer: Boolean = false
 )

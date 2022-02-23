@@ -2,32 +2,46 @@ import kotlinx.datetime.LocalDate
 import net.dankito.banking.client.model.AccountTransaction
 import net.dankito.banking.client.model.CustomerAccount
 import net.dankito.banking.client.model.parameter.GetAccountDataParameter
+import net.dankito.banking.client.model.parameter.TransferMoneyParameter
 import net.dankito.banking.fints.FinTsClient
 import net.dankito.banking.fints.callback.SimpleFinTsClientCallback
 import net.dankito.banking.fints.getAccountData
 import net.dankito.banking.fints.model.TanChallenge
+import net.dankito.banking.fints.transferMoney
 import net.dankito.utils.multiplatform.extensions.*
 
 
 class NativeApp {
+
+  private val client = FinTsClient(SimpleFinTsClientCallback { tanChallenge -> enterTan(tanChallenge) })
+
 
   fun retrieveAccountData(bankCode: String, loginName: String, password: String) {
     retrieveAccountData(GetAccountDataParameter(bankCode, loginName, password))
   }
 
   fun retrieveAccountData(param: GetAccountDataParameter) {
-    val client = FinTsClient(SimpleFinTsClientCallback { tanChallenge -> enterTan(tanChallenge) })
-
     val response = client.getAccountData(param)
 
     if (response.error != null) {
-      println("An error occurred: ${response.error}${response.errorMessage?.let { " $it" }}")
+      println("An error occurred: ${response.errorCodeAndMessage}")
     }
 
     response.customerAccount?.let { account ->
       println("Retrieved response from ${account.bankName} for ${account.customerName}")
 
       displayRetrievedAccountData(account)
+    }
+  }
+
+
+  fun transferMoney(param: TransferMoneyParameter) {
+    val response = client.transferMoney(param)
+
+    if (response.error != null) {
+      println("Could not transfer ${param.amount} to ${param.recipientName}: ${response.errorCodeAndMessage}")
+    } else {
+      println("Successfully transferred ${param.amount} to ${param.recipientName}")
     }
   }
 
