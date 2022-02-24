@@ -3,7 +3,6 @@ package net.dankito.banking.fints.mapper
 import net.dankito.banking.client.model.*
 import net.dankito.banking.client.model.AccountTransaction
 import net.dankito.banking.client.model.parameter.FinTsClientParameter
-import net.dankito.banking.client.model.parameter.GetAccountDataParameter
 import net.dankito.banking.client.model.response.ErrorCode
 import net.dankito.banking.fints.messages.datenelemente.abgeleiteteformate.Laenderkennzeichen
 import net.dankito.banking.fints.model.*

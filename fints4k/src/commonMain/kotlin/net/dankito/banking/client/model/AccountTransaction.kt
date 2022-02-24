@@ -1,11 +1,13 @@
 package net.dankito.banking.client.model
 
 import kotlinx.datetime.LocalDate
+import kotlinx.serialization.Serializable
 import net.dankito.banking.fints.model.Amount
 import net.dankito.banking.fints.model.Money
 import net.dankito.utils.multiplatform.extensions.atUnixEpochStart
 
 
+@Serializable
 open class AccountTransaction(
     val amount: Money, // TODO: if we decide to stick with Money, create own type, don't use that one from fints.model (or move over from)
     val unparsedReference: String,

@@ -1,5 +1,6 @@
 package net.dankito.banking.client.model
 
+import kotlinx.serialization.Serializable
 import net.dankito.banking.fints.messages.datenelemente.implementierte.tan.TanMedium
 import net.dankito.banking.fints.model.TanMethod
 
@@ -7,6 +8,7 @@ import net.dankito.banking.fints.model.TanMethod
 //import net.dankito.banking.client.model.tan.TanMethod
 
 
+@Serializable
 open class CustomerAccount(
     override var bankCode: String,
     override var loginName: String,

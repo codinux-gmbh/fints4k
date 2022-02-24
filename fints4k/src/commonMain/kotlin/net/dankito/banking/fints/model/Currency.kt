@@ -1,6 +1,10 @@
 package net.dankito.banking.fints.model
 
+import kotlinx.serialization.Serializable
+import net.dankito.banking.client.model.serializer.CurrencySerializer
 
+
+@Serializable(with = CurrencySerializer::class)
 open class Currency(
     val code: String
 ) {

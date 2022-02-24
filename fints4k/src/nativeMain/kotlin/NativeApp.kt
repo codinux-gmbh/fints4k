@@ -1,4 +1,8 @@
+import com.soywiz.korio.file.std.localCurrentDirVfs
+import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.LocalDate
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import net.dankito.banking.client.model.AccountTransaction
 import net.dankito.banking.client.model.CustomerAccount
 import net.dankito.banking.client.model.parameter.GetAccountDataParameter
@@ -20,7 +24,7 @@ class NativeApp {
     getAccountData(GetAccountDataParameter(bankCode, loginName, password))
   }
 
-  fun getAccountData(param: GetAccountDataParameter) {
+  fun getAccountData(param: GetAccountDataParameter, outputFilePath: String? = null) {
     val response = client.getAccountData(param)
 
     if (response.error != null) {
@@ -28,9 +32,13 @@ class NativeApp {
     }
 
     response.customerAccount?.let { account ->
-      println("Retrieved response from ${account.bankName} for ${account.customerName}")
+      if (outputFilePath != null) {
+        writeResponseToFile(outputFilePath, account)
+      } else {
+        println("Retrieved response from ${account.bankName} for ${account.customerName}")
 
       displayRetrievedAccountData(account)
+      }
     }
   }
 
@@ -98,6 +106,20 @@ class NativeApp {
 
   private fun formatDate(date: LocalDate): String {
     return date.dayOfMonth.toStringWithTwoDigits() + "." + date.monthNumber.toStringWithTwoDigits() + "." + date.year
+  }
+
+
+  private fun writeResponseToFile(outputFilePath: String, customer: CustomerAccount) {
+    try {
+      val outputFile = localCurrentDirVfs.get(outputFilePath)
+      println("Writing file to ${outputFile.absolutePath}")
+
+      val json = Json.encodeToString(customer)
+
+      runBlocking { outputFile.writeString(json) }
+    } catch (e: Exception) {
+      println("Could not write file to $outputFilePath: $e")
+    }
   }
 
 }

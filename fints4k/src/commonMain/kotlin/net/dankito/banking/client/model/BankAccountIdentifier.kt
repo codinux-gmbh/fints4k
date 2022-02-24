@@ -1,8 +1,11 @@
 package net.dankito.banking.client.model
 
+interface BankAccountIdentifier {
 
-open class BankAccountIdentifier(
-    open val identifier: String,
-    open val subAccountNumber: String?,
-    open val iban: String?,
-)
+    val identifier: String
+
+    val subAccountNumber: String?
+
+    val iban: String?
+
+}

@@ -1,6 +1,9 @@
 package net.dankito.banking.fints.model
 
+import kotlinx.serialization.Serializable
 
+
+@Serializable
 open class DecoupledTanMethodParameters(
     open val manualConfirmationAllowed: Boolean,
     open val periodicStateRequestsAllowed: Boolean,

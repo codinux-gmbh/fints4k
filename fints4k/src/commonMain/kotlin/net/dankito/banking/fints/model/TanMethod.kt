@@ -1,9 +1,11 @@
 package net.dankito.banking.fints.model
 
+import kotlinx.serialization.Serializable
 import net.dankito.banking.fints.messages.datenelemente.implementierte.signatur.Sicherheitsfunktion
 import net.dankito.banking.fints.messages.datenelemente.implementierte.tan.AllowedTanFormat
 
 
+@Serializable
 open class TanMethod(
     open val displayName: String,
     open val securityFunction: Sicherheitsfunktion,

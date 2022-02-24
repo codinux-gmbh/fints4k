@@ -38,6 +38,8 @@ class fints4kCommandLineInterface : CliktCommand(name = "fints", printHelpOnEmpt
   val retrieveTransactionsForLastNDays by option("-l", "--last-n-days", help = "Retrieve transactions for last n days. If set 'retrieveTransactions' gets set to '${RetrieveTransactions.AccordingToRetrieveFromAndTo}' and 'retrieveTransactionsFrom' will be ignored.").int()
 
 
+  val outputFile by option("-o", help = "Write retrieved account transactions to file instead of stdout. Supported formats: JSON")
+
   val preferredTanMethods by option("-m", "--tan-method", help = "Your preferred TAN methods to use if action affords a TAN. Can be repeated like '-m AppTan -m SmsTan'").enum<TanMethodType>().multiple()
 
   val abortIfRequiresTan by option("-a", "--abort-if-requires-tan", help = "If actions should be aborted if it affords a TAN. Defaults to false").flag(default = false)
@@ -71,7 +73,7 @@ class fints4kCommandLineInterface : CliktCommand(name = "fints", printHelpOnEmpt
 
 
     app.getAccountData(GetAccountDataParameter(bankCode, loginName, password, null, retrieveBalance, effectiveRetrieveTransactions,
-      retrieveTransactionsFromDate, retrieveTransactionsToDate, preferredTanMethods, abortIfTanIsRequired = abortIfRequiresTan))
+      retrieveTransactionsFromDate, retrieveTransactionsToDate, preferredTanMethods, abortIfTanIsRequired = abortIfRequiresTan), outputFile)
   }
 
 }

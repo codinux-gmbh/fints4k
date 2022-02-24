@@ -1,25 +1,27 @@
 package net.dankito.banking.client.model
 
 import kotlinx.datetime.LocalDate
+import kotlinx.serialization.Serializable
 import net.dankito.banking.fints.model.Currency
 import net.dankito.banking.fints.model.Money
 
 
+@Serializable
 open class BankAccount(
-    identifier: String,
-    subAccountNumber: String?,
-    iban: String?,
-    val accountHolderName: String,
-    val type: BankAccountType = BankAccountType.CheckingAccount,
-    val productName: String? = null,
-    val currency: String = Currency.DefaultCurrencyCode, // TODO: may parse to a value object
-    val accountLimit: String? = null,
+    override val identifier: String,
+    override val subAccountNumber: String?,
+    override val iban: String?,
+    open val accountHolderName: String,
+    open val type: BankAccountType = BankAccountType.CheckingAccount,
+    open val productName: String? = null,
+    open val currency: String = Currency.DefaultCurrencyCode, // TODO: may parse to a value object
+    open val accountLimit: String? = null,
     // TODO: create an enum AccountCapabilities [ RetrieveBalance, RetrieveTransactions, TransferMoney / MoneyTransfer(?), InstantPayment ]
-    val supportsRetrievingTransactions: Boolean = false,
-    val supportsRetrievingBalance: Boolean = false,
-    val supportsTransferringMoney: Boolean = false,
-    val supportsInstantPayment: Boolean = false
-) : BankAccountIdentifier(identifier, subAccountNumber, iban) {
+    open val supportsRetrievingTransactions: Boolean = false,
+    open val supportsRetrievingBalance: Boolean = false,
+    open val supportsTransferringMoney: Boolean = false,
+    open val supportsInstantPayment: Boolean = false
+) : BankAccountIdentifier {
 
     internal constructor() : this("", null, null, "") // for object deserializers
 

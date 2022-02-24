@@ -1,5 +1,7 @@
 package net.dankito.banking.fints.messages.datenelemente.implementierte.tan
 
+import kotlinx.serialization.Serializable
+
 
 /**
  * Informationen zu Art und Parametrisierung von TAN-Medien. Als TAN-Medien werden sowohl
@@ -8,6 +10,7 @@ package net.dankito.banking.fints.messages.datenelemente.implementierte.tan
  *
  * Wird das Datenelement „TAN-Medium-Klasse“ mit „B“ (bilateral vereinbart) belegt, so muss im Element „Sicherheitsfunktion, kodiert“ die entsprechende Sicherheitsfunktion in der DEG „Verfahrensparameter Zwei-Schritt-Verfahren“ referenziert werden.
  */
+@Serializable
 open class TanMedium(
     open val mediumClass: TanMediumKlasse,
     open val status: TanMediumStatus,
