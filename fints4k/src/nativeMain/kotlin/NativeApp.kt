@@ -11,6 +11,7 @@ import kotlinx.serialization.json.Json
 import net.dankito.banking.client.model.AccountTransaction
 import net.dankito.banking.client.model.CustomerAccount
 import net.dankito.banking.client.model.parameter.GetAccountDataParameter
+import net.dankito.banking.client.model.parameter.RetrieveTransactions
 import net.dankito.banking.client.model.parameter.TransferMoneyParameter
 import net.dankito.banking.fints.FinTsClient
 import net.dankito.banking.fints.callback.SimpleFinTsClientCallback
@@ -32,6 +33,12 @@ class NativeApp {
   }
 
   fun getAccountData(param: GetAccountDataParameter, outputFilePath: String? = null, outputFormat: OutputFormat = OutputFormat.Json) {
+    if (param.retrieveTransactions != RetrieveTransactions.No) {
+      println("Getting balance and account transactions from ${param.retrieveTransactionsFrom ?: "ab urbe condita"} to ${param.retrieveTransactionsTo ?: LocalDate.todayAtEuropeBerlin()}")
+    } else {
+      println("Retrieving account info ${if (param.retrieveBalance) "and balance" else ""} for ${param.bankCode} ...")
+    }
+
     val response = client.getAccountData(param)
 
     if (response.error != null) {
