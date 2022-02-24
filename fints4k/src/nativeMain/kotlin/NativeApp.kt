@@ -1,4 +1,9 @@
+import com.soywiz.korio.file.PathInfo
+import com.soywiz.korio.file.isAbsolute
 import com.soywiz.korio.file.std.localCurrentDirVfs
+import com.soywiz.korio.file.std.rootLocalVfs
+import com.soywiz.korio.file.std.userHomeVfs
+import com.soywiz.korio.lang.substr
 import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.LocalDate
 import kotlinx.serialization.encodeToString
@@ -13,6 +18,8 @@ import net.dankito.banking.fints.getAccountData
 import net.dankito.banking.fints.model.TanChallenge
 import net.dankito.banking.fints.transferMoney
 import net.dankito.utils.multiplatform.extensions.*
+import util.CsvWriter
+import util.OutputFormat
 
 
 class NativeApp {
@@ -24,7 +31,7 @@ class NativeApp {
     getAccountData(GetAccountDataParameter(bankCode, loginName, password))
   }
 
-  fun getAccountData(param: GetAccountDataParameter, outputFilePath: String? = null) {
+  fun getAccountData(param: GetAccountDataParameter, outputFilePath: String? = null, outputFormat: OutputFormat = OutputFormat.Json) {
     val response = client.getAccountData(param)
 
     if (response.error != null) {
@@ -33,7 +40,7 @@ class NativeApp {
 
     response.customerAccount?.let { account ->
       if (outputFilePath != null) {
-        writeResponseToFile(outputFilePath, account)
+        writeResponseToFile(outputFilePath, outputFormat, account)
       } else {
         println("Retrieved response from ${account.bankName} for ${account.customerName}")
 
@@ -109,14 +116,21 @@ class NativeApp {
   }
 
 
-  private fun writeResponseToFile(outputFilePath: String, customer: CustomerAccount) {
+  private fun writeResponseToFile(outputFilePath: String, outputFormat: OutputFormat, customer: CustomerAccount) {
     try {
-      val outputFile = localCurrentDirVfs.get(outputFilePath)
+      val outputFileInfo = PathInfo(outputFilePath)
+      val outputFile = if (outputFileInfo.isAbsolute()) rootLocalVfs.get(outputFilePath)
+                      else if (outputFilePath.startsWith("~/")) userHomeVfs.get(outputFilePath.substr(2))
+                      else localCurrentDirVfs.get(outputFilePath)
       println("Writing file to ${outputFile.absolutePath}")
 
-      val json = Json.encodeToString(customer)
+      if (outputFormat == OutputFormat.Json) {
+        val json = Json.encodeToString(customer)
 
-      runBlocking { outputFile.writeString(json) }
+        runBlocking { outputFile.writeString(json) }
+      } else {
+        CsvWriter().writeToFile(outputFile, if (outputFormat == OutputFormat.SemicolonSeparated) ";" else ",", customer)
+      }
     } catch (e: Exception) {
       println("Could not write file to $outputFilePath: $e")
     }

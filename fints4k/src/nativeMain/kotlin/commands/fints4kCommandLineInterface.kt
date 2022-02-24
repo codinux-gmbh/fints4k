@@ -14,6 +14,7 @@ import net.dankito.banking.client.model.parameter.GetAccountDataParameter
 import net.dankito.banking.client.model.parameter.RetrieveTransactions
 import net.dankito.banking.fints.model.TanMethodType
 import net.dankito.utils.multiplatform.extensions.todayAtEuropeBerlin
+import util.OutputFormat
 
 
 class fints4kCommandLineInterface : CliktCommand(name = "fints", printHelpOnEmptyArgs = true, invokeWithoutSubcommand = true) {
@@ -39,6 +40,8 @@ class fints4kCommandLineInterface : CliktCommand(name = "fints", printHelpOnEmpt
 
 
   val outputFile by option("-o", help = "Write retrieved account transactions to file instead of stdout. Supported formats: JSON")
+
+  val outputFormat by option("-f", "--format").enum<OutputFormat>().default(OutputFormat.Json)
 
   val preferredTanMethods by option("-m", "--tan-method", help = "Your preferred TAN methods to use if action affords a TAN. Can be repeated like '-m AppTan -m SmsTan'").enum<TanMethodType>().multiple()
 
@@ -69,11 +72,14 @@ class fints4kCommandLineInterface : CliktCommand(name = "fints", printHelpOnEmpt
 
     val retrieveTransactionsToDate = if (retrieveTransactionsTo.isNullOrBlank()) null else LocalDate.parse(retrieveTransactionsTo!!)
     val effectiveRetrieveTransactions = if (retrieveTransactionsFromDate != null || retrieveTransactionsToDate != null) RetrieveTransactions.AccordingToRetrieveFromAndTo
-    else retrieveTransactions
+                                        else retrieveTransactions
+
+    val effectiveOutputFormat = if (outputFile != null && outputFile?.endsWith(".csv", true) == true && outputFormat == OutputFormat.Json) OutputFormat.CommaSeparated
+                                else outputFormat
 
 
     app.getAccountData(GetAccountDataParameter(bankCode, loginName, password, null, retrieveBalance, effectiveRetrieveTransactions,
-      retrieveTransactionsFromDate, retrieveTransactionsToDate, preferredTanMethods, abortIfTanIsRequired = abortIfRequiresTan), outputFile)
+      retrieveTransactionsFromDate, retrieveTransactionsToDate, preferredTanMethods, abortIfTanIsRequired = abortIfRequiresTan), outputFile, effectiveOutputFormat)
   }
 
 }
