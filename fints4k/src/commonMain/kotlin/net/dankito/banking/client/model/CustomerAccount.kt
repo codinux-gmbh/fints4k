@@ -11,7 +11,9 @@ import net.dankito.banking.fints.model.TanMethod
 @Serializable
 open class CustomerAccount(
     override var bankCode: String,
+//    @Transient // TODO: loginName gets written to output in JSON serialization, fix this. Solution here also doesn't work: https://github.com/Kotlin/kotlinx.serialization/blob/master/docs/basic-serialization.md#constructor-properties-requirement
     override var loginName: String,
+//    @Transient // TODO: password gets written to output in JSON serialization, fix this
     override var password: String,
     open var finTsServerAddress: String,
     open var bankName: String,
