@@ -16,6 +16,8 @@ open class Money(
 
 
 
+    constructor(amount: String, currencyCode: String) : this(Amount(amount), currencyCode)
+
     constructor(amount: Amount, currencyCode: String) : this(amount, Currency(currencyCode))
 
     internal constructor() : this(Amount.Zero, "") // for object deserializers
