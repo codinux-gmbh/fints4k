@@ -116,6 +116,11 @@ open class FinTsClient @JvmOverloads constructor(
   }
 
 
+  open suspend fun transferMoneyAsync(bankCode: String, loginName: String, password: String, recipientName: String, recipientAccountIdentifier: String,
+                                      amount: Money, reference: String? = null): TransferMoneyResponse {
+    return transferMoneyAsync(TransferMoneyParameter(bankCode, loginName, password, null, recipientName, recipientAccountIdentifier, null, amount, reference))
+  }
+
   open suspend fun transferMoneyAsync(param: TransferMoneyParameter): TransferMoneyResponse {
     val finTsServerAddress = finTsServerAddressFinder.findFinTsServerAddress(param.bankCode)
     if (finTsServerAddress.isNullOrBlank()) {
