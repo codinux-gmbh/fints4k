@@ -33,11 +33,7 @@ class NativeApp {
   }
 
   fun getAccountData(param: GetAccountDataParameter, outputFilePath: String? = null, outputFormat: OutputFormat = OutputFormat.Json) {
-    if (param.retrieveTransactions != RetrieveTransactions.No) {
-      println("Getting balance and account transactions from ${param.retrieveTransactionsFrom ?: "ab urbe condita"} to ${param.retrieveTransactionsTo ?: LocalDate.todayAtEuropeBerlin()}")
-    } else {
-      println("Retrieving account info ${if (param.retrieveBalance) "and balance" else ""} for ${param.bankCode} ...")
-    }
+    displayTypeOfDataWeAreGoingToRetrieve(param)
 
     val response = client.getAccountData(param)
 
@@ -53,6 +49,25 @@ class NativeApp {
 
       displayRetrievedAccountData(account)
       }
+    }
+  }
+
+  private fun displayTypeOfDataWeAreGoingToRetrieve(param: GetAccountDataParameter) {
+    if (param.retrieveTransactions != RetrieveTransactions.No) {
+      val from = when {
+        param.retrieveTransactions == RetrieveTransactions.OfLast90Days -> "of last 90 days"
+        param.retrieveTransactionsFrom != null -> "from ${param.retrieveTransactionsFrom}"
+        else -> "since the beginning of time"
+      }
+      val to = when {
+        param.retrieveTransactions == RetrieveTransactions.OfLast90Days -> ""
+        param.retrieveTransactionsTo != null -> "to ${param.retrieveTransactionsTo}"
+        else -> "till today"
+      }
+
+      println("Getting ${if (param.retrieveBalance) "balance and" else ""} account transactions $from $to")
+    } else {
+      println("Retrieving account info ${if (param.retrieveBalance) "and balance" else ""} for ${param.bankCode} ...")
     }
   }
 
