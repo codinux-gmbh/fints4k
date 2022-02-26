@@ -98,6 +98,7 @@ open class FinTsModelMapper {
 
   open fun mapErrorCode(response: FinTsClientResponse): ErrorCode? {
     return when {
+      response.didReceiveResponse == false -> ErrorCode.NetworkError
       response.internalError != null -> ErrorCode.InternalError
       response.errorMessagesFromBank.isNotEmpty() -> ErrorCode.BankReturnedError
       response.isPinLocked -> ErrorCode.AccountLocked

@@ -6,7 +6,7 @@ import net.dankito.banking.fints.model.RetrievedAccountData
 open class GetTransactionsResponse(
     open val retrievedResponses: List<GetAccountTransactionsResponse>,
     errorMessage: String? = null
-) : FinTsClientResponse(isSuccessful(retrievedResponses), retrievedResponses.any { it.noTanMethodSelected },
+) : FinTsClientResponse(isSuccessful(retrievedResponses), retrievedResponses.all { it.didReceiveResponse }, retrievedResponses.any { it.noTanMethodSelected },
     retrievedResponses.any { it.isStrongAuthenticationRequired }, retrievedResponses.map { it.tanRequired }.firstOrNull(),
     retrievedResponses.flatMap { it.messageLogWithoutSensitiveData },
     errorMessage ?: retrievedResponses.mapNotNull { it.internalError }.joinToString("\r\n"),

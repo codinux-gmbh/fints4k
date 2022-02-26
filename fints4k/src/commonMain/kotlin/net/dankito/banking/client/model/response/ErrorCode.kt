@@ -5,6 +5,8 @@ enum class ErrorCode {
 
   BankDoesNotSupportFinTs3,
 
+  NetworkError,
+
   InternalError,
 
   BankReturnedError,

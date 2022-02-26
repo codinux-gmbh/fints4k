@@ -10,6 +10,8 @@ open class FinTsClientResponse(
 
     open val successful: Boolean,
 
+    open val didReceiveResponse: Boolean,
+
     open val noTanMethodSelected: Boolean,
 
     open val isStrongAuthenticationRequired: Boolean,
@@ -40,7 +42,7 @@ open class FinTsClientResponse(
 ) {
 
 
-    constructor(context: JobContext, response: BankResponse) : this(response.successful, response.noTanMethodSelected,
+    constructor(context: JobContext, response: BankResponse) : this(response.successful, response.didReceiveResponse, response.noTanMethodSelected,
         response.isStrongAuthenticationRequired, response.tanResponse, context.messageLogWithoutSensitiveData,
         response.internalError, response.errorsToShowToUser, response.isPinLocked, response.wrongCredentialsEntered,
         response.tanRequiredButUserDidNotEnterOne, response.tanRequiredButWeWereToldToAbortIfSo,
