@@ -76,8 +76,7 @@ kotlin {
 
         commonTest {
             dependencies {
-                implementation kotlin("test-common")
-                implementation kotlin("test-annotations-common")
+                implementation kotlin("test")
             }
         }
 
@@ -90,14 +89,8 @@ kotlin {
 
         jvmTest {
             dependencies {
-
                 implementation "org.assertj:assertj-core:$assertJVersion"
                 implementation "org.mockito:mockito-core:$mockitoVersion"
-
-
-//                implementation project(":BankingUiCommon")
-//                implementation project(":BankFinder")
-//                implementation project(":fints4kBankingClient")
 
 
                 implementation "org.apache.commons:commons-csv:1.8"
@@ -107,24 +100,11 @@ kotlin {
 
         }
 
-        jvmTest.dependencies {
-            implementation kotlin("test-junit")
-
-            implementation "org.junit.jupiter:junit-jupiter:$junit5Version"
-            runtimeOnly "org.junit.jupiter:junit-jupiter-engine:$junit5Version"
-
-            implementation "org.slf4j:slf4j-simple:$slf4jVersion"
-        }
-
 
         jsMain {
             dependencies {
 
             }
-        }
-
-        jsTest.dependencies {
-            implementation kotlin("test-js")
         }
 
 
