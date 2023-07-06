@@ -69,7 +69,8 @@ kotlin {
 
                 implementation "co.touchlab:stately-concurrency:1.2.0"
 
-                implementation "io.ktor:ktor-client-core:$ktorVersion"
+                implementation "io.ktor:ktor-client-core:$ktorVersion" // only left here cause kmp-web-client doesn't expose ktor as api
+                implementation("net.dankito.web.client:kmp-web-client:1.0.0-SNAPSHOT")
             }
         }
 
@@ -83,8 +84,6 @@ kotlin {
 
         jvmMain {
             dependencies {
-                implementation "io.ktor:ktor-client-okhttp:$ktorVersion"
-
                 implementation "org.slf4j:slf4j-api:$slf4jVersion"
             }
         }
@@ -120,7 +119,7 @@ kotlin {
 
         jsMain {
             dependencies {
-                implementation "io.ktor:ktor-client-js:$ktorVersion"
+
             }
         }
 
@@ -129,18 +128,8 @@ kotlin {
         }
 
 
-        iosMain {
-            dependencies {
-                implementation "io.ktor:ktor-client-ios:$ktorVersion"
-            }
-        }
-
-
         nativeMain {
             dependencies {
-                // requires cURL to be installed on your system
-                implementation "io.ktor:ktor-client-curl:$ktorVersion"
-
                 implementation "com.github.ajalt.clikt:clikt:3.4.0"
 
                 // only needed for writing files to output

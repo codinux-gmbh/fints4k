@@ -41,6 +41,10 @@ allprojects {
         mavenLocal()
         mavenCentral()
         google()
+        // TODO: remove again as soon as kmp-web-client is released
+        maven {
+            url "https://oss.sonatype.org/content/repositories/snapshots/"
+        }
     }
 
     group 'net.codinux.banking'
