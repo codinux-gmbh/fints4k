@@ -8,39 +8,41 @@ group = "net.codinux.utils"
 
 
 kotlin {
+    // Enable the default target hierarchy:
+    targetHierarchy.default()
+
     jvm {
-        compilations.all {
-            kotlinOptions.jvmTarget = '1.8'
-        }
-        withJava()
+        jvmToolchain(8)
+        withJava() // not allowed if android { } is present
+
         testRuns["test"].executionTask.configure {
             useJUnitPlatform()
+
+            testLogging {     // This is for logging and can be removed.
+                events("passed", "skipped", "failed")
+            }
         }
     }
 
     js(IR) {
-        binaries.executable()
+//        binaries.executable()
+
         browser {
             testTask {
                 useKarma {
-                    // we cannot assume that Chrome and Firefox are installed on all systems
-                    // useChromeHeadless()
-                    // useFirefox()
-                    enabled = false
+                    useChromeHeadless()
+                    useFirefoxHeadless()
                 }
             }
         }
-        nodejs {
-            testTask {
-                useMocha {
-                    enabled = true
-                }
-                testLogging {
-                    events "failed"
-                }
-            }
-        }
+
+        nodejs()
     }
+
+
+    linuxX64()
+    mingwX64()
+
 
     ios {
         binaries {
@@ -49,14 +51,13 @@ kotlin {
             }
         }
     }
-
-    def hostOs = System.getProperty("os.name")
-    def isMingwX64 = hostOs.startsWith("Windows")
-    def nativeTarget
-    if (hostOs == "Mac OS X") nativeTarget = macosX64('native')
-    else if (hostOs == "Linux") nativeTarget = linuxX64("native")
-    else if (isMingwX64) nativeTarget = mingwX64("native")
-    else throw new GradleException("Host OS is not supported in Kotlin/Native.")
+    iosSimulatorArm64()
+    macosX64()
+    macosArm64()
+    watchos()
+    watchosSimulatorArm64()
+    tvos()
+    tvosSimulatorArm64()
 
 
     sourceSets {
