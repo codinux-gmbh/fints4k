@@ -1,11 +1,11 @@
 package net.dankito.banking.fints.messages.datenelemente.abgeleiteteformate
 
 import kotlinx.datetime.LocalDateTime
+import net.codinux.log.logger
 import net.dankito.utils.multiplatform.extensions.of
 import net.dankito.banking.fints.messages.Existenzstatus
 import net.dankito.banking.fints.messages.datenelemente.basisformate.ZiffernDatenelement
 import net.dankito.utils.multiplatform.extensions.toStringWithTwoDigits
-import net.dankito.utils.multiplatform.log.LoggerFactory
 
 
 /**
@@ -20,7 +20,7 @@ open class Uhrzeit(time: Int?, existenzstatus: Existenzstatus) : ZiffernDatenele
         const val HbciTimeFormatString = "HHmmss"
 
 
-        private val log = LoggerFactory.getLogger(Uhrzeit::class)
+        private val log by logger()
 
 
         fun format(time: LocalDateTime): String { // parse to HbciTimeFormatString

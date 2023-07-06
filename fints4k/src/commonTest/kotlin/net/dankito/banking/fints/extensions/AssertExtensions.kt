@@ -1,6 +1,5 @@
 package net.dankito.banking.fints.extensions
 
-import net.dankito.utils.multiplatform.extensions.platformSpecificQualifiedName
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 import kotlin.test.assertEquals
@@ -66,7 +65,7 @@ fun <T : Any?> assertContains(collection: Collection<T>, vararg items: T) {
 inline fun <reified T : Throwable> assertThrows(action: () -> Unit) {
   try {
     action()
-    fail("action() didn't throw any exception. Expected was ${T::class.platformSpecificQualifiedName}")
+    fail("action() didn't throw any exception. Expected was ${T::class.simpleName}")
   } catch (throwable: Throwable) {
     assertTrue(throwable is T)
   }

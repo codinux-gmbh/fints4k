@@ -2,13 +2,13 @@ package net.dankito.banking.fints.transactions.mt940
 
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.Month
+import net.codinux.log.logger
 import net.dankito.utils.multiplatform.extensions.todayAtEuropeBerlin
 import net.dankito.banking.fints.log.IMessageLogAppender
 import net.dankito.banking.fints.model.Amount
 import net.dankito.banking.fints.transactions.mt940.model.*
 import net.dankito.utils.multiplatform.DateFormatter
 import net.dankito.utils.multiplatform.extensions.isUpperCase
-import net.dankito.utils.multiplatform.log.LoggerFactory
 
 
 /*
@@ -75,10 +75,9 @@ open class Mt940Parser(
         const val SepaReferenceKey = "SVWZ+"
         const val DeviantOriginatorKey = "ABWA+"
         const val DeviantRecipientKey = "ABWE+"
-
-
-        private val log = LoggerFactory.getLogger(Mt940Parser::class)
     }
+
+    private val log by logger()
 
 
     /**

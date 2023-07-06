@@ -1,10 +1,11 @@
 package net.dankito.banking.fints.log
 
+import net.codinux.log.Logger
+import net.codinux.log.LoggerFactory
+import net.codinux.log.logger
 import net.dankito.banking.fints.model.BankData
 import net.dankito.banking.fints.model.MessageLogEntry
 import net.dankito.banking.fints.model.MessageLogEntryType
-import net.dankito.utils.multiplatform.log.Logger
-import net.dankito.utils.multiplatform.log.LoggerFactory
 import net.dankito.utils.multiplatform.extensions.getInnerException
 import net.dankito.utils.multiplatform.extensions.nthIndexOf
 import net.dankito.utils.multiplatform.extensions.toStringWithTwoDigits
@@ -21,7 +22,7 @@ open class MessageLogCollector {
 
         private const val NewLine = "\r\n"
 
-        private val log = LoggerFactory.getLogger(MessageLogCollector::class)
+        private val log by logger()
     }
 
 

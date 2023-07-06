@@ -1,5 +1,6 @@
 package net.dankito.banking.fints.transactions
 
+import net.codinux.log.logger
 import net.dankito.banking.fints.log.IMessageLogAppender
 import net.dankito.banking.fints.model.*
 import net.dankito.banking.fints.transactions.mt940.IMt940Parser
@@ -8,8 +9,6 @@ import net.dankito.banking.fints.transactions.mt940.model.AccountStatement
 import net.dankito.banking.fints.transactions.mt940.model.Balance
 import net.dankito.banking.fints.transactions.mt940.model.Transaction
 import net.dankito.banking.fints.transactions.mt940.model.StatementLine
-import net.dankito.utils.multiplatform.log.LoggerFactory
-import kotlin.reflect.KClass
 
 
 open class Mt940AccountTransactionsParser(
@@ -17,9 +16,7 @@ open class Mt940AccountTransactionsParser(
     override var logAppender: IMessageLogAppender? = null
 ) : IAccountTransactionsParser {
 
-    companion object {
-        private val log = LoggerFactory.getLogger(Mt940AccountTransactionsParser::class)
-    }
+    private val log by logger()
 
 
     override fun parseTransactions(transactionsString: String, bank: BankData, account: AccountData): List<AccountTransaction> {

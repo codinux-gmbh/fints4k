@@ -1,15 +1,13 @@
 package net.dankito.banking.fints.tan
 
 import io.ktor.utils.io.core.toByteArray
+import net.codinux.log.logger
 import net.dankito.banking.fints.messages.HbciCharset
-import net.dankito.utils.multiplatform.log.LoggerFactory
 
 
 open class TanImageDecoder {
 
-    companion object {
-        private val log = LoggerFactory.getLogger(TanImageDecoder::class)
-    }
+    private val log by logger()
 
 
     open fun decodeChallenge(challengeHHD_UC: String): TanImage {

@@ -3,6 +3,7 @@ package net.dankito.banking.fints.response
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.atTime
+import net.codinux.log.logger
 import net.dankito.banking.fints.log.IMessageLogAppender
 import net.dankito.banking.fints.messages.Separators
 import net.dankito.banking.fints.messages.datenelemente.abgeleiteteformate.Datum
@@ -24,7 +25,6 @@ import net.dankito.banking.fints.model.Money
 import net.dankito.banking.fints.response.segments.*
 import net.dankito.banking.fints.util.MessageUtils
 import net.dankito.utils.multiplatform.extensions.getAllExceptionMessagesJoined
-import net.dankito.utils.multiplatform.log.LoggerFactory
 
 
 open class ResponseParser(
@@ -40,10 +40,9 @@ open class ResponseParser(
         const val AufsetzpunktResponseCode = 3040
 
         const val SupportedTanMethodsForUserResponseCode = 3920
-
-
-        private val log = LoggerFactory.getLogger(ResponseParser::class)
     }
+
+    private val log by logger()
 
 
     open fun parse(response: String): BankResponse {

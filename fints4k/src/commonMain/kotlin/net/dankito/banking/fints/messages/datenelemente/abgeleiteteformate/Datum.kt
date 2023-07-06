@@ -1,11 +1,11 @@
 package net.dankito.banking.fints.messages.datenelemente.abgeleiteteformate
 
 import kotlinx.datetime.LocalDate
+import net.codinux.log.logger
 import net.dankito.banking.fints.messages.Existenzstatus
 import net.dankito.banking.fints.messages.datenelemente.basisformate.NumerischesDatenelement
 import net.dankito.utils.multiplatform.extensions.toStringWithMinDigits
 import net.dankito.utils.multiplatform.extensions.toStringWithTwoDigits
-import net.dankito.utils.multiplatform.log.LoggerFactory
 
 
 /**
@@ -19,7 +19,7 @@ open class Datum(date: Int?, existenzstatus: Existenzstatus) : NumerischesDatene
         const val HbciDateFormatString = "yyyyMMdd"
 
 
-        private val log = LoggerFactory.getLogger(Datum::class)
+        private val log by logger()
 
 
         fun format(date: LocalDate): String { // create HbciDateFormatString

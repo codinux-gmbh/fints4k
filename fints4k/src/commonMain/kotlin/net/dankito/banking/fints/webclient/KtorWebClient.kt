@@ -6,17 +6,13 @@ import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
 import kotlinx.coroutines.cancel
-import net.dankito.utils.multiplatform.log.LoggerFactory
+import net.codinux.log.logger
 
 
 open class KtorWebClient : IWebClient {
 
-    companion object {
-        private val log = LoggerFactory.getLogger(KtorWebClient::class)
-    }
+    private val log by logger()
 
 
     protected val client = HttpClient {

@@ -2,6 +2,7 @@ package net.dankito.banking.fints
 
 import kotlinx.coroutines.delay
 import kotlinx.datetime.LocalDate
+import net.codinux.log.logger
 import net.dankito.banking.fints.messages.MessageBuilder
 import net.dankito.banking.fints.messages.MessageBuilderResult
 import net.dankito.banking.fints.messages.datenelemente.implementierte.signatur.VersionDesSicherheitsverfahrens
@@ -17,7 +18,6 @@ import net.dankito.banking.fints.response.segments.*
 import net.dankito.banking.fints.tan.FlickerCodeDecoder
 import net.dankito.banking.fints.tan.TanImageDecoder
 import net.dankito.banking.fints.util.TanMethodSelector
-import net.dankito.utils.multiplatform.log.LoggerFactory
 import net.dankito.utils.multiplatform.extensions.millisSinceEpochAtEuropeBerlin
 import net.dankito.utils.multiplatform.extensions.minusDays
 import net.dankito.utils.multiplatform.extensions.todayAtEuropeBerlin
@@ -36,9 +36,7 @@ open class FinTsJobExecutor(
     protected open val tanMethodSelector: TanMethodSelector = TanMethodSelector()
 ) {
 
-    companion object {
-        private val log = LoggerFactory.getLogger(FinTsJobExecutor::class)
-    }
+    private val log by logger()
 
 
     open suspend fun getAnonymousBankInfo(context: JobContext): BankResponse {
@@ -426,7 +424,7 @@ open class FinTsJobExecutor(
     }
 
     protected open fun automaticallyRetrieveIfUserEnteredDecoupledTan(context: JobContext, tanChallenge: TanChallenge) {
-        log.info("automaticallyRetrieveIfUserEnteredDecoupledTan() called for $tanChallenge")
+        log.info { "automaticallyRetrieveIfUserEnteredDecoupledTan() called for $tanChallenge" }
     }
 
     protected open suspend fun handleEnterTanResult(context: JobContext, enteredTanResult: EnterTanResult, tanResponse: TanResponse,

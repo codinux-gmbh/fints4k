@@ -1,5 +1,6 @@
 package net.dankito.banking.fints
 
+import net.codinux.log.logger
 import net.dankito.banking.fints.messages.MessageBuilder
 import net.dankito.banking.fints.messages.MessageBuilderResult
 import net.dankito.banking.fints.model.*
@@ -11,7 +12,6 @@ import net.dankito.banking.fints.webclient.IWebClient
 import net.dankito.banking.fints.webclient.KtorWebClient
 import net.dankito.banking.fints.webclient.WebClientResponse
 import net.dankito.utils.multiplatform.extensions.getAllExceptionMessagesJoined
-import net.dankito.utils.multiplatform.log.LoggerFactory
 
 
 open class RequestExecutor(
@@ -20,15 +20,13 @@ open class RequestExecutor(
     protected open val base64Service: IBase64Service = PureKotlinBase64Service()
 ) {
 
-    companion object {
-        private val log = LoggerFactory.getLogger(RequestExecutor::class)
-    }
+    private val log by logger()
 
 
     open suspend fun getAndHandleResponseForMessage(message: MessageBuilderResult, context: JobContext, tanRequiredCallback: suspend (TanResponse, BankResponse) -> BankResponse): BankResponse {
         if (message.createdMessage == null) {
-            log.error("Could not create FinTS message to be sent to bank. isJobAllowed ${message.isJobAllowed}, isJobVersionSupported = ${message.isJobVersionSupported}," +
-              "allowedVersions = ${message.allowedVersions}, supportedVersions = ${message.supportedVersions}.")
+            log.error { "Could not create FinTS message to be sent to bank. isJobAllowed ${message.isJobAllowed}, isJobVersionSupported = ${message.isJobVersionSupported}," +
+              "allowedVersions = ${message.allowedVersions}, supportedVersions = ${message.supportedVersions}." }
             return BankResponse(false, messageThatCouldNotBeCreated = message, internalError = "Could not create FinTS message to be sent to bank") // TODO: translate
         }
         else {

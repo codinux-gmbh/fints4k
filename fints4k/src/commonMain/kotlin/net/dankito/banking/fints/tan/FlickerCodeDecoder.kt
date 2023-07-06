@@ -1,17 +1,16 @@
 package net.dankito.banking.fints.tan
 
+import net.codinux.log.logger
 import net.dankito.banking.fints.model.HHDVersion
-import net.dankito.utils.multiplatform.log.LoggerFactory
 
 
 open class FlickerCodeDecoder {
 
     companion object {
         val ContainsOtherSymbolsThanFiguresPattern = Regex("\\D")
-
-
-        private val log = LoggerFactory.getLogger(FlickerCodeDecoder::class)
     }
+
+    private val log by logger()
 
 
     open fun decodeChallenge(challengeHHD_UC: String, hhdVersion: HHDVersion): FlickerCode {
