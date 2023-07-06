@@ -5,17 +5,6 @@ plugins {
 }
 
 
-allprojects {
-    configurations.all {
-        resolutionStrategy {
-            // otherwise Kotlin throws an exception even though it is on the classpath:
-            // "Ktor native HttpClient requires kotlinx.coroutines version with `native-mt` suffix (like `1.3.9-native-mt`)"
-            force("org.jetbrains.kotlinx:kotlinx-coroutines-core:${coroutinesVersion}-native-mt")
-        }
-    }
-}
-
-
 kotlin {
     jvm {
         compilations.all {
@@ -30,9 +19,6 @@ kotlin {
     js(IR) {
         binaries.executable()
         browser {
-            commonWebpackConfig {
-                cssSupport.enabled = true
-            }
             testTask {
                 useKarma {
                     // we cannot assume that Chrome and Firefox are installed on all systems
@@ -76,7 +62,7 @@ kotlin {
             dependencies {
                 api project(":multiplatform-utils")
 
-                implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2"
+                implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1"
 
                 implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion"
 
@@ -144,9 +130,6 @@ kotlin {
 
         iosMain {
             dependencies {
-                // ktor Native needs "-native-mt" coroutines version. Export it so that referencing applications don't need to import it on their own
-                api("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion-native-mt")
-
                 implementation "io.ktor:ktor-client-ios:$ktorVersion"
             }
         }
@@ -154,9 +137,6 @@ kotlin {
 
         nativeMain {
             dependencies {
-                // ktor Native needs "-native-mt" coroutines version. Export it so that referencing applications don't need to import it on their own
-                api "org.jetbrains.kotlinx:kotlinx-coroutines-core:${coroutinesVersion}-native-mt"
-
                 // requires cURL to be installed on your system
                 implementation "io.ktor:ktor-client-curl:$ktorVersion"
 
