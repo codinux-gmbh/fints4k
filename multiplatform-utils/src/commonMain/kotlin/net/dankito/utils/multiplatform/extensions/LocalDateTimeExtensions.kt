@@ -48,12 +48,12 @@ fun LocalDateTime.Companion.nowAt(timeZone: TimeZone): LocalDateTime {
 }
 
 
-val LocalDateTime.millisSinceEpochAtUtc: Long
-  get() = this.toEpochMillisecondsAt(TimeZone.UTC)
-
-val LocalDateTime.millisSinceEpochAtSystemDefaultTimeZone: Long
-  get() = this.toEpochMillisecondsAt(TimeZone.currentSystemDefault())
-
+//val LocalDateTime.millisSinceEpochAtUtc: Long
+//  get() = this.toEpochMillisecondsAt(TimeZone.UTC)
+//
+//val LocalDateTime.millisSinceEpochAtSystemDefaultTimeZone: Long
+//  get() = this.toEpochMillisecondsAt(TimeZone.currentSystemDefault())
+//
 //val LocalDateTime.millisSinceEpochAtEuropeBerlin: Long
 //  get() = this.toEpochMillisecondsAt(TimeZone.europeBerlin)
 
