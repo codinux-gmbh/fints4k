@@ -11,7 +11,7 @@ actual class DateFormatter actual constructor(pattern: String) {
     actual constructor(dateStyle: DateFormatStyle, timeStyle: DateFormatStyle) : this("")
 
 
-    actual fun format(date: LocalDate): String {
+    actual fun formatDate(date: LocalDate): String {
         return format(date.toLocalDateTime())
     }
 

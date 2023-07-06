@@ -15,7 +15,8 @@ expect class DateFormatter constructor(pattern: String) {
 
     fun format(date: LocalDateTime): String
 
-    fun format(date: LocalDate): String
+    // cannot be named format() due to JavaScript name conflicts
+    fun formatDate(date: LocalDate): String
 
     fun parseDate(dateString: String): LocalDate?
 

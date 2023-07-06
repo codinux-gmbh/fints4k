@@ -2,6 +2,7 @@ package net.dankito.utils.multiplatform.extensions
 
 import kotlinx.datetime.*
 import net.dankito.utils.multiplatform.DateFormatter
+import kotlin.js.JsName
 
 
 fun LocalDateTime.Companion.of(hour: Int, minute: Int, second: Int = 0, nanosecond: Int = 0): LocalDateTime {
@@ -37,6 +38,7 @@ fun LocalDateTime.Companion.nowAtEuropeBerlin(): LocalDateTime {
   return nowAt(TimeZone.europeBerlin)
 }
 
+@JsName("nowAtForTimeZoneString")
 fun LocalDateTime.Companion.nowAt(timeZone: String): LocalDateTime {
   return nowAt(TimeZone.of(timeZone))
 }
@@ -52,8 +54,8 @@ val LocalDateTime.millisSinceEpochAtUtc: Long
 val LocalDateTime.millisSinceEpochAtSystemDefaultTimeZone: Long
   get() = this.toEpochMillisecondsAt(TimeZone.currentSystemDefault())
 
-val LocalDateTime.millisSinceEpochAtEuropeBerlin: Long
-  get() = this.toEpochMillisecondsAt(TimeZone.europeBerlin)
+//val LocalDateTime.millisSinceEpochAtEuropeBerlin: Long
+//  get() = this.toEpochMillisecondsAt(TimeZone.europeBerlin)
 
 fun LocalDateTime.toEpochMillisecondsAt(timeZone: TimeZone): Long {
   return this.toInstant(timeZone).toEpochMilliseconds()
@@ -64,6 +66,7 @@ fun LocalDateTime.format(formatter: DateFormatter): String {
   return formatter.format(this)
 }
 
+@JsName("formatPattern")
 fun LocalDateTime.format(pattern: String): String {
   return this.format(DateFormatter(pattern))
 }

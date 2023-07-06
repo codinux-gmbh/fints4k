@@ -29,7 +29,7 @@ actual class DateFormatter actual constructor(pattern: String) {
             : this((DateFormat.getDateTimeInstance(dateStyle.convert(), timeStyle.convert()) as? SimpleDateFormat)?.toPattern() ?: "")
 
 
-    actual fun format(date: LocalDate): String {
+    actual fun formatDate(date: LocalDate): String {
         return format(date.toLocalDateTime())
     }
 

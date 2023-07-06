@@ -36,7 +36,7 @@ actual class DateFormatter actual constructor(val pattern: String): NSDateFormat
     }
 
 
-    actual fun format(date: LocalDate): String {
+    actual fun formatDate(date: LocalDate): String {
         return format(date.toLocalDateTime())
     }
 
