@@ -50,7 +50,7 @@ open class FinTsClient @JvmOverloads constructor(
   open suspend fun getAccountDataAsync(param: GetAccountDataParameter): GetAccountDataResponse {
     val finTsServerAddress = finTsServerAddressFinder.findFinTsServerAddress(param.bankCode)
     if (finTsServerAddress.isNullOrBlank()) {
-      return GetAccountDataResponse(ErrorCode.BankDoesNotSupportFinTs3, "Either bank does not FinTS 3.0 or we don't know its FinTS server address", null, listOf())
+      return GetAccountDataResponse(ErrorCode.BankDoesNotSupportFinTs3, "Either bank does not support FinTS 3.0 or we don't know its FinTS server address", null, listOf())
     }
 
     val bank = mapper.mapToBankData(param, finTsServerAddress)
@@ -94,25 +94,7 @@ open class FinTsClient @JvmOverloads constructor(
   protected open suspend fun getAccountData(param: GetAccountDataParameter, bank: BankData, account: AccountData): GetAccountTransactionsResponse {
     val context = JobContext(JobContextType.GetTransactions, this.callback, product, bank, account)
 
-    val retrieveTransactionsFrom = when (param.retrieveTransactions) {
-      RetrieveTransactions.No -> LocalDate.todayAtEuropeBerlin() // TODO: implement RetrieveTransactions.No
-      RetrieveTransactions.OfLast90Days -> calculate90DaysAgo()
-      RetrieveTransactions.AccordingToRetrieveFromAndTo -> param.retrieveTransactionsFrom
-      else -> null
-    }
-
-    val retrieveTransactionsTo = when (param.retrieveTransactions) {
-      RetrieveTransactions.AccordingToRetrieveFromAndTo -> param.retrieveTransactionsTo
-      else -> null
-    }
-
-    return jobExecutor.getTransactionsAsync(context, GetAccountTransactionsParameter(bank, account, param.retrieveBalance, retrieveTransactionsFrom,
-      retrieveTransactionsTo, abortIfTanIsRequired = param.abortIfTanIsRequired))
-  }
-
-  private fun calculate90DaysAgo(): LocalDate? {
-    // Europe/Berlin: we're communicating with German bank servers, so we have to use their time zone
-    return LocalDate.todayAtEuropeBerlin().minusDays(90)
+    return jobExecutor.getTransactionsAsync(context, mapper.toGetAccountTransactionsParameter(param, bank, account))
   }
 
 

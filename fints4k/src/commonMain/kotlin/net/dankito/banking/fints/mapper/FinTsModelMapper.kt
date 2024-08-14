@@ -1,8 +1,11 @@
 package net.dankito.banking.fints.mapper
 
+import kotlinx.datetime.LocalDate
 import net.dankito.banking.client.model.*
 import net.dankito.banking.client.model.AccountTransaction
 import net.dankito.banking.client.model.parameter.FinTsClientParameter
+import net.dankito.banking.client.model.parameter.GetAccountDataParameter
+import net.dankito.banking.client.model.parameter.RetrieveTransactions
 import net.dankito.banking.client.model.response.ErrorCode
 import net.dankito.banking.fints.messages.datenelemente.abgeleiteteformate.Laenderkennzeichen
 import net.dankito.banking.fints.model.*
@@ -10,6 +13,8 @@ import net.dankito.banking.fints.response.client.FinTsClientResponse
 import net.dankito.banking.fints.response.client.GetAccountTransactionsResponse
 import net.dankito.banking.fints.response.segments.AccountType
 import net.dankito.banking.fints.util.BicFinder
+import net.dankito.utils.multiplatform.extensions.minusDays
+import net.dankito.utils.multiplatform.extensions.todayAtEuropeBerlin
 
 
 open class FinTsModelMapper {
@@ -93,6 +98,29 @@ open class FinTsModelMapper {
       transaction.referenceWithNoSpecialType, transaction.primaNotaNumber, transaction.textKeySupplement,
       transaction.currencyType, transaction.bookingKey, transaction.referenceForTheAccountOwner, transaction.referenceOfTheAccountServicingInstitution, transaction.supplementaryDetails,
       transaction.transactionReferenceNumber, transaction.relatedReferenceNumber)
+  }
+
+
+  open fun toGetAccountTransactionsParameter(param: GetAccountDataParameter, bank: BankData, account: AccountData): GetAccountTransactionsParameter {
+    val retrieveTransactionsFrom = when (param.retrieveTransactions) {
+      RetrieveTransactions.No -> LocalDate.todayAtEuropeBerlin() // TODO: implement RetrieveTransactions.No
+      RetrieveTransactions.OfLast90Days -> calculate90DaysAgo()
+      RetrieveTransactions.AccordingToRetrieveFromAndTo -> param.retrieveTransactionsFrom
+      else -> null
+    }
+
+    val retrieveTransactionsTo = when (param.retrieveTransactions) {
+      RetrieveTransactions.AccordingToRetrieveFromAndTo -> param.retrieveTransactionsTo
+      else -> null
+    }
+
+    return GetAccountTransactionsParameter(bank, account, param.retrieveBalance, retrieveTransactionsFrom,
+      retrieveTransactionsTo, abortIfTanIsRequired = param.abortIfTanIsRequired)
+  }
+
+  open fun calculate90DaysAgo(): LocalDate {
+    // Europe/Berlin: we're communicating with German bank servers, so we have to use their time zone
+    return LocalDate.todayAtEuropeBerlin().minusDays(90)
   }
 
 
