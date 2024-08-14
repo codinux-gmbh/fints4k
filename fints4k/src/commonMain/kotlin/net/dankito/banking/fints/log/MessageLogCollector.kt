@@ -38,7 +38,7 @@ open class MessageLogCollector {
 
         addMessageLogEntry(type, messageToLog, context)
 
-        log.info { messageToLog }
+        log.debug { messageToLog }
     }
 
     open fun logError(loggingClass: KClass<*>, message: String, context: MessageContext, e: Exception? = null) {
