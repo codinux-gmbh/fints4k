@@ -1,5 +1,8 @@
 package net.dankito.banking.fints.util
 
+/**
+ * To update these data, go to BankFinder project and run BankListCreatorTest.
+ */
 open class FinTsServerAddressFinder {
 
 	open fun findFinTsServerAddress(bankCode: String): String? {

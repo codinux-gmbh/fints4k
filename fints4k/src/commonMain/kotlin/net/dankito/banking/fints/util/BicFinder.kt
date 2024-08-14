@@ -1,5 +1,8 @@
 package net.dankito.banking.fints.util
 
+/**
+ * To update these data, go to BankFinder project and run BankListCreatorTest.
+ */
 open class BicFinder {
 
 	open fun findBic(bankCode: String): String? {
