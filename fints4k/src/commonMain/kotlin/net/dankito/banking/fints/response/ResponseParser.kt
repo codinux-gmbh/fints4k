@@ -240,9 +240,18 @@ open class ResponseParser(
         return UserParameters(customerId, updVersion, areListedJobsBlocked, username, extension, segment)
     }
 
-    protected open fun parseAccountInfo(segment: String, dataElementGroups: List<String>): AccountInfo {
+    protected open fun parseAccountInfo(segment: String, dataElementGroups: List<String>): AccountInfo? {
         // this is parsing a Kontoverbindung. May extract a method for it.
         val accountDetails = getDataElements(dataElementGroups[1])
+        if (accountDetails.isEmpty()) {
+            // yes, by standard the Kontoinformation can be missing:
+            //   N: bei Geschäftsvorfällen ohne Kontenbezug
+            //   M: sonst
+            // But in my eyes Deutsche Bank uses it wrong and adds a second HIUPD for the same account but with most information missing:
+            //   HIUPD:7:6:4+++2200672485+++Christian+Dankl, Christian+++HKTAN:1+HKPRO:1+HKVVB:1+HKFRD:1+DKPSP:1+HKPSP:1'
+            return null
+        }
+
         val accountNumber = parseString(accountDetails[0])
         val subAccountAttribute = parseStringToNullIfEmpty(accountDetails[1])
         val bankCountryCode = parseInt(accountDetails[2])
