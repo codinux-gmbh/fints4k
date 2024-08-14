@@ -1,6 +1,7 @@
 package net.dankito.banking.fints.webclient
 
 import io.ktor.client.HttpClient
+import io.ktor.client.plugins.*
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
@@ -10,13 +11,19 @@ import kotlinx.coroutines.cancel
 import net.codinux.log.logger
 
 
-open class KtorWebClient : IWebClient {
+open class KtorWebClient(
+    connectTimeoutMillis: Long = 10_000,
+    requestTimeoutMillis: Long = 60_000
+) : IWebClient {
 
     private val log by logger()
 
 
     protected val client = HttpClient {
-
+        install(HttpTimeout) {
+            this.connectTimeoutMillis = connectTimeoutMillis
+            this.requestTimeoutMillis = requestTimeoutMillis
+        }
     }
 
 
