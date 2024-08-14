@@ -18,7 +18,7 @@ open class TanMedium(
 ) {
 
 
-    internal constructor() : this(TanMediumKlasse.AlleMedien, TanMediumStatus.Verfuegbar, null)
+    internal constructor() : this(TanMediumKlasse.AlleMedien, TanMediumStatus.Verfuegbar, null) // for object deserializers
 
 
     override fun equals(other: Any?): Boolean {

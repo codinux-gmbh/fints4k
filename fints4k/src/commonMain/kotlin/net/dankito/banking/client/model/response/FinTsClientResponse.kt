@@ -12,6 +12,9 @@ open class FinTsClientResponse(
   open val finTsModel: BankData? = null
 ) {
 
+  internal constructor() : this(null, null, listOf()) // for object deserializers
+
+
   open val successful: Boolean
     get() = error == null
 

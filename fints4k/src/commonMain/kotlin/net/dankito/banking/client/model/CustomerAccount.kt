@@ -32,6 +32,9 @@ open class CustomerAccount(
 ) : CustomerCredentials(bankCode, loginName, password) {
 
 
+    internal constructor() : this("", "", "", "", "", "") // for object deserializers
+
+
     override fun toString(): String {
         return "$bankName $loginName"
     }

@@ -13,6 +13,9 @@ open class GetAccountDataResponse(
     finTsModel: BankData? = null
 ) : FinTsClientResponse(error, errorMessage, messageLogWithoutSensitiveData, finTsModel) {
 
+    internal constructor() : this(null, null, null, listOf()) // for object deserializers
+
+
     open val retrievedTransactions: List<AccountTransaction>
         get() = customerAccount?.accounts?.flatMap { it.bookedTransactions } ?: listOf()
 
