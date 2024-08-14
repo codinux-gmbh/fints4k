@@ -48,7 +48,7 @@ fun LocalDate.Companion.nowAt(timeZone: String): LocalDate {
 
 @JsName("nowAtForDate")
 fun LocalDate.Companion.nowAt(timeZone: TimeZone): LocalDate {
-  return Clock.System.todayAt(timeZone)
+  return Clock.System.todayIn(timeZone)
 }
 
 
