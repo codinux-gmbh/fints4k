@@ -28,7 +28,7 @@ kotlin {
         browser {
             testTask {
                 useKarma {
-                    useChromeHeadless()
+//                    useChromeHeadless()
                     useFirefoxHeadless()
                 }
             }
@@ -112,10 +112,10 @@ kotlin {
 
         nativeMain {
             dependencies {
-                implementation "com.github.ajalt.clikt:clikt:3.4.0"
+                implementation("com.github.ajalt.clikt:clikt:3.5.4")
 
                 // only needed for writing files to output
-                implementation "com.soywiz.korlibs.korio:korio:2.5.0"
+                implementation "com.soywiz.korlibs.korio:korio:3.4.0"
             }
         }
 
