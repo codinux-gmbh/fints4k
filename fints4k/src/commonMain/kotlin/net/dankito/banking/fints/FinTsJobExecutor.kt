@@ -373,11 +373,9 @@ open class FinTsJobExecutor(
 
 
     protected open suspend fun handleEnteringTanRequired(context: JobContext, tanResponse: TanResponse, response: BankResponse): BankResponse {
-        val bank = context.bank // TODO: copy required data to TanChallenge
-
         // on all platforms run on Dispatchers.Main, but on iOS skip this (or wrap in withContext(Dispatchers.IO) )
 //        val enteredTanResult = GlobalScope.async {
-            val tanChallenge = createTanChallenge(tanResponse, modelMapper.mapToActionRequiringTan(context.type), bank)
+            val tanChallenge = createTanChallenge(tanResponse, modelMapper.mapToActionRequiringTan(context.type), context.bank, context.account)
 
             context.callback.enterTan(tanChallenge)
 
@@ -395,7 +393,7 @@ open class FinTsJobExecutor(
         return handleEnterTanResult(context, enteredTanResult, tanResponse, response)
     }
 
-    protected open fun createTanChallenge(tanResponse: TanResponse, forAction: ActionRequiringTan, bank: BankData): TanChallenge {
+    protected open fun createTanChallenge(tanResponse: TanResponse, forAction: ActionRequiringTan, bank: BankData, account: AccountData? = null): TanChallenge {
         // TODO: is this true for all tan methods?
         val messageToShowToUser = tanResponse.challenge ?: ""
         val challenge = tanResponse.challengeHHD_UC ?: ""
@@ -405,13 +403,13 @@ open class FinTsJobExecutor(
             TanMethodType.ChipTanFlickercode ->
                 FlickerCodeTanChallenge(
                     FlickerCodeDecoder().decodeChallenge(challenge, tanMethod.hhdVersion ?: HHDVersion.HHD_1_4), // HHD 1.4 is currently the most used version
-                    forAction, bank, messageToShowToUser, challenge, tanMethod, tanResponse.tanMediaIdentifier)
+                    forAction, messageToShowToUser, challenge, tanMethod, tanResponse.tanMediaIdentifier, bank, account)
 
             TanMethodType.ChipTanQrCode, TanMethodType.ChipTanPhotoTanMatrixCode,
             TanMethodType.QrCode, TanMethodType.photoTan ->
-                ImageTanChallenge(TanImageDecoder().decodeChallenge(challenge), forAction, bank, messageToShowToUser, challenge, tanMethod, tanResponse.tanMediaIdentifier)
+                ImageTanChallenge(TanImageDecoder().decodeChallenge(challenge), forAction, messageToShowToUser, challenge, tanMethod, tanResponse.tanMediaIdentifier, bank, account)
 
-            else -> TanChallenge(forAction, bank, messageToShowToUser, challenge, tanMethod, tanResponse.tanMediaIdentifier)
+            else -> TanChallenge(forAction, messageToShowToUser, challenge, tanMethod, tanResponse.tanMediaIdentifier, bank, account)
         }
     }
 
