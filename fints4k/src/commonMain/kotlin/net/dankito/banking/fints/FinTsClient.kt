@@ -177,7 +177,7 @@ open class FinTsClient @JvmOverloads constructor(
 //      return GetAccountInfoResponse(it)
     }
 
-    val context = JobContext(JobContextType.AddAccount, this.callback, product, bank) // TODO: add / change JobContextType
+    val context = JobContext(JobContextType.GetAccountInfo, this.callback, product, bank)
 
     /*      First dialog: Get user's basic data like BPD, customer system ID and her TAN methods     */
 

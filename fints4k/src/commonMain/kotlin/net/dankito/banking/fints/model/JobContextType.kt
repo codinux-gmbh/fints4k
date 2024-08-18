@@ -9,7 +9,9 @@ enum class JobContextType {
 
     ChangeTanMedium,
 
-    AddAccount,
+    GetAccountInfo,
+
+    AddAccount, // TODO: may split actions and create two JobContexts, one for GetAccountInfo and one for GetTransactions
 
     GetTransactions,
 
