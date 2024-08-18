@@ -19,7 +19,7 @@ import util.OutputFormat
 
 class fints4kCommandLineInterface : CliktCommand(name = "fints", printHelpOnEmptyArgs = true, invokeWithoutSubcommand = true) {
   init {
-    versionOption("1.0.0 Alpha-10", names = setOf("-v", "--version"))
+    versionOption("1.0.0 Alpha-11", names = setOf("-v", "--version"))
   }
 
   val bankCode by argument("Bankleitzahl", "Die Bankleitzahl deiner Bank")
