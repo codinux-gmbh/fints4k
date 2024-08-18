@@ -81,10 +81,9 @@ open class ModelMapper(
         }
 
         response.getSegmentsById<AccountInfo>(InstituteSegmentId.AccountInfo).forEach { accountInfo ->
-            var accountHolderName = accountInfo.accountHolderName1
-            accountInfo.accountHolderName2?.let {
-                accountHolderName += it // TODO: add a whitespace in between?
-            }
+            val accountHolderName = if (accountInfo.accountHolderName2.isNullOrBlank()) accountInfo.accountHolderName1.trim() // Baader Bank adds a lot of white spaces at end
+            else accountInfo.accountHolderName1.trim() + " " + accountInfo.accountHolderName2.trim()
+
             bank.customerName = accountHolderName
 
             findExistingAccount(bank, accountInfo)?.let { account ->
