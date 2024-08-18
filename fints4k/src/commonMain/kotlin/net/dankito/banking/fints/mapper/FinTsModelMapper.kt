@@ -51,7 +51,8 @@ open class FinTsModelMapper {
 
   open fun map(account: AccountData): BankAccount {
     return BankAccount(account.accountIdentifier, account.subAccountAttribute, account.iban, account.accountHolderName, map(account.accountType), account.productName,
-      account.currency ?: Currency.DefaultCurrencyCode, account.accountLimit, account.supportsRetrievingAccountTransactions, account.supportsRetrievingBalance, account.supportsTransferringMoney, account.supportsRealTimeTransfer)
+      account.currency ?: Currency.DefaultCurrencyCode, account.accountLimit, account.countDaysForWhichTransactionsAreKept, account.isAccountTypeSupportedByApplication,
+      account.supportsRetrievingAccountTransactions, account.supportsRetrievingBalance, account.supportsTransferringMoney, account.supportsRealTimeTransfer)
   }
 
   open fun map(accountType: AccountType?): BankAccountType {
