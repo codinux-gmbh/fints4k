@@ -377,7 +377,7 @@ open class FinTsJobExecutor(
 
         // on all platforms run on Dispatchers.Main, but on iOS skip this (or wrap in withContext(Dispatchers.IO) )
 //        val enteredTanResult = GlobalScope.async {
-            val tanChallenge = createTanChallenge(tanResponse, bank)
+            val tanChallenge = createTanChallenge(tanResponse, modelMapper.mapToActionRequiringTan(context.type), bank)
 
             context.callback.enterTan(tanChallenge)
 
@@ -395,7 +395,7 @@ open class FinTsJobExecutor(
         return handleEnterTanResult(context, enteredTanResult, tanResponse, response)
     }
 
-    protected open fun createTanChallenge(tanResponse: TanResponse, bank: BankData): TanChallenge {
+    protected open fun createTanChallenge(tanResponse: TanResponse, forAction: ActionRequiringTan, bank: BankData): TanChallenge {
         // TODO: is this true for all tan methods?
         val messageToShowToUser = tanResponse.challenge ?: ""
         val challenge = tanResponse.challengeHHD_UC ?: ""
@@ -405,13 +405,13 @@ open class FinTsJobExecutor(
             TanMethodType.ChipTanFlickercode ->
                 FlickerCodeTanChallenge(
                     FlickerCodeDecoder().decodeChallenge(challenge, tanMethod.hhdVersion ?: HHDVersion.HHD_1_4), // HHD 1.4 is currently the most used version
-                    messageToShowToUser, challenge, tanMethod, tanResponse.tanMediaIdentifier)
+                    forAction, bank, messageToShowToUser, challenge, tanMethod, tanResponse.tanMediaIdentifier)
 
             TanMethodType.ChipTanQrCode, TanMethodType.ChipTanPhotoTanMatrixCode,
             TanMethodType.QrCode, TanMethodType.photoTan ->
-                ImageTanChallenge(TanImageDecoder().decodeChallenge(challenge), messageToShowToUser, challenge, tanMethod, tanResponse.tanMediaIdentifier)
+                ImageTanChallenge(TanImageDecoder().decodeChallenge(challenge), forAction, bank, messageToShowToUser, challenge, tanMethod, tanResponse.tanMediaIdentifier)
 
-            else -> TanChallenge(messageToShowToUser, challenge, tanMethod, tanResponse.tanMediaIdentifier)
+            else -> TanChallenge(forAction, bank, messageToShowToUser, challenge, tanMethod, tanResponse.tanMediaIdentifier)
         }
     }
 

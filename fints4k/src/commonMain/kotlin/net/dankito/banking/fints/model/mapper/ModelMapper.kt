@@ -330,4 +330,15 @@ open class ModelMapper(
         return accountInfo.accountType
     }
 
+    fun mapToActionRequiringTan(type: JobContextType): ActionRequiringTan = when(type) {
+        JobContextType.AnonymousBankInfo -> ActionRequiringTan.GetAnonymousBankInfo
+        JobContextType.GetTanMedia -> ActionRequiringTan.GetTanMedia
+        JobContextType.ChangeTanMedium -> ActionRequiringTan.ChangeTanMedium
+        JobContextType.GetAccountInfo -> ActionRequiringTan.GetAccountInfo
+        // TODO: may split actions and create two JobContexts, one for GetAccountInfo and one for GetTransactions
+        JobContextType.AddAccount -> ActionRequiringTan.GetTransactions
+        JobContextType.GetTransactions -> ActionRequiringTan.GetTransactions
+        JobContextType.TransferMoney -> ActionRequiringTan.TransferMoney
+    }
+
 }

@@ -5,6 +5,8 @@ import net.dankito.banking.fints.response.client.FinTsClientResponse
 
 
 open class TanChallenge(
+    val forAction: ActionRequiringTan,
+    val bank: BankData,
     val messageToShowToUser: String,
     val challenge: String,
     val tanMethod: TanMethod,

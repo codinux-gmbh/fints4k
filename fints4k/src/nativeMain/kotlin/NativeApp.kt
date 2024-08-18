@@ -84,7 +84,7 @@ class NativeApp {
 
 
   private fun enterTan(tanChallenge: TanChallenge) {
-    println("A TAN is required:")
+    println("A TAN is required for ${tanChallenge.forAction}:")
     println(tanChallenge.messageToShowToUser)
     println()
 
