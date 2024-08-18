@@ -97,7 +97,7 @@ kotlin {
 
                 implementation "org.apache.commons:commons-csv:1.8"
 
-                implementation "org.slf4j:slf4j-simple:$slf4jVersion"
+                implementation "ch.qos.logback:logback-classic:$logbackVersion"
             }
 
         }
