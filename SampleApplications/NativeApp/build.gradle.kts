@@ -6,12 +6,12 @@ plugins {
 
 
 kotlin {
-    targetHierarchy.default()
-
     linuxX64()
     mingwX64()
     macosX64()
     macosArm64()
+
+    applyDefaultHierarchyTemplate()
 
 
     val kotlinxSerializationVersion: String by project
