@@ -1,7 +1,7 @@
 package net.dankito.banking.fints.messages.segmente.implementierte.sepa
 
 import kotlinx.datetime.LocalDateTime
-import net.dankito.utils.multiplatform.extensions.nowAtUtc
+import net.dankito.banking.fints.extensions.nowAtUtc
 
 
 /**

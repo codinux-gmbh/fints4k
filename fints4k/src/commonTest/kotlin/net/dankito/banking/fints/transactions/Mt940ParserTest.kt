@@ -8,7 +8,7 @@ import net.dankito.banking.fints.transactions.mt940.model.StatementLine
 import kotlinx.datetime.LocalDate
 import net.dankito.banking.fints.extensions.*
 import net.dankito.banking.fints.model.Amount
-import net.dankito.utils.multiplatform.extensions.toStringWithMinDigits
+import net.dankito.banking.fints.test.*
 import kotlin.test.Test
 import kotlin.test.assertContains
 

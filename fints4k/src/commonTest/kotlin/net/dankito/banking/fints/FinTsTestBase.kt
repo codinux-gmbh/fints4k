@@ -2,7 +2,7 @@ package net.dankito.banking.fints
 
 import kotlinx.datetime.LocalDate
 import net.dankito.banking.fints.callback.SimpleFinTsClientCallback
-import net.dankito.utils.multiplatform.extensions.randomWithSeed
+import net.dankito.banking.fints.extensions.randomWithSeed
 import net.dankito.banking.fints.messages.datenelemente.abgeleiteteformate.Datum
 import net.dankito.banking.fints.messages.datenelemente.abgeleiteteformate.Laenderkennzeichen
 import net.dankito.banking.fints.messages.datenelemente.implementierte.Dialogsprache

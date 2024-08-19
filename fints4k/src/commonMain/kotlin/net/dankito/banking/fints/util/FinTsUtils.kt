@@ -3,8 +3,8 @@ package net.dankito.banking.fints.util
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
-import net.dankito.utils.multiplatform.extensions.nowAtEuropeBerlin
-import net.dankito.utils.multiplatform.extensions.todayAtEuropeBerlin
+import net.dankito.banking.fints.extensions.nowAtEuropeBerlin
+import net.dankito.banking.fints.extensions.todayAtEuropeBerlin
 import net.dankito.banking.fints.messages.datenelemente.abgeleiteteformate.Datum
 import net.dankito.banking.fints.messages.datenelemente.abgeleiteteformate.Uhrzeit
 

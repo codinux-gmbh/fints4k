@@ -1,4 +1,4 @@
-package net.dankito.utils.multiplatform.extensions
+package net.dankito.banking.fints.extensions
 
 import kotlinx.datetime.*
 import kotlin.js.JsName

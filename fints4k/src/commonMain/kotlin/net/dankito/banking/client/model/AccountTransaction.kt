@@ -4,7 +4,7 @@ import kotlinx.datetime.LocalDate
 import kotlinx.serialization.Serializable
 import net.dankito.banking.fints.model.Amount
 import net.dankito.banking.fints.model.Money
-import net.dankito.utils.multiplatform.extensions.UnixEpochStart
+import net.dankito.banking.fints.extensions.UnixEpochStart
 
 
 @Serializable

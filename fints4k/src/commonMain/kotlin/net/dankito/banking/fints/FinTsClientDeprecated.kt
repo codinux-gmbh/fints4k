@@ -4,8 +4,8 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.datetime.*
 import net.dankito.banking.fints.callback.FinTsClientCallback
-import net.dankito.utils.multiplatform.extensions.minusDays
-import net.dankito.utils.multiplatform.extensions.todayAtEuropeBerlin
+import net.dankito.banking.fints.extensions.minusDays
+import net.dankito.banking.fints.extensions.todayAtEuropeBerlin
 import net.dankito.banking.fints.messages.datenelemente.implementierte.tan.*
 import net.dankito.banking.fints.model.*
 import net.dankito.banking.fints.response.BankResponse

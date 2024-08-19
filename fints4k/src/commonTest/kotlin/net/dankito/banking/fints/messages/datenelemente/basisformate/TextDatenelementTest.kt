@@ -1,6 +1,6 @@
 package net.dankito.banking.fints.messages.datenelemente.basisformate
 
-import net.dankito.banking.fints.extensions.assertThrows
+import net.dankito.banking.fints.test.assertThrows
 import net.dankito.banking.fints.messages.Existenzstatus
 import net.dankito.banking.fints.messages.datenelementgruppen.implementierte.signatur.SicherheitsidentifikationDetails
 import kotlin.test.Test

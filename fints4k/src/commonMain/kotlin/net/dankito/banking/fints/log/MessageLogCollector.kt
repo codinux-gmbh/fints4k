@@ -6,9 +6,9 @@ import net.codinux.log.logger
 import net.dankito.banking.fints.model.BankData
 import net.dankito.banking.fints.model.MessageLogEntry
 import net.dankito.banking.fints.model.MessageLogEntryType
-import net.dankito.utils.multiplatform.extensions.getInnerException
-import net.dankito.utils.multiplatform.extensions.nthIndexOf
-import net.dankito.utils.multiplatform.extensions.toStringWithMinDigits
+import net.dankito.banking.fints.extensions.getInnerException
+import net.dankito.banking.fints.extensions.nthIndexOf
+import net.dankito.banking.fints.extensions.toStringWithMinDigits
 import kotlin.reflect.KClass
 
 

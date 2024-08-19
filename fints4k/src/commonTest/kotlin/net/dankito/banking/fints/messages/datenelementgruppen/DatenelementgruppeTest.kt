@@ -1,6 +1,6 @@
 package net.dankito.banking.fints.messages.datenelementgruppen
 
-import net.dankito.banking.fints.extensions.assertEmpty
+import net.dankito.banking.fints.test.assertEmpty
 import net.dankito.banking.fints.messages.Separators
 import net.dankito.banking.fints.messages.datenelementgruppen.implementierte.signatur.BenutzerdefinierteSignatur
 import kotlin.test.Test

@@ -1,7 +1,7 @@
 package net.dankito.banking.fints.model
 
 import kotlinx.datetime.LocalDate
-import net.dankito.utils.multiplatform.extensions.UnixEpochStart
+import net.dankito.banking.fints.extensions.UnixEpochStart
 
 
 open class AccountTransaction(

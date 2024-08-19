@@ -12,10 +12,10 @@ import net.dankito.banking.fints.messages.segmente.id.ISegmentId
 import net.dankito.banking.fints.messages.segmente.id.MessageSegmentId
 import net.dankito.banking.fints.response.segments.*
 import kotlinx.datetime.LocalDate
-import net.dankito.banking.fints.extensions.assertContains
-import net.dankito.banking.fints.extensions.assertContainsExactly
-import net.dankito.banking.fints.extensions.assertEmpty
-import net.dankito.banking.fints.extensions.assertSize
+import net.dankito.banking.fints.test.assertContains
+import net.dankito.banking.fints.test.assertContainsExactly
+import net.dankito.banking.fints.test.assertEmpty
+import net.dankito.banking.fints.test.assertSize
 import net.dankito.banking.fints.model.Amount
 import kotlin.test.*
 

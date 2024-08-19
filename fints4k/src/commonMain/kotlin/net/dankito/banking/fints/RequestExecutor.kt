@@ -11,7 +11,7 @@ import net.dankito.banking.fints.util.PureKotlinBase64Service
 import net.dankito.banking.fints.webclient.IWebClient
 import net.dankito.banking.fints.webclient.KtorWebClient
 import net.dankito.banking.fints.webclient.WebClientResponse
-import net.dankito.utils.multiplatform.extensions.getAllExceptionMessagesJoined
+import net.dankito.banking.fints.extensions.getAllExceptionMessagesJoined
 
 
 open class RequestExecutor(

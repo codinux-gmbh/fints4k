@@ -1,4 +1,4 @@
-package net.dankito.banking.fints.extensions
+package net.dankito.banking.fints.test
 
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract

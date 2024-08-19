@@ -1,4 +1,4 @@
-package net.dankito.utils.multiplatform.extensions
+package net.dankito.banking.fints.extensions
 
 import kotlin.test.Test
 import kotlin.test.assertEquals

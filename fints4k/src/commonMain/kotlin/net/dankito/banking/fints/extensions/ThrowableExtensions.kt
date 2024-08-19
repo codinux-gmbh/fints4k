@@ -1,4 +1,4 @@
-package net.dankito.utils.multiplatform.extensions
+package net.dankito.banking.fints.extensions
 
 
 fun Throwable.getAllExceptionMessagesJoined(maxDepth: Int = 5): String {

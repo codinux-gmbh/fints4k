@@ -25,7 +25,7 @@ import net.dankito.banking.fints.model.CreditCardTransaction
 import net.dankito.banking.fints.model.Money
 import net.dankito.banking.fints.response.segments.*
 import net.dankito.banking.fints.util.MessageUtils
-import net.dankito.utils.multiplatform.extensions.getAllExceptionMessagesJoined
+import net.dankito.banking.fints.extensions.getAllExceptionMessagesJoined
 
 
 open class ResponseParser(

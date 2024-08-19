@@ -1,6 +1,6 @@
 package net.dankito.banking.fints.util
 
-import net.dankito.utils.multiplatform.extensions.randomWithSeed
+import net.dankito.banking.fints.extensions.randomWithSeed
 import kotlin.random.Random
 import kotlin.test.Test
 import kotlin.test.assertEquals

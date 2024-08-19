@@ -1,6 +1,6 @@
 package net.dankito.banking.fints.messages.datenelemente.implementierte
 
-import net.dankito.banking.fints.extensions.assertThrows
+import net.dankito.banking.fints.test.assertThrows
 import net.dankito.banking.fints.messages.Existenzstatus
 import kotlin.test.Test
 

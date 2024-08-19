@@ -1,6 +1,6 @@
 package net.dankito.banking.fints.messages.segmente.implementierte.sepa
 
-import net.dankito.banking.fints.extensions.assertContains
+import net.dankito.banking.fints.test.assertContains
 import net.dankito.banking.fints.messages.segmente.id.CustomerSegmentId
 import net.dankito.banking.fints.model.*
 import kotlin.test.Test

@@ -2,9 +2,9 @@ package net.dankito.banking.fints.messages.datenelemente.abgeleiteteformate
 
 import kotlinx.datetime.LocalTime
 import net.codinux.log.logger
+import net.dankito.banking.fints.extensions.toStringWithMinDigits
 import net.dankito.banking.fints.messages.Existenzstatus
 import net.dankito.banking.fints.messages.datenelemente.basisformate.ZiffernDatenelement
-import net.dankito.utils.multiplatform.extensions.toStringWithMinDigits
 
 
 /**

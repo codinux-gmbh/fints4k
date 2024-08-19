@@ -1,6 +1,6 @@
 package net.dankito.banking.fints.messages
 
-import net.dankito.utils.multiplatform.extensions.randomWithSeed
+import net.dankito.banking.fints.extensions.randomWithSeed
 import net.dankito.banking.fints.messages.datenelemente.implementierte.Aufsetzpunkt
 import net.dankito.banking.fints.messages.datenelemente.implementierte.KundensystemID
 import net.dankito.banking.fints.messages.datenelemente.implementierte.Synchronisierungsmodus

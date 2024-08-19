@@ -13,8 +13,8 @@ import net.dankito.banking.fints.response.client.FinTsClientResponse
 import net.dankito.banking.fints.response.client.GetAccountTransactionsResponse
 import net.dankito.banking.fints.response.segments.AccountType
 import net.dankito.banking.fints.util.BicFinder
-import net.dankito.utils.multiplatform.extensions.minusDays
-import net.dankito.utils.multiplatform.extensions.todayAtEuropeBerlin
+import net.dankito.banking.fints.extensions.minusDays
+import net.dankito.banking.fints.extensions.todayAtEuropeBerlin
 
 
 open class FinTsModelMapper {

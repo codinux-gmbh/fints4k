@@ -3,7 +3,7 @@ package net.dankito.banking.fints.transactions.mt940
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.Month
 import net.codinux.log.logger
-import net.dankito.utils.multiplatform.extensions.todayAtEuropeBerlin
+import net.dankito.banking.fints.extensions.todayAtEuropeBerlin
 import net.dankito.banking.fints.log.IMessageLogAppender
 import net.dankito.banking.fints.model.Amount
 import net.dankito.banking.fints.transactions.mt940.model.*
