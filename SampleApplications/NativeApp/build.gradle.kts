@@ -12,11 +12,15 @@ kotlin {
     macosArm64()
 
 
+    val kotlinxSerializationVersion: String by project
+
     sourceSets {
 
         val nativeMain by getting {
             dependencies {
                 implementation(project(":fints4k"))
+
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$kotlinxSerializationVersion")
 
                 implementation("com.github.ajalt.clikt:clikt:3.5.4")
 

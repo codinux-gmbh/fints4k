@@ -3,22 +3,13 @@ ext {
     appVersionName = '1.0.0-Alpha-11-SNAPSHOT'
 
 
-    /*      MPP / basic dependencies        */
-
-
-    javaUtilsVersion = '1.0.18'
-
-
     /*      Test        */
-
-    junit5Version = '5.5.2'
 
     assertJVersion = '3.12.2'
 
     mockitoVersion = '2.22.0'
     mockitoKotlinVersion = '1.6.0'
 
-    slf4jVersion = '1.7.26'
     logbackVersion = '1.2.3'
 }
 
