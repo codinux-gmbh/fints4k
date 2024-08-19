@@ -1,4 +1,5 @@
 pluginManagement {
+    val kotlinVersion: String by settings
     val atomicfuVersion: String by settings
 
     repositories {
@@ -7,6 +8,8 @@ pluginManagement {
     }
 
     plugins {
+//        id("org.jetbrains.kotlin.multiplatform") version kotlinVersion
+        id("org.jetbrains.kotlin.plugin.serialization") version kotlinVersion
         id("org.jetbrains.kotlinx.atomicfu") version atomicfuVersion
     }
 }

@@ -1,9 +1,9 @@
 plugins {
     id("org.jetbrains.kotlin.multiplatform")
-    id("org.jetbrains.kotlin.plugin.serialization") version "$kotlinVersion"
+    id("org.jetbrains.kotlin.plugin.serialization")
     id("org.jetbrains.kotlinx.atomicfu")
 
-    id "maven-publish"
+    id("maven-publish")
 }
 
 
