@@ -1,4 +1,4 @@
-package net.dankito.utils.multiplatform
+package net.dankito.banking.fints.mapper
 
 // required so that Joda time zones get loaded, see:
 // https://github.com/Kotlin/kotlinx-datetime#note-about-time-zones-in-js

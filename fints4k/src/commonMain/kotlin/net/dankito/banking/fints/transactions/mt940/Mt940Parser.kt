@@ -7,7 +7,7 @@ import net.dankito.banking.fints.extensions.todayAtEuropeBerlin
 import net.dankito.banking.fints.log.IMessageLogAppender
 import net.dankito.banking.fints.model.Amount
 import net.dankito.banking.fints.transactions.mt940.model.*
-import net.dankito.utils.multiplatform.DateFormatter
+import net.dankito.banking.fints.mapper.DateFormatter
 
 
 /*

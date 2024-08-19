@@ -1,4 +1,4 @@
-package net.dankito.utils.multiplatform
+package net.dankito.banking.fints.mapper
 
 import kotlinx.datetime.LocalDate
 

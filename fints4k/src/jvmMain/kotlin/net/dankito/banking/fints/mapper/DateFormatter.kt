@@ -1,9 +1,8 @@
-package net.dankito.utils.multiplatform
+package net.dankito.banking.fints.mapper
 
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.toKotlinLocalDate
 import java.time.format.DateTimeFormatter
-
 
 actual class DateFormatter actual constructor(pattern: String) {
 
