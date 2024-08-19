@@ -1,7 +1,13 @@
 pluginManagement {
+    val atomicfuVersion: String by settings
+
     repositories {
         mavenCentral()
         gradlePluginPortal()
+    }
+
+    plugins {
+        id("org.jetbrains.kotlinx.atomicfu") version atomicfuVersion
     }
 }
 

@@ -1,6 +1,6 @@
 package net.dankito.banking.fints.model
 
-import co.touchlab.stately.concurrency.AtomicInt
+import kotlinx.atomicfu.atomic
 import net.dankito.banking.fints.callback.FinTsClientCallback
 import net.dankito.banking.fints.log.IMessageLogAppender
 import net.dankito.banking.fints.log.MessageContext
@@ -27,7 +27,7 @@ open class JobContext(
 ) : MessageBaseData(bank, product), IMessageLogAppender {
 
     companion object {
-        private var JobCount = AtomicInt(0) // this variable is accessed from multiple threads, so make it thread safe
+        private val JobCount = atomic(0) // this variable is accessed from multiple threads, so make it thread safe
     }
 
 

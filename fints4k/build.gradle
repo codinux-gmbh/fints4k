@@ -1,6 +1,8 @@
 plugins {
-    id "org.jetbrains.kotlin.multiplatform"
-    id "org.jetbrains.kotlin.plugin.serialization" version "$kotlinVersion"
+    id("org.jetbrains.kotlin.multiplatform")
+    id("org.jetbrains.kotlin.plugin.serialization") version "$kotlinVersion"
+    id("org.jetbrains.kotlinx.atomicfu")
+
     id "maven-publish"
 }
 
@@ -68,8 +70,6 @@ kotlin {
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$kotlinxSerializationVersion")
 
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
-
-                implementation "co.touchlab:stately-concurrency:1.2.0"
 
                 implementation("io.ktor:ktor-client-core:$ktorVersion")
             }
