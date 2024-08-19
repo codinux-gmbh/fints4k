@@ -15,10 +15,10 @@ import net.dankito.banking.client.model.parameter.RetrieveTransactions
 import net.dankito.banking.client.model.parameter.TransferMoneyParameter
 import net.dankito.banking.fints.FinTsClient
 import net.dankito.banking.fints.callback.SimpleFinTsClientCallback
+import net.dankito.banking.fints.extensions.toStringWithMinDigits
 import net.dankito.banking.fints.getAccountData
 import net.dankito.banking.fints.model.TanChallenge
 import net.dankito.banking.fints.transferMoney
-import net.dankito.utils.multiplatform.extensions.*
 import util.CsvWriter
 import util.OutputFormat
 
