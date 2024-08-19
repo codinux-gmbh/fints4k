@@ -63,7 +63,7 @@ kotlin {
             dependencies {
                 api("org.jetbrains.kotlinx:kotlinx-datetime:$kotlinxDateTimeVersion")
 
-                implementation("net.codinux.log:kmp-log:1.5.1")
+                implementation("net.codinux.log:kmp-log:$klfVersion")
 
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$kotlinxSerializationVersion")
 
