@@ -8,7 +8,7 @@ pluginManagement {
 rootProject.name = "fints4kProject"
 
 
-include ":fints4k"
+include(":fints4k")
 
 
 // Sample applications
