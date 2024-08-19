@@ -54,14 +54,12 @@ allprojects {
 
 task jarAll {
     dependsOn = [
-            "multiplatform-utils:jvmJar",
-            "fints4k:jvmJar",
+        "fints4k:jvmJar",
     ]
 }
 
 task publishAllToMavenLocal {
     dependsOn = [
-            "multiplatform-utils:publishToMavenLocal",
-            "fints4k:publishToMavenLocal",
+        "fints4k:publishToMavenLocal",
     ]
 }
