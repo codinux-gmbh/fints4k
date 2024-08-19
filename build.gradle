@@ -30,8 +30,6 @@ buildscript {
 
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.8.20"
-
-        classpath "com.android.tools.build:gradle:7.0.4"
     }
 }
 
@@ -40,13 +38,9 @@ allprojects {
     repositories {
         mavenCentral()
         google()
-        // TODO: remove again as soon as kmp-web-client is released
-        maven {
-            url "https://oss.sonatype.org/content/repositories/snapshots/"
-        }
     }
 
-    group 'net.codinux.banking'
+    group "net.codinux.banking"
     version appVersionName
 }
 

@@ -65,9 +65,9 @@ kotlin {
 
                 implementation("net.codinux.log:kmp-log:1.5.1")
 
-                implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1"
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.5.1")
 
-                implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion"
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
 
                 implementation "co.touchlab:stately-concurrency:1.2.0"
 
@@ -96,9 +96,6 @@ kotlin {
                 implementation "org.assertj:assertj-core:$assertJVersion"
                 implementation "org.mockito:mockito-core:$mockitoVersion"
 
-
-                implementation "org.apache.commons:commons-csv:1.8"
-
                 implementation "ch.qos.logback:logback-classic:$logbackVersion"
             }
 
@@ -116,10 +113,7 @@ kotlin {
 
         nativeMain {
             dependencies {
-                implementation("com.github.ajalt.clikt:clikt:3.5.4")
 
-                // only needed for writing files to output
-                implementation "com.soywiz.korlibs.korio:korio:3.4.0"
             }
         }
 
