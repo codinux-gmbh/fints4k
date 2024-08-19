@@ -27,3 +27,7 @@ include "CorsProxy"
 findProject(":CorsProxy")?.projectDir = file("SampleApplications/CorsProxy")
 findProject(":CorsProxy")?.name = "CorsProxy"
 
+include("NativeApp")
+findProject(":NativeApp")?.projectDir = file("SampleApplications/NativeApp")
+findProject(":NativeApp")?.name = "NativeApp"
+
