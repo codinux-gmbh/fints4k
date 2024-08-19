@@ -76,12 +76,7 @@ kotlin {
 
         jvmMain {
             dependencies {
-                // TODO: why does for kotlinx-datetime also the platform specific dependency has to be imported?
-                api("org.jetbrains.kotlinx:kotlinx-datetime-jvm:$kotlinxDateTimeVersion")
 
-                compileOnly "org.slf4j:slf4j-api:$slf4jVersion"
-
-                compileOnly "com.fasterxml.jackson.core:jackson-databind:2.9.9"
             }
         }
 
@@ -95,8 +90,6 @@ kotlin {
 
         jsMain {
             dependencies {
-                // TODO: why does for kotlinx-datetime also the platform specific dependency has to be imported?
-                api("org.jetbrains.kotlinx:kotlinx-datetime-js:$kotlinxDateTimeVersion")
                 implementation npm("@js-joda/timezone", "2.3.0")
             }
         }
@@ -104,15 +97,13 @@ kotlin {
 
         linuxX64Main {
             dependencies {
-                // TODO: why does for kotlinx-datetime also the platform specific dependency has to be imported?
-                api("org.jetbrains.kotlinx:kotlinx-datetime-linuxx64:$kotlinxDateTimeVersion")
+
             }
         }
 
         mingwX64Main {
             dependencies {
-                // TODO: why does for kotlinx-datetime also the platform specific dependency has to be imported?
-                api("org.jetbrains.kotlinx:kotlinx-datetime-mingwx64:$kotlinxDateTimeVersion")
+
             }
         }
 
