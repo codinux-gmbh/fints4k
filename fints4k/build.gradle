@@ -63,7 +63,7 @@ kotlin {
             dependencies {
                 api project(":multiplatform-utils")
 
-                implementation("net.codinux.log:kmp-log:1.1.2")
+                implementation("net.codinux.log:kmp-log:1.5.1")
 
                 implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1"
 
