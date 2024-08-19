@@ -2,7 +2,6 @@ package net.dankito.banking.fints.messages.segmente.implementierte.sepa
 
 import kotlinx.datetime.LocalDateTime
 import net.dankito.utils.multiplatform.extensions.nowAtUtc
-import net.dankito.utils.multiplatform.DateFormatter
 
 
 /**
@@ -32,8 +31,6 @@ open class SepaMessageCreator : ISepaMessageCreator {
         const val PaymentInformationIdKey = "PaymentInformationId"
 
         const val NumberOfTransactionsKey = "NumberOfTransactions"
-
-        val IsoDateFormat = DateFormatter("yyyy-MM-dd'T'HH:mm:ss.SSS")
     }
 
 

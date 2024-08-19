@@ -1,7 +1,6 @@
 package net.dankito.banking.fints.model
 
 import kotlinx.datetime.LocalDate
-import net.dankito.utils.multiplatform.extensions.format
 
 
 open class CreditCardTransaction(
@@ -29,7 +28,7 @@ open class CreditCardTransaction(
 
 
     override fun toString(): String {
-        return "${valueDate.format("dd.MM.yy")} $amount $description"
+        return "$valueDate $amount $description"
     }
 
 }

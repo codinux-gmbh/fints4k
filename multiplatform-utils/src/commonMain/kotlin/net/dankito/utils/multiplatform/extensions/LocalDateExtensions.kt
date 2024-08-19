@@ -1,7 +1,6 @@
 package net.dankito.utils.multiplatform.extensions
 
 import kotlinx.datetime.*
-import net.dankito.utils.multiplatform.DateFormatter
 import kotlin.js.JsName
 
 
@@ -77,15 +76,4 @@ fun LocalDate.addDays(days: Int): LocalDate {
 
 fun LocalDate.minusDays(days: Int): LocalDate {
   return this.minus(days, DateTimeUnit.DAY)
-}
-
-
-@JsName("formatDate")
-fun LocalDate.format(formatter: DateFormatter): String {
-  return this.atTime(0, 0).format(formatter)
-}
-
-@JsName("formatDatePattern")
-fun LocalDate.format(pattern: String): String {
-  return this.format(DateFormatter(pattern))
 }

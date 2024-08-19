@@ -52,7 +52,7 @@ open class Mt940Parser(
         const val ClosingBalanceCode = "62"
 
 
-        val DateFormatter = DateFormatter("yyMMdd")
+        val DateFormatter = DateFormatter("yyMMdd") // TODO: replace with LocalDate.Format { }
 
         val CurrentYearTwoDigit = LocalDate.todayAtEuropeBerlin().year - 2000
 

@@ -1,7 +1,6 @@
 package net.dankito.utils.multiplatform.extensions
 
 import kotlinx.datetime.*
-import net.dankito.utils.multiplatform.DateFormatter
 import kotlin.js.JsName
 
 
@@ -59,14 +58,4 @@ fun LocalDateTime.Companion.nowAt(timeZone: TimeZone): LocalDateTime {
 
 fun LocalDateTime.toEpochMillisecondsAt(timeZone: TimeZone): Long {
   return this.toInstant(timeZone).toEpochMilliseconds()
-}
-
-
-fun LocalDateTime.format(formatter: DateFormatter): String {
-  return formatter.format(this)
-}
-
-@JsName("formatPattern")
-fun LocalDateTime.format(pattern: String): String {
-  return this.format(DateFormatter(pattern))
 }
