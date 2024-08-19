@@ -18,7 +18,6 @@ import net.dankito.banking.fints.response.segments.*
 import net.dankito.banking.fints.tan.FlickerCodeDecoder
 import net.dankito.banking.fints.tan.TanImageDecoder
 import net.dankito.banking.fints.util.TanMethodSelector
-import net.dankito.utils.multiplatform.extensions.millisSinceEpochAtEuropeBerlin
 import net.dankito.utils.multiplatform.extensions.minusDays
 import net.dankito.utils.multiplatform.extensions.todayAtEuropeBerlin
 import net.dankito.utils.multiplatform.extensions.todayAtSystemDefaultTimeZone
@@ -237,7 +236,7 @@ open class FinTsJobExecutor(
           || (response.successful && (parameter.alsoRetrieveBalance == false || balance != null))
         val fromDate = parameter.fromDate
             ?: parameter.account.countDaysForWhichTransactionsAreKept?.let { LocalDate.todayAtSystemDefaultTimeZone().minusDays(it) }
-            ?: bookedTransactions.minByOrNull { it.valueDate.millisSinceEpochAtEuropeBerlin }?.valueDate
+            ?: bookedTransactions.minByOrNull { it.valueDate }?.valueDate
         val retrievedData = RetrievedAccountData(parameter.account, successful, balance, bookedTransactions, unbookedTransactions, fromDate, parameter.toDate ?: LocalDate.todayAtEuropeBerlin(), response.internalError)
 
         return GetAccountTransactionsResponse(context, response, retrievedData,

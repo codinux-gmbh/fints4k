@@ -2,6 +2,7 @@ package net.dankito.banking.fints.response
 
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.LocalTime
 import kotlinx.datetime.atTime
 import net.codinux.log.logger
 import net.dankito.banking.fints.log.IMessageLogAppender
@@ -690,7 +691,7 @@ open class ResponseParser(
             date = parseDate(dataElements[++dateIndex])
         }
 
-        var time: LocalDateTime? = null
+        var time: LocalTime? = null
         if (dataElements.size > dateIndex + 1) {
             try {
                 time = parseTime(dataElements[dateIndex + 1])
@@ -1005,11 +1006,11 @@ open class ResponseParser(
         return null
     }
 
-    protected open fun parseTime(timeString: String): LocalDateTime {
+    protected open fun parseTime(timeString: String): LocalTime {
         return Uhrzeit.parse(timeString)
     }
 
-    protected open fun parseNullableTime(timeString: String): LocalDateTime? {
+    protected open fun parseNullableTime(timeString: String): LocalTime? {
         try {
             return parseTime(timeString)
         } catch (ignored: Exception) { }

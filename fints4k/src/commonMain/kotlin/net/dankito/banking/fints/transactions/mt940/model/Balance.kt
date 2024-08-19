@@ -1,8 +1,8 @@
 package net.dankito.banking.fints.transactions.mt940.model
 
 import kotlinx.datetime.LocalDate
-import net.dankito.utils.multiplatform.extensions.atUnixEpochStart
 import net.dankito.banking.fints.model.Amount
+import net.dankito.utils.multiplatform.extensions.UnixEpochStart
 
 
 open class Balance(
@@ -42,7 +42,7 @@ open class Balance(
 
 ) {
 
-    internal constructor() : this(false, false, LocalDate.atUnixEpochStart, "", Amount.Zero) // for object deserializers
+    internal constructor() : this(false, false, UnixEpochStart, "", Amount.Zero) // for object deserializers
 
 
     override fun toString(): String {

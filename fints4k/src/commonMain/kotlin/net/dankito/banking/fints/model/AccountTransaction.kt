@@ -1,7 +1,7 @@
 package net.dankito.banking.fints.model
 
 import kotlinx.datetime.LocalDate
-import net.dankito.utils.multiplatform.extensions.atUnixEpochStart
+import net.dankito.utils.multiplatform.extensions.UnixEpochStart
 
 
 open class AccountTransaction(
@@ -45,7 +45,7 @@ open class AccountTransaction(
 ) {
 
     // for object deserializers
-    internal constructor() : this(AccountData(), Money(Amount.Zero, ""), "", LocalDate.atUnixEpochStart, null, null, null, null, LocalDate.atUnixEpochStart)
+    internal constructor() : this(AccountData(), Money(Amount.Zero, ""), "", UnixEpochStart, null, null, null, null, UnixEpochStart)
 
     constructor(account: AccountData, amount: Money, unparsedReference: String, bookingDate: LocalDate, otherPartyName: String?, otherPartyBankCode: String?, otherPartyAccountId: String?, bookingText: String?, valueDate: LocalDate)
         : this(account, amount, false, unparsedReference, bookingDate, otherPartyName, otherPartyBankCode, otherPartyAccountId, bookingText, valueDate,

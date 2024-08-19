@@ -4,7 +4,7 @@ import kotlinx.datetime.LocalDate
 import kotlinx.serialization.Serializable
 import net.dankito.banking.fints.model.Amount
 import net.dankito.banking.fints.model.Money
-import net.dankito.utils.multiplatform.extensions.atUnixEpochStart
+import net.dankito.utils.multiplatform.extensions.UnixEpochStart
 
 
 @Serializable
@@ -47,7 +47,7 @@ open class AccountTransaction(
 ) {
 
     // for object deserializers
-    internal constructor() : this(Money(Amount.Zero, ""), "", LocalDate.atUnixEpochStart, null, null, null, null, LocalDate.atUnixEpochStart)
+    internal constructor() : this(Money(Amount.Zero, ""), "", UnixEpochStart, null, null, null, null, UnixEpochStart)
 
     constructor(amount: Money, unparsedReference: String, bookingDate: LocalDate, otherPartyName: String?, otherPartyBankCode: String?, otherPartyAccountId: String?, bookingText: String?, valueDate: LocalDate)
         : this(amount, unparsedReference, bookingDate, otherPartyName, otherPartyBankCode, otherPartyAccountId, bookingText, valueDate,

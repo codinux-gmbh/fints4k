@@ -1,8 +1,7 @@
 package net.dankito.banking.fints.util
 
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.LocalDateTime
-import net.dankito.utils.multiplatform.extensions.of
+import kotlinx.datetime.LocalTime
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -42,7 +41,7 @@ class FinTsUtilsTest {
     fun formatTime_AM() {
 
         // given
-        val time = LocalDateTime.of(8, 2, 1)
+        val time = LocalTime(8, 2, 1)
 
         // when
         val result = underTest.formatTime(time)
@@ -55,7 +54,7 @@ class FinTsUtilsTest {
     fun formatTime_PM() {
 
         // given
-        val time = LocalDateTime.of(18, 22, 51)
+        val time = LocalTime(18, 22, 51)
 
         // when
         val result = underTest.formatTime(time)
@@ -68,7 +67,7 @@ class FinTsUtilsTest {
     fun formatTimeAsInt_AM() {
 
         // given
-        val time = LocalDateTime.of(8, 2, 1)
+        val time = LocalTime(8, 2, 1)
 
         // when
         val result = underTest.formatTimeAsInt(time)
@@ -81,7 +80,7 @@ class FinTsUtilsTest {
     fun formatTimeAsInt_PM() {
 
         // given
-        val time = LocalDateTime.of(18, 22, 51)
+        val time = LocalTime(18, 22, 51)
 
         // when
         val result = underTest.formatTimeAsInt(time)

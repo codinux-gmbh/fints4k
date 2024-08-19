@@ -1,16 +1,14 @@
 package net.dankito.banking.fints
 
-import kotlinx.datetime.LocalDate
 import net.dankito.banking.client.model.parameter.FinTsClientParameter
-import net.dankito.banking.fints.callback.FinTsClientCallback
-import net.dankito.banking.fints.model.*
 import net.dankito.banking.client.model.parameter.GetAccountDataParameter
-import net.dankito.banking.client.model.parameter.RetrieveTransactions
 import net.dankito.banking.client.model.parameter.TransferMoneyParameter
 import net.dankito.banking.client.model.response.ErrorCode
 import net.dankito.banking.client.model.response.GetAccountDataResponse
 import net.dankito.banking.client.model.response.TransferMoneyResponse
+import net.dankito.banking.fints.callback.FinTsClientCallback
 import net.dankito.banking.fints.mapper.FinTsModelMapper
+import net.dankito.banking.fints.model.*
 import net.dankito.banking.fints.response.client.FinTsClientResponse
 import net.dankito.banking.fints.response.client.GetAccountInfoResponse
 import net.dankito.banking.fints.response.client.GetAccountTransactionsResponse
@@ -18,8 +16,6 @@ import net.dankito.banking.fints.response.segments.AccountType
 import net.dankito.banking.fints.util.BicFinder
 import net.dankito.banking.fints.util.FinTsServerAddressFinder
 import net.dankito.banking.fints.webclient.IWebClient
-import net.dankito.utils.multiplatform.extensions.minusDays
-import net.dankito.utils.multiplatform.extensions.todayAtEuropeBerlin
 import kotlin.jvm.JvmOverloads
 
 

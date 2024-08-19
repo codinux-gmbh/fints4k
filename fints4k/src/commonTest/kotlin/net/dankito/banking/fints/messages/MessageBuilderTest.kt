@@ -1,7 +1,7 @@
 package net.dankito.banking.fints.messages
 
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.LocalTime
 import kotlinx.datetime.Month
 import net.dankito.banking.fints.FinTsTestBase
 import net.dankito.banking.fints.messages.datenelemente.implementierte.tan.JobTanConfiguration
@@ -22,7 +22,7 @@ class MessageBuilderTest : FinTsTestBase() {
             return Date.toString()
         }
 
-        override fun formatTime(time: LocalDateTime): String {
+        override fun formatTime(time: LocalTime): String {
             return Time.toString()
         }
     }) {

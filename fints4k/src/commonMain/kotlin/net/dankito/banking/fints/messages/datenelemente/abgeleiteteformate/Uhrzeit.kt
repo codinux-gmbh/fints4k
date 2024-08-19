@@ -1,8 +1,7 @@
 package net.dankito.banking.fints.messages.datenelemente.abgeleiteteformate
 
-import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.LocalTime
 import net.codinux.log.logger
-import net.dankito.utils.multiplatform.extensions.of
 import net.dankito.banking.fints.messages.Existenzstatus
 import net.dankito.banking.fints.messages.datenelemente.basisformate.ZiffernDatenelement
 import net.dankito.utils.multiplatform.extensions.toStringWithTwoDigits
@@ -23,11 +22,11 @@ open class Uhrzeit(time: Int?, existenzstatus: Existenzstatus) : ZiffernDatenele
         private val log by logger()
 
 
-        fun format(time: LocalDateTime): String { // parse to HbciTimeFormatString
+        fun format(time: LocalTime): String { // parse to HbciTimeFormatString
             return time.hour.toStringWithTwoDigits() + time.minute.toStringWithTwoDigits() + time.second.toStringWithTwoDigits() // TODO: is this correct?
         }
 
-        fun parse(timeString: String): LocalDateTime {
+        fun parse(timeString: String): LocalTime {
             // do not use DateFormatter as Java DateFormat is not thread safe, resulting in a lot of curious errors in parallel execution
 
             if (timeString.length == 6) {
@@ -36,7 +35,7 @@ open class Uhrzeit(time: Int?, existenzstatus: Existenzstatus) : ZiffernDatenele
                     val minute = timeString.substring(2, 4)
                     val second = timeString.substring(4, 6)
 
-                    return LocalDateTime.of(hour.toInt(), minute.toInt(), second.toInt())
+                    return LocalTime(hour.toInt(), minute.toInt(), second.toInt())
                 } catch (e: Exception) {
                     log.error(e) { "Could not parse time string '$timeString' to HBCI time" }
                 }
@@ -45,9 +44,5 @@ open class Uhrzeit(time: Int?, existenzstatus: Existenzstatus) : ZiffernDatenele
             throw IllegalArgumentException("Cannot parse '$timeString' to HBCI Time. Only times in format '${HbciTimeFormatString}' are allowed in HBCI / FinTS.")
         }
     }
-
-
-    constructor(time: LocalDateTime?, existenzstatus: Existenzstatus)
-            : this(time?.let { format(time).toInt() }, existenzstatus)
 
 }
