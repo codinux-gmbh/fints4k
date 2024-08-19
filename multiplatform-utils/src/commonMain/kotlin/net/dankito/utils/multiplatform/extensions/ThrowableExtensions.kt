@@ -22,10 +22,6 @@ fun Throwable.getAllExceptionMessages(maxDepth: Int = 5): List<String> {
     return exceptionMessages.toList()
 }
 
-fun Throwable.getInnerExceptionMessage(maxDepth: Int = 3): String {
-    return this.getInnerException(maxDepth).message ?: ""
-}
-
 fun Throwable.getInnerException(maxDepth: Int = 3): Throwable {
     var innerException = this
     var depth = 0

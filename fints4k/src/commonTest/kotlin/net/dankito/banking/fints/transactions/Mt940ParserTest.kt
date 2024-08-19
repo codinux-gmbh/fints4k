@@ -8,7 +8,7 @@ import net.dankito.banking.fints.transactions.mt940.model.StatementLine
 import kotlinx.datetime.LocalDate
 import net.dankito.banking.fints.extensions.*
 import net.dankito.banking.fints.model.Amount
-import net.dankito.utils.multiplatform.extensions.toStringWithTwoDigits
+import net.dankito.utils.multiplatform.extensions.toStringWithMinDigits
 import kotlin.test.Test
 import kotlin.test.assertContains
 
@@ -386,12 +386,12 @@ class Mt940ParserTest : FinTsTestBase() {
 
     private fun convertMt940Date(date: LocalDate): String {
         // don't use DateFormatter for this as it's not implemented in Kotlin/Native
-        return (date.year % 100).toString() + date.monthNumber.toStringWithTwoDigits() + date.dayOfMonth.toStringWithTwoDigits()
+        return (date.year % 100).toString() + date.monthNumber.toStringWithMinDigits(2) + date.dayOfMonth.toStringWithMinDigits(2)
     }
 
     private fun convertToShortBookingDate(date: LocalDate): String {
         // don't use DateFormatter for this as it's not implemented in Kotlin/Native
-        return date.monthNumber.toStringWithTwoDigits() + date.dayOfMonth.toStringWithTwoDigits()
+        return date.monthNumber.toStringWithMinDigits(2) + date.dayOfMonth.toStringWithMinDigits(2)
     }
 
 }

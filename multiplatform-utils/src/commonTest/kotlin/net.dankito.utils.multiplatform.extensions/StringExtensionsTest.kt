@@ -15,16 +15,6 @@ internal class StringExtensionsTest {
   }
 
   @Test
-  fun countOccurrences() {
-    val expectedOccurrences = 30
-    val input = "java.lang.Exception: A severe error occurred" + IntRange(1, expectedOccurrences).map { "\r\n\tStack trace element $it" }
-
-    val result = input.countOccurrences("\n")
-
-    assertEquals(expectedOccurrences, result)
-  }
-
-  @Test
   fun indicesOf() {
     val expectedOccurrences = 30
     val stringToFind = "\r\n"

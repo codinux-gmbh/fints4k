@@ -4,7 +4,7 @@ import kotlinx.datetime.LocalTime
 import net.codinux.log.logger
 import net.dankito.banking.fints.messages.Existenzstatus
 import net.dankito.banking.fints.messages.datenelemente.basisformate.ZiffernDatenelement
-import net.dankito.utils.multiplatform.extensions.toStringWithTwoDigits
+import net.dankito.utils.multiplatform.extensions.toStringWithMinDigits
 
 
 /**
@@ -23,7 +23,7 @@ open class Uhrzeit(time: Int?, existenzstatus: Existenzstatus) : ZiffernDatenele
 
 
         fun format(time: LocalTime): String { // parse to HbciTimeFormatString
-            return time.hour.toStringWithTwoDigits() + time.minute.toStringWithTwoDigits() + time.second.toStringWithTwoDigits() // TODO: is this correct?
+            return time.hour.toStringWithMinDigits(2) + time.minute.toStringWithMinDigits(2) + time.second.toStringWithMinDigits(2) // TODO: is this correct?
         }
 
         fun parse(timeString: String): LocalTime {

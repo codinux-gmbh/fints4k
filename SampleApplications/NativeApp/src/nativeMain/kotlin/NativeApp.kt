@@ -128,13 +128,13 @@ class NativeApp {
     val largestAmountDigits = bookedTransactions.maxByOrNull { it.amount.displayString.length }?.amount?.displayString?.length ?: 0
 
     bookedTransactions.sortedByDescending { it.valueDate }.forEachIndexed { transactionIndex, transaction ->
-      println("${(transactionIndex + 1).toStringWithMinDigits(countTransactionsDigits, " ")}. ${formatDate(transaction.valueDate)} " +
-        "${transaction.amount.displayString.ensureMinStringLength(largestAmountDigits, " ")} ${transaction.otherPartyName ?: ""} - ${transaction.reference}")
+      println("${(transactionIndex + 1).toStringWithMinDigits(countTransactionsDigits, ' ')}. ${formatDate(transaction.valueDate)} " +
+        "${transaction.amount.displayString.padStart(largestAmountDigits, ' ')} ${transaction.otherPartyName ?: ""} - ${transaction.reference}")
     }
   }
 
   private fun formatDate(date: LocalDate): String {
-    return date.dayOfMonth.toStringWithTwoDigits() + "." + date.monthNumber.toStringWithTwoDigits() + "." + date.year
+    return date.dayOfMonth.toStringWithMinDigits(2) + "." + date.monthNumber.toStringWithMinDigits(2) + "." + date.year
   }
 
 
@@ -157,5 +157,19 @@ class NativeApp {
       println("Could not write file to $outputFilePath: $e")
     }
   }
+
+
+  val Int.numberOfDigits: Int
+    get() {
+      var number = this
+      var count = 0
+
+      while (number != 0) {
+        number /= 10
+        ++count
+      }
+
+      return count
+    }
 
 }

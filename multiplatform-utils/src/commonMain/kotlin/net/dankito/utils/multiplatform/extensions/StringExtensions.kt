@@ -44,10 +44,3 @@ fun String.indicesOf(string: String, startIndex: Int = 0, ignoreCase: Boolean = 
 
   return indices
 }
-
-/**
- * Finds all occurrences of [string] in String.
- */
-fun String.countOccurrences(string: String, startIndex: Int = 0, ignoreCase: Boolean = false): Int {
-  return this.indicesOf(string, startIndex, ignoreCase).size
-}

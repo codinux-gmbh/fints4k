@@ -8,7 +8,6 @@ import net.dankito.banking.fints.log.IMessageLogAppender
 import net.dankito.banking.fints.model.Amount
 import net.dankito.banking.fints.transactions.mt940.model.*
 import net.dankito.utils.multiplatform.DateFormatter
-import net.dankito.utils.multiplatform.extensions.isUpperCase
 
 
 /*
@@ -361,7 +360,7 @@ open class Mt940Parser(
 
         for (i in 1..referenceParts.size - 1) {
             val part = referenceParts[i]
-            if (part.isNotEmpty() && part.first().isUpperCase && referenceParts[i - 1].last().isUpperCase == false) {
+            if (part.isNotEmpty() && part.first().isUpperCase() && referenceParts[i - 1].last().isUpperCase() == false) {
                 reference.append(" ")
             }
 

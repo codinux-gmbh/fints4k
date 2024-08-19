@@ -5,7 +5,6 @@ import net.codinux.log.logger
 import net.dankito.banking.fints.messages.Existenzstatus
 import net.dankito.banking.fints.messages.datenelemente.basisformate.NumerischesDatenelement
 import net.dankito.utils.multiplatform.extensions.toStringWithMinDigits
-import net.dankito.utils.multiplatform.extensions.toStringWithTwoDigits
 
 
 /**
@@ -23,7 +22,7 @@ open class Datum(date: Int?, existenzstatus: Existenzstatus) : NumerischesDatene
 
 
         fun format(date: LocalDate): String { // create HbciDateFormatString
-            return date.year.toStringWithMinDigits(4) + date.monthNumber.toStringWithTwoDigits() + date.dayOfMonth.toStringWithTwoDigits() // TODO: is this correct?
+            return date.year.toStringWithMinDigits(4) + date.monthNumber.toStringWithMinDigits(2) + date.dayOfMonth.toStringWithMinDigits(2) // TODO: is this correct?
         }
 
         fun parse(dateString: String): LocalDate {

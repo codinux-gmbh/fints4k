@@ -49,44 +49,8 @@ class NumberExtensionsTest {
 
 
   @Test
-  fun getNumberOfDigits_0() {
-    val result = 0.numberOfDigits
-
-    assertEquals(0, result)
-  }
-
-  @Test
-  fun getNumberOfDigits_1Digit() {
-    val result = 7.numberOfDigits
-
-    assertEquals(1, result)
-  }
-
-  @Test
-  fun getNumberOfDigits_2Digits() {
-    val result = 42.numberOfDigits
-
-    assertEquals(2, result)
-  }
-
-  @Test
-  fun getNumberOfDigits_3Digits() {
-    val result = 123.numberOfDigits
-
-    assertEquals(3, result)
-  }
-
-  @Test
-  fun getNumberOfDigits_10Digits() {
-    val result = 1234567890.numberOfDigits
-
-    assertEquals(10, result)
-  }
-
-
-  @Test
   fun ensureMinStringLength() {
-    val result = "123,45 EUR".ensureMinStringLength(12, " ")
+    val result = "123,45 EUR".padStart(12, ' ')
 
     assertEquals("  123,45 EUR", result)
   }
