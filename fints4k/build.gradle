@@ -71,20 +71,23 @@ kotlin {
 
                 implementation "co.touchlab:stately-concurrency:1.2.0"
 
-                implementation "io.ktor:ktor-client-core:$ktorVersion" // only left here cause kmp-web-client doesn't expose ktor as api
-                implementation("net.dankito.web.client:kmp-web-client:1.0.0-SNAPSHOT")
+                implementation("io.ktor:ktor-client-core:$ktorVersion")
             }
         }
 
         commonTest {
             dependencies {
                 implementation kotlin("test")
+
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesVersion")
             }
         }
 
 
         jvmMain {
             dependencies {
+                // or use client-java or client-okhttp?
+                implementation("io.ktor:ktor-client-cio:$ktorVersion")
             }
         }
 
@@ -104,7 +107,7 @@ kotlin {
 
         jsMain {
             dependencies {
-
+                implementation("io.ktor:ktor-client-js:$ktorVersion")
             }
         }
 
@@ -115,6 +118,24 @@ kotlin {
 
                 // only needed for writing files to output
                 implementation "com.soywiz.korlibs.korio:korio:3.4.0"
+            }
+        }
+
+        linuxMain {
+            dependencies {
+                implementation("io.ktor:ktor-client-curl:$ktorVersion")
+            }
+        }
+
+        mingwMain {
+            dependencies {
+                implementation("io.ktor:ktor-client-winhttp:$ktorVersion")
+            }
+        }
+
+        appleMain {
+            dependencies {
+                implementation("io.ktor:ktor-client-darwin:$ktorVersion")
             }
         }
 

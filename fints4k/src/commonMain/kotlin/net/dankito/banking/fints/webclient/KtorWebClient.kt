@@ -2,8 +2,7 @@ package net.dankito.banking.fints.webclient
 
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.*
-import io.ktor.client.request.post
-import io.ktor.client.request.setBody
+import io.ktor.client.request.*
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
@@ -37,6 +36,14 @@ open class KtorWebClient(
         }
     }
 
+
+    suspend fun get(url: String): WebClientResponse {
+        val clientResponse = client.get(url)
+
+        val responseBody = clientResponse.bodyAsText()
+
+        return WebClientResponse(clientResponse.status.value == 200, clientResponse.status.value, body = responseBody)
+    }
 
     override suspend fun post(url: String, body: String, contentType: String, userAgent: String): WebClientResponse {
         return postInCoroutine(url, body, contentType, userAgent)
