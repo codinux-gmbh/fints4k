@@ -2,7 +2,6 @@ package net.dankito.banking.fints.config
 
 import net.dankito.banking.fints.FinTsJobExecutor
 import net.dankito.banking.fints.RequestExecutor
-import net.dankito.banking.fints.log.MessageLogCollector
 import net.dankito.banking.fints.messages.MessageBuilder
 import net.dankito.banking.fints.model.mapper.ModelMapper
 import net.dankito.banking.fints.util.FinTsServerAddressFinder
@@ -21,6 +20,5 @@ class FinTsClientConfiguration(
     modelMapper: ModelMapper = ModelMapper(messageBuilder),
     tanMethodSelector: TanMethodSelector = TanMethodSelector(),
     var jobExecutor: FinTsJobExecutor = FinTsJobExecutor(requestExecutor, messageBuilder, modelMapper, tanMethodSelector),
-    var finTsServerAddressFinder: FinTsServerAddressFinder = FinTsServerAddressFinder(),
-    var messageLogCollector: MessageLogCollector = MessageLogCollector()
+    var finTsServerAddressFinder: FinTsServerAddressFinder = FinTsServerAddressFinder()
 )

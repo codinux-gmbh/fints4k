@@ -7,8 +7,10 @@ import net.dankito.banking.fints.log.MessageContext
 
 open class MessageLogEntry(
     open val type: MessageLogEntryType,
-    open val message: String,
     open val context: MessageContext,
+    open val messageTrace: String,
+    open val message: String,
+    open val error: Throwable? = null,
     open val time: Instant = Clock.System.now()
 ) {
 

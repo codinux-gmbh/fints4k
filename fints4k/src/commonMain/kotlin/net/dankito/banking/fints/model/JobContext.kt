@@ -23,7 +23,8 @@ open class JobContext(
     /**
      * Only set if the current context is for a specific account (like get account's transactions).
      */
-    open val account: AccountData? = null
+    open val account: AccountData? = null,
+    protected open val messageLogCollector: MessageLogCollector = MessageLogCollector()
 ) : MessageBaseData(bank, config.options.product), IMessageLogAppender {
 
     companion object {
@@ -38,7 +39,7 @@ open class JobContext(
     open val responseParser: ResponseParser = ResponseParser(logAppender = this)
 
     open val messageLogWithoutSensitiveData: List<MessageLogEntry>
-        get() = config.messageLogCollector.messageLogWithoutSensitiveData
+        get() = messageLogCollector.messageLogWithoutSensitiveData
 
 
     open var dialog: DialogContext = DialogContext() // create null value so that variable is not null
@@ -72,11 +73,11 @@ open class JobContext(
 
 
     open fun addMessageLog(type: MessageLogEntryType, message: String) {
-        config.messageLogCollector.addMessageLog(type, message, createMessageContext())
+        messageLogCollector.addMessageLog(type, message, createMessageContext())
     }
 
     override fun logError(loggingClass: KClass<*>, message: String, e: Exception?) {
-        config.messageLogCollector.logError(loggingClass, message, createMessageContext(), e)
+        messageLogCollector.logError(loggingClass, message, createMessageContext(), e)
     }
 
     protected open fun createMessageContext(): MessageContext {
