@@ -7,6 +7,7 @@ import net.dankito.banking.client.model.response.ErrorCode
 import net.dankito.banking.client.model.response.GetAccountDataResponse
 import net.dankito.banking.client.model.response.TransferMoneyResponse
 import net.dankito.banking.fints.callback.FinTsClientCallback
+import net.dankito.banking.fints.config.FinTsClientConfiguration
 import net.dankito.banking.fints.mapper.FinTsModelMapper
 import net.dankito.banking.fints.model.*
 import net.dankito.banking.fints.response.client.FinTsClientResponse
@@ -14,16 +15,11 @@ import net.dankito.banking.fints.response.client.GetAccountInfoResponse
 import net.dankito.banking.fints.response.client.GetAccountTransactionsResponse
 import net.dankito.banking.fints.response.segments.AccountType
 import net.dankito.banking.fints.util.BicFinder
-import net.dankito.banking.fints.util.FinTsServerAddressFinder
-import net.dankito.banking.fints.webclient.IWebClient
-import kotlin.jvm.JvmOverloads
 
 
-open class FinTsClient @JvmOverloads constructor(
-  open var callback: FinTsClientCallback,
-  protected open val jobExecutor: FinTsJobExecutor = FinTsJobExecutor(),
-  protected open val finTsServerAddressFinder: FinTsServerAddressFinder = FinTsServerAddressFinder(),
-  protected open val product: ProductData = ProductData("15E53C26816138699C7B6A3E8", "1.0.0") // TODO: get version dynamically
+open class FinTsClient(
+  protected open val config: FinTsClientConfiguration,
+  open var callback: FinTsClientCallback
 ) {
 
   companion object { // TODO: use the English names
@@ -31,7 +27,7 @@ open class FinTsClient @JvmOverloads constructor(
   }
 
 
-  constructor(callback: FinTsClientCallback, webClient: IWebClient) : this(callback, FinTsJobExecutor(RequestExecutor(webClient = webClient))) // Swift does not support default parameter values -> create constructor overloads
+  constructor(callback: FinTsClientCallback) : this(FinTsClientConfiguration(), callback)
 
 
   protected open val mapper = FinTsModelMapper()
@@ -44,7 +40,7 @@ open class FinTsClient @JvmOverloads constructor(
   }
 
   open suspend fun getAccountDataAsync(param: GetAccountDataParameter): GetAccountDataResponse {
-    val finTsServerAddress = finTsServerAddressFinder.findFinTsServerAddress(param.bankCode)
+    val finTsServerAddress = config.finTsServerAddressFinder.findFinTsServerAddress(param.bankCode)
     if (finTsServerAddress.isNullOrBlank()) {
       return GetAccountDataResponse(ErrorCode.BankDoesNotSupportFinTs3, "Either bank does not support FinTS 3.0 or we don't know its FinTS server address", null, listOf())
     }
@@ -88,9 +84,9 @@ open class FinTsClient @JvmOverloads constructor(
   }
 
   protected open suspend fun getAccountData(param: GetAccountDataParameter, bank: BankData, account: AccountData): GetAccountTransactionsResponse {
-    val context = JobContext(JobContextType.GetTransactions, this.callback, product, bank, account)
+    val context = JobContext(JobContextType.GetTransactions, this.callback, config, bank, account)
 
-    return jobExecutor.getTransactionsAsync(context, mapper.toGetAccountTransactionsParameter(param, bank, account))
+    return config.jobExecutor.getTransactionsAsync(context, mapper.toGetAccountTransactionsParameter(param, bank, account))
   }
 
 
@@ -100,7 +96,7 @@ open class FinTsClient @JvmOverloads constructor(
   }
 
   open suspend fun transferMoneyAsync(param: TransferMoneyParameter): TransferMoneyResponse {
-    val finTsServerAddress = finTsServerAddressFinder.findFinTsServerAddress(param.bankCode)
+    val finTsServerAddress = config.finTsServerAddressFinder.findFinTsServerAddress(param.bankCode)
     if (finTsServerAddress.isNullOrBlank()) {
       return TransferMoneyResponse(ErrorCode.BankDoesNotSupportFinTs3, "Either bank does not FinTS 3.0 or we don't know its FinTS server address", listOf(), null)
     }
@@ -146,9 +142,9 @@ open class FinTsClient @JvmOverloads constructor(
       accountToUse = selectedAccount
     }
 
-    val context = JobContext(JobContextType.TransferMoney, this.callback, product, bank, accountToUse)
+    val context = JobContext(JobContextType.TransferMoney, this.callback, config, bank, accountToUse)
 
-    val response = jobExecutor.transferMoneyAsync(context, BankTransferData(param.recipientName, param.recipientAccountIdentifier, recipientBankIdentifier,
+    val response = config.jobExecutor.transferMoneyAsync(context, BankTransferData(param.recipientName, param.recipientAccountIdentifier, recipientBankIdentifier,
       param.amount, param.reference, param.instantPayment))
 
     return TransferMoneyResponse(mapper.mapErrorCode(response), mapper.mapErrorMessages(response), mapper.mergeMessageLog(previousJobResponse, response), bank)
@@ -173,11 +169,11 @@ open class FinTsClient @JvmOverloads constructor(
 //      return GetAccountInfoResponse(it)
     }
 
-    val context = JobContext(JobContextType.GetAccountInfo, this.callback, product, bank)
+    val context = JobContext(JobContextType.GetAccountInfo, this.callback, config, bank)
 
     /*      First dialog: Get user's basic data like BPD, customer system ID and her TAN methods     */
 
-    val newUserInfoResponse = jobExecutor.retrieveBasicDataLikeUsersTanMethods(context, param.preferredTanMethods, param.preferredTanMedium)
+    val newUserInfoResponse = config.jobExecutor.retrieveBasicDataLikeUsersTanMethods(context, param.preferredTanMethods, param.preferredTanMedium)
 
     if (newUserInfoResponse.successful == false) { // bank parameter (FinTS server address, ...) already seem to be wrong
       return GetAccountInfoResponse(context, newUserInfoResponse)
@@ -186,7 +182,7 @@ open class FinTsClient @JvmOverloads constructor(
     /*      Second dialog, executed in retrieveBasicDataLikeUsersTanMethods() if required: some banks require that in order to initialize a dialog with
     strong customer authorization TAN media is required       */
 
-    val getAccountsResponse = jobExecutor.getAccounts(context)
+    val getAccountsResponse = config.jobExecutor.getAccounts(context)
 
     return GetAccountInfoResponse(context, getAccountsResponse)
   }

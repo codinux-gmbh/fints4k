@@ -2,6 +2,7 @@ package net.dankito.banking.fints
 
 import kotlinx.datetime.LocalDate
 import net.dankito.banking.fints.callback.SimpleFinTsClientCallback
+import net.dankito.banking.fints.config.FinTsClientConfiguration
 import net.dankito.banking.fints.extensions.randomWithSeed
 import net.dankito.banking.fints.messages.datenelemente.abgeleiteteformate.Datum
 import net.dankito.banking.fints.messages.datenelemente.abgeleiteteformate.Laenderkennzeichen
@@ -55,6 +56,8 @@ abstract class FinTsTestBase {
 
         const val Time = 182752
 
+        val ClientConfig = FinTsClientConfiguration()
+
 
         init {
             Bank.changeTanMediumParameters = ChangeTanMediaParameters(JobParameters("", 1, 1, 1, ":0:0"), false, false, false, false, false, listOf())
@@ -72,7 +75,7 @@ abstract class FinTsTestBase {
 
 
     protected open fun createContext(bank: BankData = Bank, dialogId: String = DialogContext.InitialDialogId): JobContext {
-        val context = JobContext(JobContextType.AnonymousBankInfo, SimpleFinTsClientCallback(), Product, bank)
+        val context = JobContext(JobContextType.AnonymousBankInfo, SimpleFinTsClientCallback(), ClientConfig, bank)
         context.startNewDialog(dialogId = dialogId)
 
         return context

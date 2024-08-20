@@ -4,6 +4,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.datetime.*
 import net.dankito.banking.fints.callback.FinTsClientCallback
+import net.dankito.banking.fints.config.FinTsClientConfiguration
 import net.dankito.banking.fints.extensions.minusDays
 import net.dankito.banking.fints.extensions.todayAtEuropeBerlin
 import net.dankito.banking.fints.messages.datenelemente.implementierte.tan.*
@@ -18,14 +19,11 @@ import net.dankito.banking.fints.webclient.IWebClient
  * [addAccountAsync] gets user's TAN methods, user's TAN media, user's bank accounts and may even current balance and account transactions of last 90 days.
  */
 open class FinTsClientDeprecated(
-    open var callback: FinTsClientCallback,
-    protected open val jobExecutor: FinTsJobExecutor = FinTsJobExecutor(),
-    protected open val product: ProductData = ProductData("15E53C26816138699C7B6A3E8", "1.0.0") // TODO: get version dynamically
+    protected val config: FinTsClientConfiguration,
+    open var callback: FinTsClientCallback
 ) {
 
-    constructor(callback: FinTsClientCallback) : this(callback, FinTsJobExecutor()) // Swift does not support default parameter values -> create constructor overloads
-
-    constructor(callback: FinTsClientCallback, webClient: IWebClient) : this(callback, FinTsJobExecutor(RequestExecutor(webClient = webClient)))
+    constructor(callback: FinTsClientCallback) : this(FinTsClientConfiguration(), callback)
 
 
     /**
@@ -48,20 +46,20 @@ open class FinTsClientDeprecated(
      * On success [bank] parameter is updated afterwards.
      */
     open suspend fun getAnonymousBankInfo(bank: BankData): FinTsClientResponse {
-        val context = JobContext(JobContextType.AnonymousBankInfo, this.callback, product, bank)
+        val context = JobContext(JobContextType.AnonymousBankInfo, this.callback, config, bank)
 
-        val response =  jobExecutor.getAnonymousBankInfo(context)
+        val response =  config.jobExecutor.getAnonymousBankInfo(context)
         return FinTsClientResponse(context, response)
     }
 
 
     open suspend fun addAccountAsync(parameter: AddAccountParameter): AddAccountResponse {
         val bank = parameter.bank
-        val context = JobContext(JobContextType.AddAccount, this.callback, product, bank)
+        val context = JobContext(JobContextType.AddAccount, this.callback, config, bank)
 
         /*      First dialog: Get user's basic data like BPD, customer system ID and her TAN methods     */
 
-        val newUserInfoResponse = jobExecutor.retrieveBasicDataLikeUsersTanMethods(context, parameter.preferredTanMethods, parameter.preferredTanMedium)
+        val newUserInfoResponse = config.jobExecutor.retrieveBasicDataLikeUsersTanMethods(context, parameter.preferredTanMethods, parameter.preferredTanMedium)
 
         if (newUserInfoResponse.successful == false) { // bank parameter (FinTS server address, ...) already seem to be wrong
             return AddAccountResponse(context, newUserInfoResponse)
@@ -77,7 +75,7 @@ open class FinTsClientDeprecated(
 
         /*      Third dialog: Now we can initialize our first dialog with strong customer authorization. Use it to get UPD and customer's accounts        */
 
-        val getAccountsResponse = jobExecutor.getAccounts(context)
+        val getAccountsResponse = config.jobExecutor.getAccounts(context)
 
         if (getAccountsResponse.successful == false) {
             return AddAccountResponse(context, getAccountsResponse)
@@ -138,33 +136,33 @@ open class FinTsClientDeprecated(
 
     open suspend fun getAccountTransactionsAsync(parameter: GetAccountTransactionsParameter): GetAccountTransactionsResponse {
 
-        val context = JobContext(JobContextType.GetTransactions, this.callback, product, parameter.bank, parameter.account)
+        val context = JobContext(JobContextType.GetTransactions, this.callback, config, parameter.bank, parameter.account)
 
-        return jobExecutor.getTransactionsAsync(context, parameter)
+        return config.jobExecutor.getTransactionsAsync(context, parameter)
     }
 
 
     open suspend fun getTanMediaList(bank: BankData, tanMediaKind: TanMedienArtVersion = TanMedienArtVersion.Alle,
                              tanMediumClass: TanMediumKlasse = TanMediumKlasse.AlleMedien): GetTanMediaListResponse {
 
-        val context = JobContext(JobContextType.GetTanMedia, this.callback, product, bank)
+        val context = JobContext(JobContextType.GetTanMedia, this.callback, config, bank)
 
-        return jobExecutor.getTanMediaList(context, tanMediaKind, tanMediumClass)
+        return config.jobExecutor.getTanMediaList(context, tanMediaKind, tanMediumClass)
     }
 
 
     open suspend fun changeTanMedium(newActiveTanMedium: TanGeneratorTanMedium, bank: BankData): FinTsClientResponse {
-        val context = JobContext(JobContextType.ChangeTanMedium, this.callback, product, bank)
+        val context = JobContext(JobContextType.ChangeTanMedium, this.callback, config, bank)
 
-        val response = jobExecutor.changeTanMedium(context, newActiveTanMedium)
+        val response = config.jobExecutor.changeTanMedium(context, newActiveTanMedium)
         return FinTsClientResponse(context, response)
     }
 
 
     open suspend fun doBankTransferAsync(bankTransferData: BankTransferData, bank: BankData, account: AccountData): FinTsClientResponse {
-        val context = JobContext(JobContextType.TransferMoney, this.callback, product, bank, account)
+        val context = JobContext(JobContextType.TransferMoney, this.callback, config, bank, account)
 
-        return jobExecutor.transferMoneyAsync(context, bankTransferData)
+        return config.jobExecutor.transferMoneyAsync(context, bankTransferData)
     }
 
 }

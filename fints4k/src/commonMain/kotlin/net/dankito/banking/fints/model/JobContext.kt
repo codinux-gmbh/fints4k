@@ -2,6 +2,7 @@ package net.dankito.banking.fints.model
 
 import kotlinx.atomicfu.atomic
 import net.dankito.banking.fints.callback.FinTsClientCallback
+import net.dankito.banking.fints.config.FinTsClientConfiguration
 import net.dankito.banking.fints.log.IMessageLogAppender
 import net.dankito.banking.fints.log.MessageContext
 import net.dankito.banking.fints.log.MessageLogCollector
@@ -17,14 +18,13 @@ import kotlin.reflect.KClass
 open class JobContext(
     open val type: JobContextType,
     open val callback: FinTsClientCallback,
-    product: ProductData,
+    open val config: FinTsClientConfiguration,
     bank: BankData,
     /**
      * Only set if the current context is for a specific account (like get account's transactions).
      */
-    open val account: AccountData? = null,
-    protected open val messageLogCollector: MessageLogCollector = MessageLogCollector()
-) : MessageBaseData(bank, product), IMessageLogAppender {
+    open val account: AccountData? = null
+) : MessageBaseData(bank, config.options.product), IMessageLogAppender {
 
     companion object {
         private val JobCount = atomic(0) // this variable is accessed from multiple threads, so make it thread safe
@@ -38,7 +38,7 @@ open class JobContext(
     open val responseParser: ResponseParser = ResponseParser(logAppender = this)
 
     open val messageLogWithoutSensitiveData: List<MessageLogEntry>
-        get() = messageLogCollector.messageLogWithoutSensitiveData
+        get() = config.messageLogCollector.messageLogWithoutSensitiveData
 
 
     open var dialog: DialogContext = DialogContext() // create null value so that variable is not null
@@ -72,11 +72,11 @@ open class JobContext(
 
 
     open fun addMessageLog(type: MessageLogEntryType, message: String) {
-        messageLogCollector.addMessageLog(type, message, createMessageContext())
+        config.messageLogCollector.addMessageLog(type, message, createMessageContext())
     }
 
     override fun logError(loggingClass: KClass<*>, message: String, e: Exception?) {
-        messageLogCollector.logError(loggingClass, message, createMessageContext(), e)
+        config.messageLogCollector.logError(loggingClass, message, createMessageContext(), e)
     }
 
     protected open fun createMessageContext(): MessageContext {
