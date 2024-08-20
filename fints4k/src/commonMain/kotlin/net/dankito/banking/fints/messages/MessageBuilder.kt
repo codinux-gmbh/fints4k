@@ -230,8 +230,8 @@ open class MessageBuilder(protected val utils: FinTsUtils = FinTsUtils()) {
         if (result.isJobVersionSupported) {
             val segmentNumber = SignedMessagePayloadFirstSegmentNumber
 
-            val balanceJob = if (result.isAllowed(5)) SaldenabfrageVersion5(segmentNumber, account)
-            // TODO: what about HKSAL6?
+            val balanceJob = if (result.isAllowed(6)) SaldenabfrageVersion6(segmentNumber, account)
+            else if (result.isAllowed(5)) SaldenabfrageVersion5(segmentNumber, account)
             else SaldenabfrageVersion7(segmentNumber, account, context.bank)
 
             val segments = mutableListOf<Segment>(balanceJob)
@@ -249,7 +249,7 @@ open class MessageBuilder(protected val utils: FinTsUtils = FinTsUtils()) {
     }
 
     protected open fun supportsGetBalanceMessage(account: AccountData): MessageBuilderResult {
-        return getSupportedVersionsOfJobForAccount(CustomerSegmentId.Balance, account, listOf(5, 7))
+        return getSupportedVersionsOfJobForAccount(CustomerSegmentId.Balance, account, listOf(5, 6, 7))
     }
 
 

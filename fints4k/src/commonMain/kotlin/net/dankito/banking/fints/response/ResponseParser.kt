@@ -248,6 +248,9 @@ open class ResponseParser(
             // yes, by standard the Kontoinformation can be missing:
             //   N: bei Geschäftsvorfällen ohne Kontenbezug
             //   M: sonst
+            // ("Darüber hinaus kann auch ein Eintrag für nicht kontogebundene Geschäftsvorfälle (z. B. Informationsbestellung) eingestellt werden.
+            //   Hierbei handelt es sich im Regelfall um Geschäftsvorfälle, die auch über den anonymen Zugang genutzt werden können. In diesem Fall
+            //   sind die Felder für die Kontoverbindung und die übrigen kontobezogenen Angaben nicht zu belegen.")
             // But in my eyes Deutsche Bank uses it wrong and adds a second HIUPD for the same account but with most information missing:
             //   HIUPD:7:6:4+++2200672485+++Christian+Dankl, Christian+++HKTAN:1+HKPRO:1+HKVVB:1+HKFRD:1+DKPSP:1+HKPSP:1'
             return null
@@ -262,8 +265,15 @@ open class ResponseParser(
         val customerId = parseString(dataElementGroups[3])
         val accountType = parseNullableCodeEnum(dataElementGroups[4], AccountTypeCode.values())?.type
         val currency = parseStringToNullIfEmpty(dataElementGroups[5])
+
+        // Name Kontoinhaber 1 und 2
+        // Die Felder "Name des Kontoinhabers 1" und "Name des Kontoinhabers 2" sind in FinTS V3.0 mit ..27 Stellen definiert.
+        // Da diese Felder in anderem Kontext maximal 35 Stellen lang sein können, wird auch für diese beiden UPD-Felder eine
+        // Maximallänge von 35 Stellen zugelassen. Bestehende Implementierungen sollten damit keine Probleme bekommen und
+        // evtl. überzählige Stellen (>27) ggf. abschneiden.
         val accountHolderName1 = parseString(dataElementGroups[6])
         val accountHolderName2 = if (dataElementGroups.size > 7) parseStringToNullIfEmpty(dataElementGroups[7]) else null
+
         val productName = if (dataElementGroups.size > 8) parseStringToNullIfEmpty(dataElementGroups[8]) else null
         val limit = if (dataElementGroups.size > 9) parseStringToNullIfEmpty(dataElementGroups[9]) else null // TODO: parse limit
 
@@ -440,11 +450,18 @@ open class ResponseParser(
     }
 
     protected open fun mapToSingleTanMethodParameters(methodDataElements: List<String>): TanMethodParameters {
+        val sicherheitsfunktion = try {
+            parseCodeEnum(methodDataElements[0], Sicherheitsfunktion.values())
+        } catch (e: Throwable) {
+            log.error { "Could not map Sicherheitsfuntion from value '${methodDataElements[0]}'" }
+            throw e
+        }
+
         val dkTanMethod = tryToParseDkTanMethod(methodDataElements[3])
         val isDecoupledTanMethod = dkTanMethod == DkTanMethod.Decoupled || dkTanMethod == DkTanMethod.DecoupledPush
 
         return TanMethodParameters(
-            parseCodeEnum(methodDataElements[0], Sicherheitsfunktion.values()),
+            sicherheitsfunktion,
             parseCodeEnum(methodDataElements[1], TanProcess.values()),
             parseString(methodDataElements[2]),
             dkTanMethod,
@@ -649,17 +666,28 @@ open class ResponseParser(
 
 
     protected open fun parseBalanceSegment(segment: String, dataElementGroups: List<String>): BalanceSegment {
-        // dataElementGroups[1] is account details
+        //  2: Kontoverbindung Auftraggeber (ktv, M), ab Version 7: Kontoverbindung international (kti, M)
+        //  3: Kontoproduktbezeichnung (an ..30, M)
+        //  4: Kontowährung (cur, M)
+        //  5: Gebuchter Saldo (btg, M)
+        //  6: Saldo der vorgemerkten Umsätze (btg, O)
+        //  7: Kreditlinie (btg, O)
+        //  8: Verfügbarer Betrag (btg, O)
+        //  9: Bereits verfügter Betrag (btg, O)
+        // 10: Überziehung (btg, O)
+        // 11: Buchungszeitpunkt (tsp, O)
+        // ab Version 7: 12: Fälligkeit (dat, O: bei Kreditkartenkonten, N: sonst)
+        // ab Version 8: 13: Ab Monatswechsel pfändbar (btg, O)
 
         val balance = parseBalance(dataElementGroups[4])
         val balanceOfPreBookedTransactions = if (dataElementGroups.size > 5) parseBalanceToNullIfZeroOrNotSet(dataElementGroups[5]) else null
 
         return BalanceSegment(
-            balance.amount,
-            parseString(dataElementGroups[3]),
-            balance.date,
-            parseString(dataElementGroups[2]),
-            balanceOfPreBookedTransactions?.amount,
+            balance = balance.amount,
+            currency = parseString(dataElementGroups[3]),
+            date = balance.date,
+            accountProductName = parseString(dataElementGroups[2]),
+            balanceOfPreBookedTransactions = balanceOfPreBookedTransactions?.amount,
             segment
         )
     }
