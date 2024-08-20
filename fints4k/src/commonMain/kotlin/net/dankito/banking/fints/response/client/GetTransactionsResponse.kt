@@ -13,6 +13,7 @@ open class GetTransactionsResponse(
     retrievedResponses.flatMap { it.errorMessagesFromBank }, retrievedResponses.any { it.isPinLocked },
     retrievedResponses.any { it.wrongCredentialsEntered }, retrievedResponses.any { it.userCancelledAction },
     retrievedResponses.any { it.tanRequiredButWeWereToldToAbortIfSo },
+    retrievedResponses.flatMap { it.receivedSegments },
     retrievedResponses.any { it.isJobAllowed }, retrievedResponses.any { it.isJobAllowed },
     retrievedResponses.flatMap { it.allowedVersions }.toSet().toList(),
     retrievedResponses.flatMap { it.supportedVersions }.toSet().toList()

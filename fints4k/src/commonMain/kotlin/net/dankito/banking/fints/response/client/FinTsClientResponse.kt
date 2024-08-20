@@ -3,6 +3,7 @@ package net.dankito.banking.fints.response.client
 import net.dankito.banking.fints.model.JobContext
 import net.dankito.banking.fints.model.MessageLogEntry
 import net.dankito.banking.fints.response.BankResponse
+import net.dankito.banking.fints.response.segments.ReceivedSegment
 import net.dankito.banking.fints.response.segments.TanResponse
 
 
@@ -34,6 +35,8 @@ open class FinTsClientResponse(
 
     open val tanRequiredButWeWereToldToAbortIfSo: Boolean = false,
 
+    open val receivedSegments: List<ReceivedSegment> = listOf(),
+
     // i think they can be removed
     open val isJobAllowed: Boolean = true,
     open val isJobVersionSupported: Boolean = true,
@@ -46,6 +49,7 @@ open class FinTsClientResponse(
         response.isStrongAuthenticationRequired, response.tanResponse, context.messageLog,
         response.internalError, response.errorsToShowToUser, response.isPinLocked, response.wrongCredentialsEntered,
         response.tanRequiredButUserDidNotEnterOne, response.tanRequiredButWeWereToldToAbortIfSo,
+        response.receivedSegments,
         response.messageThatCouldNotBeCreated?.isJobAllowed ?: true,
         response.messageThatCouldNotBeCreated?.isJobVersionSupported ?: true,
         response.messageThatCouldNotBeCreated?.allowedVersions ?: listOf(),
