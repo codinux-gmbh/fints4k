@@ -30,40 +30,41 @@ open class MessageLogCollector {
 
     // in either case remove sensitive data after response is parsed as otherwise some information like account holder name and accounts may is not set yet on BankData
     open val messageLogWithoutSensitiveData: List<MessageLogEntry>
-        get() = ArrayList(messageLog)
+        // safe CPU cycles by only formatting and removing sensitive data if messageLog is really requested
+        get() = messageLog.map { MessageLogEntry(it.type, it.context, it.messageTrace, createMessageForLog(it), it.error, it.time) }
+
+    private fun createMessageForLog(logEntry: MessageLogEntry): String {
+        val message = if (logEntry.type == MessageLogEntryType.Error) {
+            logEntry.messageTrace + logEntry.message + (if (logEntry.error != null) NewLine + getStackTrace(logEntry.error!!) else "")
+        } else {
+            logEntry.messageTrace + "\n" + prettyPrintHbciMessage(logEntry.message)
+        }
+
+        return safelyRemoveSensitiveDataFromMessage(message, logEntry.context.bank)
+    }
 
 
     open fun addMessageLog(type: MessageLogEntryType, message: String, context: MessageContext) {
-        val messageToLog = createMessage(type, prettyPrintHbciMessage(message), context, true)
+        val messageTrace = createMessageTraceString(type, context)
 
-        addMessageLogEntry(type, messageToLog, context)
+        addMessageLogEntry(type, context, messageTrace, message)
 
-        log.debug { messageToLog }
+        log.debug { "$messageTrace\n${prettyPrintHbciMessage(message)}" }
     }
 
     open fun logError(loggingClass: KClass<*>, message: String, context: MessageContext, e: Exception? = null) {
         val type = MessageLogEntryType.Error
-        val messageToLog = createMessage(type, message, context, false)
-
-        LoggerFactory.getLogger(loggingClass).error(e) { messageToLog }
-
-        val errorStackTrace = if (e != null) NewLine + getStackTrace(e) else ""
-
-        addMessageLogEntry(type, messageToLog + errorStackTrace, context)
-    }
-
-    protected open fun addMessageLogEntry(type: MessageLogEntryType, message: String, context: MessageContext) {
-        val withoutSensitiveData = safelyRemoveSensitiveDataFromMessage(message, context.bank)
-
-        messageLog.add(MessageLogEntry(type, withoutSensitiveData, context))
-    }
-
-
-    protected open fun createMessage(type: MessageLogEntryType, message: String, context: MessageContext, separateWithNewLine: Boolean): String {
         val messageTrace = createMessageTraceString(type, context)
 
-        return "$messageTrace${ if (separateWithNewLine) NewLine else " " }$message"
+        LoggerFactory.getLogger(loggingClass).error(e) { messageTrace + messageTrace }
+
+        addMessageLogEntry(type, context, messageTrace, message, e)
     }
+
+    protected open fun addMessageLogEntry(type: MessageLogEntryType, context: MessageContext, messageTrace: String, message: String, error: Throwable? = null) {
+        messageLog.add(MessageLogEntry(type, context, messageTrace, message, error))
+    }
+
 
     protected open fun createMessageTraceString(type: MessageLogEntryType, context: MessageContext): String {
         return "${twoDigits(context.jobNumber)}_${twoDigits(context.dialogNumber)}_${twoDigits(context.messageNumber)}_" +
@@ -136,7 +137,7 @@ open class MessageLogCollector {
     }
 
 
-    protected open fun getStackTrace(e: Exception): String {
+    protected open fun getStackTrace(e: Throwable): String {
         val innerException = e.getInnerException()
 
         val stackTraceString = innerException.stackTraceToString()
