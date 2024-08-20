@@ -88,7 +88,7 @@ open class BankData(
     open val bankCodeForOnlineBanking: String
         get() {
             // for UniCredit / HypVereinsbank for online banking '70020270' has to be used as bank code
-            if (bankName.contains("unicredit", true)) {
+            if (bankName.contains("unicredit", true) || bic.startsWith("HYVEDE")) {
                 return "70020270"
             }
 
