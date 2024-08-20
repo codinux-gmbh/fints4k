@@ -20,7 +20,7 @@ import net.dankito.banking.fints.webclient.IWebClient
  */
 open class FinTsClientDeprecated(
     protected val config: FinTsClientConfiguration,
-    open var callback: FinTsClientCallback
+    open val callback: FinTsClientCallback
 ) {
 
     constructor(callback: FinTsClientCallback) : this(FinTsClientConfiguration(), callback)

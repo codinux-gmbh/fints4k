@@ -3,6 +3,7 @@ package net.dankito.banking.fints
 import kotlinx.datetime.LocalDate
 import net.dankito.banking.fints.callback.SimpleFinTsClientCallback
 import net.dankito.banking.fints.config.FinTsClientConfiguration
+import net.dankito.banking.fints.config.FinTsClientOptions
 import net.dankito.banking.fints.extensions.randomWithSeed
 import net.dankito.banking.fints.messages.datenelemente.abgeleiteteformate.Datum
 import net.dankito.banking.fints.messages.datenelemente.abgeleiteteformate.Laenderkennzeichen
@@ -56,7 +57,7 @@ abstract class FinTsTestBase {
 
         const val Time = 182752
 
-        val ClientConfig = FinTsClientConfiguration()
+        val ClientConfig = FinTsClientConfiguration(FinTsClientOptions(version = ProductVersion, productName = ProductName))
 
 
         init {
