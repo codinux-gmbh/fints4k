@@ -45,11 +45,7 @@ open class MessageLogCollector {
         val type = MessageLogEntryType.Error
         val messageToLog = createMessage(type, message, context, false)
 
-        if (e != null) {
-            getLogger(loggingClass).error(e) { messageToLog }
-        } else {
-            getLogger(loggingClass).error { messageToLog }
-        }
+        LoggerFactory.getLogger(loggingClass).error(e) { messageToLog }
 
         val errorStackTrace = if (e != null) NewLine + getStackTrace(e) else ""
 
@@ -147,10 +143,6 @@ open class MessageLogCollector {
         val indexOf16thLine = stackTraceString.nthIndexOf("\n", MaxCountStackTraceElements)
 
         return if (indexOf16thLine < 0) stackTraceString else stackTraceString.substring(0, indexOf16thLine)
-    }
-
-    protected open fun getLogger(loggingClass: KClass<*>): Logger {
-        return LoggerFactory.getLogger(loggingClass)
     }
 
 }
