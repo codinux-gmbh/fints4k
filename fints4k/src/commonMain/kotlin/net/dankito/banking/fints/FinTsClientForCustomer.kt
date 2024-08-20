@@ -20,7 +20,7 @@ open class FinTsClientForCustomer(
     protected val client = FinTsClientDeprecated(config, callback)
 
 
-    open val messageLogWithoutSensitiveData: List<MessageLogEntry> = mutableListOf()
+    open val messageLog: List<MessageLogEntry> = mutableListOf()
 
 
     open suspend fun addAccountAsync(): AddAccountResponse {

@@ -1,8 +1,8 @@
 package net.dankito.banking.fints.log
 
-import net.codinux.log.Logger
 import net.codinux.log.LoggerFactory
 import net.codinux.log.logger
+import net.dankito.banking.fints.config.FinTsClientOptions
 import net.dankito.banking.fints.model.BankData
 import net.dankito.banking.fints.model.MessageLogEntry
 import net.dankito.banking.fints.model.MessageLogEntryType
@@ -12,7 +12,9 @@ import net.dankito.banking.fints.extensions.toStringWithMinDigits
 import kotlin.reflect.KClass
 
 
-open class MessageLogCollector {
+open class MessageLogCollector(
+    private val options: FinTsClientOptions = FinTsClientOptions()
+) {
 
     companion object {
         val FindAccountTransactionsStartRegex = Regex("^HIKAZ:\\d:\\d:\\d\\+@\\d+@", RegexOption.MULTILINE)
@@ -26,12 +28,12 @@ open class MessageLogCollector {
     }
 
 
-    protected open val messageLog = ArrayList<MessageLogEntry>() // TODO: make thread safe like with CopyOnWriteArrayList
+    protected open val _messageLog = ArrayList<MessageLogEntry>() // TODO: make thread safe like with CopyOnWriteArrayList
 
     // in either case remove sensitive data after response is parsed as otherwise some information like account holder name and accounts may is not set yet on BankData
-    open val messageLogWithoutSensitiveData: List<MessageLogEntry>
+    open val messageLog: List<MessageLogEntry>
         // safe CPU cycles by only formatting and removing sensitive data if messageLog is really requested
-        get() = messageLog.map { MessageLogEntry(it.type, it.context, it.messageTrace, createMessageForLog(it), it.error, it.time) }
+        get() = _messageLog.map { MessageLogEntry(it.type, it.context, it.messageTrace, createMessageForLog(it), it.error, it.time) }
 
     private fun createMessageForLog(logEntry: MessageLogEntry): String {
         val message = if (logEntry.type == MessageLogEntryType.Error) {
@@ -40,7 +42,11 @@ open class MessageLogCollector {
             logEntry.messageTrace + "\n" + prettyPrintHbciMessage(logEntry.message)
         }
 
-        return safelyRemoveSensitiveDataFromMessage(message, logEntry.context.bank)
+        return if (options.removeSensitiveDataFromMessageLog) {
+            safelyRemoveSensitiveDataFromMessage(message, logEntry.context.bank)
+        } else {
+            message
+        }
     }
 
 
@@ -62,7 +68,7 @@ open class MessageLogCollector {
     }
 
     protected open fun addMessageLogEntry(type: MessageLogEntryType, context: MessageContext, messageTrace: String, message: String, error: Throwable? = null) {
-        messageLog.add(MessageLogEntry(type, context, messageTrace, message, error))
+        _messageLog.add(MessageLogEntry(type, context, messageTrace, message, error))
     }
 
 

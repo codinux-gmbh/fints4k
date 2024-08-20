@@ -8,7 +8,7 @@ open class GetTransactionsResponse(
     errorMessage: String? = null
 ) : FinTsClientResponse(isSuccessful(retrievedResponses), retrievedResponses.all { it.didReceiveResponse }, retrievedResponses.any { it.noTanMethodSelected },
     retrievedResponses.any { it.isStrongAuthenticationRequired }, retrievedResponses.map { it.tanRequired }.firstOrNull(),
-    retrievedResponses.flatMap { it.messageLogWithoutSensitiveData },
+    retrievedResponses.flatMap { it.messageLog },
     errorMessage ?: retrievedResponses.mapNotNull { it.internalError }.joinToString("\r\n"),
     retrievedResponses.flatMap { it.errorMessagesFromBank }, retrievedResponses.any { it.isPinLocked },
     retrievedResponses.any { it.wrongCredentialsEntered }, retrievedResponses.any { it.userCancelledAction },

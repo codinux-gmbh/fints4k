@@ -53,7 +53,7 @@ open class FinTsClient(
 
       if (getAccountInfoResponse.successful == false || param.retrieveOnlyAccountInfo) {
         return GetAccountDataResponse(mapper.mapErrorCode(getAccountInfoResponse), mapper.mapErrorMessages(getAccountInfoResponse), null,
-          getAccountInfoResponse.messageLogWithoutSensitiveData, bank)
+          getAccountInfoResponse.messageLog, bank)
       } else {
         return getAccountData(param, getAccountInfoResponse.bank, getAccountInfoResponse.bank.accounts, getAccountInfoResponse)
       }
@@ -69,7 +69,7 @@ open class FinTsClient(
 
     if (accountsSupportingRetrievingTransactions.isEmpty()) {
       val errorMessage = "None of the accounts ${accounts.map { it.productName }} supports retrieving balance or transactions" // TODO: translate
-      return GetAccountDataResponse(ErrorCode.NoneOfTheAccountsSupportsRetrievingData, errorMessage, mapper.map(bank), previousJobResponse?.messageLogWithoutSensitiveData ?: listOf(), bank)
+      return GetAccountDataResponse(ErrorCode.NoneOfTheAccountsSupportsRetrievingData, errorMessage, mapper.map(bank), previousJobResponse?.messageLog ?: listOf(), bank)
     }
 
     accountsSupportingRetrievingTransactions.forEach { account ->
@@ -115,7 +115,7 @@ open class FinTsClient(
 
       if (getAccountInfoResponse.successful == false) {
         return TransferMoneyResponse(mapper.mapErrorCode(getAccountInfoResponse), mapper.mapErrorMessages(getAccountInfoResponse),
-          getAccountInfoResponse.messageLogWithoutSensitiveData, bank)
+          getAccountInfoResponse.messageLog, bank)
       } else {
         return transferMoneyAsync(param, recipientBankIdentifier, getAccountInfoResponse.bank, getAccountInfoResponse.bank.accounts, getAccountInfoResponse)
       }
@@ -129,14 +129,14 @@ open class FinTsClient(
     val accountToUse: AccountData
 
     if (accountsSupportingTransfer.isEmpty()) {
-      return TransferMoneyResponse(ErrorCode.NoAccountSupportsMoneyTransfer, "None of the accounts $accounts supports money transfer", previousJobResponse?.messageLogWithoutSensitiveData ?: listOf(), bank)
+      return TransferMoneyResponse(ErrorCode.NoAccountSupportsMoneyTransfer, "None of the accounts $accounts supports money transfer", previousJobResponse?.messageLog ?: listOf(), bank)
     } else if (accountsSupportingTransfer.size == 1) {
       accountToUse = accountsSupportingTransfer.first()
     } else {
       val selectedAccount = param.selectAccountToUseForTransfer?.invoke(accountsSupportingTransfer)
 
       if (selectedAccount == null) {
-        return TransferMoneyResponse(ErrorCode.MoreThanOneAccountSupportsMoneyTransfer, "More than one of the accounts $accountsSupportingTransfer supports money transfer, so we cannot clearly determine which one to use for this transfer", previousJobResponse?.messageLogWithoutSensitiveData ?: listOf(), bank)
+        return TransferMoneyResponse(ErrorCode.MoreThanOneAccountSupportsMoneyTransfer, "More than one of the accounts $accountsSupportingTransfer supports money transfer, so we cannot clearly determine which one to use for this transfer", previousJobResponse?.messageLog ?: listOf(), bank)
       }
 
       accountToUse = selectedAccount

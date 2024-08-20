@@ -158,7 +158,7 @@ open class FinTsModelMapper {
   }
 
   open fun mergeMessageLog(vararg responses: FinTsClientResponse?): List<MessageLogEntry> {
-    return responses.filterNotNull().flatMap { it.messageLogWithoutSensitiveData }
+    return responses.filterNotNull().flatMap { it.messageLog }
   }
 
 }

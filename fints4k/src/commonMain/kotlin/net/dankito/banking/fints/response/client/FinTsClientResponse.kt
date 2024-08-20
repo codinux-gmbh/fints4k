@@ -17,7 +17,7 @@ open class FinTsClientResponse(
     open val isStrongAuthenticationRequired: Boolean,
     open val tanRequired: TanResponse? = null,
 
-    open val messageLogWithoutSensitiveData: List<MessageLogEntry>,
+    open val messageLog: List<MessageLogEntry>,
 
     /**
      * A fints4k internal error like an error occurred during web request or response parsing.
@@ -43,7 +43,7 @@ open class FinTsClientResponse(
 
 
     constructor(context: JobContext, response: BankResponse) : this(response.successful, response.didReceiveResponse, response.noTanMethodSelected,
-        response.isStrongAuthenticationRequired, response.tanResponse, context.messageLogWithoutSensitiveData,
+        response.isStrongAuthenticationRequired, response.tanResponse, context.messageLog,
         response.internalError, response.errorsToShowToUser, response.isPinLocked, response.wrongCredentialsEntered,
         response.tanRequiredButUserDidNotEnterOne, response.tanRequiredButWeWereToldToAbortIfSo,
         response.messageThatCouldNotBeCreated?.isJobAllowed ?: true,
