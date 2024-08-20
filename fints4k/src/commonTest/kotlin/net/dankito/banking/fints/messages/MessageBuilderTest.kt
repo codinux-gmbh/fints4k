@@ -17,7 +17,7 @@ import kotlin.test.*
 
 class MessageBuilderTest : FinTsTestBase() {
 
-    private val underTest = object : MessageBuilder(utils = object : FinTsUtils() {
+    private val underTest = object : MessageBuilder(object : FinTsUtils() {
         override fun formatDate(date: LocalDate): String {
             return Date.toString()
         }

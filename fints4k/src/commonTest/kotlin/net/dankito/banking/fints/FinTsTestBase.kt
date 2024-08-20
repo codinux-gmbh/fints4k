@@ -9,6 +9,7 @@ import net.dankito.banking.fints.messages.datenelemente.abgeleiteteformate.Datum
 import net.dankito.banking.fints.messages.datenelemente.abgeleiteteformate.Laenderkennzeichen
 import net.dankito.banking.fints.messages.datenelemente.implementierte.Dialogsprache
 import net.dankito.banking.fints.messages.datenelemente.implementierte.signatur.Sicherheitsfunktion
+import net.dankito.banking.fints.messages.segmente.id.CustomerSegmentId
 import net.dankito.banking.fints.model.*
 import net.dankito.banking.fints.response.segments.AccountType
 import net.dankito.banking.fints.response.segments.ChangeTanMediaParameters
@@ -85,6 +86,10 @@ abstract class FinTsTestBase {
     protected open fun createDialogId(): String {
         return randomWithSeed().nextInt(1000000, 9999999).toString()
     }
+
+    protected open fun createAllowedJob(segmentId: CustomerSegmentId, version: Int): JobParameters = JobParameters(
+        segmentId.id, 1, 1, null, "${segmentId.id.replace("HK", "HI")}S:1:$version"
+    )
 
     protected open fun convertDate(date: LocalDate): String {
         return Datum.format(date)
