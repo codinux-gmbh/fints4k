@@ -108,6 +108,11 @@ open class MessageLogCollector {
             .replace(bank.customerId, "<customer_id>")
             .replace("+" + bank.pin, "+<pin>")
 
+        if (bank.userId != bank.customerId) {
+            prettyPrintMessageWithoutSensitiveData = prettyPrintMessageWithoutSensitiveData
+                .replace(bank.userId, "<user_id>")
+        }
+
         if (bank.customerName.isNotBlank()) {
             prettyPrintMessageWithoutSensitiveData = prettyPrintMessageWithoutSensitiveData
                 .replace(bank.customerName, "<customer_name>", true)
