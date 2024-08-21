@@ -34,4 +34,12 @@ open class AddAccountResponse(
     open val retrievedData: List<RetrievedAccountData>
         get() = retrievedTransactionsResponses.mapNotNull { it.retrievedData }
 
+    override val messageLog: List<MessageLogEntry>
+        get() = buildList {
+            addAll(super.messageLog)
+            retrievedTransactionsResponses.forEach {
+                addAll(it.messageLog)
+            }
+        }
+
 }
