@@ -64,13 +64,13 @@ kotlin {
             dependencies {
                 api("org.jetbrains.kotlinx:kotlinx-datetime:$kotlinxDateTimeVersion")
 
-                implementation("net.codinux.log:kmp-log:$klfVersion")
-
-                implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$kotlinxSerializationVersion")
-
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
 
                 implementation("io.ktor:ktor-client-core:$ktorVersion")
+
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$kotlinxSerializationVersion")
+
+                implementation("net.codinux.log:kmp-log:$klfVersion")
             }
         }
 
