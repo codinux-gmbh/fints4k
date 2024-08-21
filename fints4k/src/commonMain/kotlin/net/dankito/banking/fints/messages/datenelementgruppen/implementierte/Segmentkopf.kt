@@ -9,9 +9,9 @@ import net.dankito.banking.fints.messages.segmente.id.ISegmentId
 
 
 open class Segmentkopf(
-    identifier: String,
-    segmentVersion: Int,
-    segmentNumber: Int = 0,
+    val identifier: String,
+    val segmentVersion: Int,
+    val segmentNumber: Int = 0,
     bezugssegment: Int? = null
 
 ) : Datenelementgruppe(listOf(
@@ -21,5 +21,7 @@ open class Segmentkopf(
 ), Existenzstatus.Mandatory) {
 
     constructor(id: ISegmentId, segmentVersion: Int, segmentNumber: Int) : this(id.id, segmentVersion, segmentNumber)
+
+    override fun toString() = "$identifier:$segmentNumber:$segmentVersion"
 
 }

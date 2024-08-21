@@ -4,6 +4,7 @@ import net.dankito.banking.fints.messages.Nachrichtenteil
 import net.dankito.banking.fints.messages.Separators
 import net.dankito.banking.fints.messages.datenelemente.DatenelementBase
 import net.dankito.banking.fints.messages.datenelemente.implementierte.DoNotPrintDatenelement
+import net.dankito.banking.fints.messages.datenelementgruppen.implementierte.Segmentkopf
 
 
 abstract class Segment(val dataElementsAndGroups: List<DatenelementBase>) : Nachrichtenteil() {
@@ -27,5 +28,7 @@ abstract class Segment(val dataElementsAndGroups: List<DatenelementBase>) : Nach
     protected open fun cutEmptyDataElementGroupsAtEndOfSegment(formattedSegment: String): String {
         return ReplaceEmptyDataElementGroupSeparatorsAtEndPattern.replaceFirst(formattedSegment, "")
     }
+
+    override fun toString() = "${dataElementsAndGroups.firstOrNull { it is Segmentkopf }}"
 
 }
