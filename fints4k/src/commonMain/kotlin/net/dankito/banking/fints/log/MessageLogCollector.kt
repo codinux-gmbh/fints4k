@@ -9,11 +9,13 @@ import net.dankito.banking.fints.model.MessageLogEntryType
 import net.dankito.banking.fints.extensions.getInnerException
 import net.dankito.banking.fints.extensions.nthIndexOf
 import net.dankito.banking.fints.extensions.toStringWithMinDigits
+import net.dankito.banking.fints.util.FinTsUtils
 import kotlin.reflect.KClass
 
 
 open class MessageLogCollector(
-    private val options: FinTsClientOptions = FinTsClientOptions()
+    private val options: FinTsClientOptions = FinTsClientOptions(),
+    private val finTsUtils: FinTsUtils = FinTsUtils()
 ) {
 
     companion object {
@@ -22,7 +24,7 @@ open class MessageLogCollector(
 
         const val MaxCountStackTraceElements = 15
 
-        private const val NewLine = "\r\n"
+        internal const val NewLine = "\r\n"
 
         private val log by logger()
     }
@@ -39,7 +41,7 @@ open class MessageLogCollector(
         val message = if (logEntry.type == MessageLogEntryType.Error) {
             logEntry.messageTrace + logEntry.message + (if (logEntry.error != null) NewLine + getStackTrace(logEntry.error!!) else "")
         } else {
-            logEntry.messageTrace + "\n" + prettyPrintHbciMessage(logEntry.message)
+            logEntry.messageTrace + "\n" + prettyPrintFinTsMessage(logEntry.message)
         }
 
         return if (options.removeSensitiveDataFromMessageLog) {
@@ -55,7 +57,7 @@ open class MessageLogCollector(
 
         addMessageLogEntry(type, context, messageTrace, message)
 
-        log.debug { "$messageTrace\n${prettyPrintHbciMessage(message)}" }
+        log.debug { "$messageTrace\n${prettyPrintFinTsMessage(message)}" }
     }
 
     open fun logError(loggingClass: KClass<*>, message: String, context: MessageContext, e: Exception? = null) {
@@ -92,9 +94,8 @@ open class MessageLogCollector(
         }
     }
 
-    protected open fun prettyPrintHbciMessage(message: String): String {
-        return message.replace("'", "'$NewLine")
-    }
+    protected open fun prettyPrintFinTsMessage(message: String): String =
+        finTsUtils.prettyPrintFinTsMessage(message)
 
 
     protected open fun safelyRemoveSensitiveDataFromMessage(message: String, bank: BankData?): String {

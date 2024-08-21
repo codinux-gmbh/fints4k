@@ -5,11 +5,18 @@ import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
 import net.dankito.banking.fints.extensions.nowAtEuropeBerlin
 import net.dankito.banking.fints.extensions.todayAtEuropeBerlin
+import net.dankito.banking.fints.log.MessageLogCollector
 import net.dankito.banking.fints.messages.datenelemente.abgeleiteteformate.Datum
 import net.dankito.banking.fints.messages.datenelemente.abgeleiteteformate.Uhrzeit
 
 
 open class FinTsUtils {
+
+    companion object {
+        private val NewLine = MessageLogCollector.NewLine
+
+        private val BreakableSegmentSeparatorsRegex = Regex("""'([A-Z])""")
+    }
 
 
     open fun formatDateToday(): String {
@@ -43,6 +50,13 @@ open class FinTsUtils {
 
     open fun formatTimeAsInt(time: LocalTime): Int {
         return convertToInt(formatTime(time))
+    }
+
+
+    open fun prettyPrintFinTsMessage(finTsMessage: String): String {
+        return finTsMessage
+            .replace(BreakableSegmentSeparatorsRegex, "'$NewLine$1")
+            .replace("@HNSHK:", "@${NewLine}HNSHK:")
     }
 
 
