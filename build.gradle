@@ -49,3 +49,9 @@ task publishAllToMavenLocal {
         "fints4k:publishToMavenLocal",
     ]
 }
+
+task publishAll {
+    dependsOn = [
+        "fints4k:publish",
+    ]
+}
