@@ -5,15 +5,16 @@ import net.dankito.banking.fints.callback.SimpleFinTsClientCallback
 import net.dankito.banking.fints.config.FinTsClientConfiguration
 import net.dankito.banking.fints.config.FinTsClientOptions
 import net.dankito.banking.fints.extensions.randomWithSeed
+import net.dankito.banking.fints.messages.MessageBuilder
+import net.dankito.banking.fints.messages.MessageBuilderResult
 import net.dankito.banking.fints.messages.datenelemente.abgeleiteteformate.Datum
 import net.dankito.banking.fints.messages.datenelemente.abgeleiteteformate.Laenderkennzeichen
 import net.dankito.banking.fints.messages.datenelemente.implementierte.Dialogsprache
 import net.dankito.banking.fints.messages.datenelemente.implementierte.signatur.Sicherheitsfunktion
+import net.dankito.banking.fints.messages.datenelemente.implementierte.tan.*
 import net.dankito.banking.fints.messages.segmente.id.CustomerSegmentId
 import net.dankito.banking.fints.model.*
-import net.dankito.banking.fints.response.segments.AccountType
-import net.dankito.banking.fints.response.segments.ChangeTanMediaParameters
-import net.dankito.banking.fints.response.segments.JobParameters
+import net.dankito.banking.fints.response.segments.*
 
 
 abstract class FinTsTestBase {
@@ -106,6 +107,57 @@ abstract class FinTsTestBase {
 
     protected open fun createEmptyJobParameters(): JobParameters {
         return JobParameters("", 1, 1, 1, ":0:0")
+    }
+
+
+    protected fun createBankWithAllFeatures(): BankData {
+        val bank = createTestBank()
+
+        val getTransactionsJob = RetrieveAccountTransactionsParameters(JobParameters(CustomerSegmentId.AccountTransactionsMt940.id, 1, 1, null, "HIKAZS:73:5"), 180, true, false)
+        val changeTanMediumJob = createAllowedJob(CustomerSegmentId.ChangeTanMedium, 3)
+        bank.supportedJobs = listOf(
+            getTransactionsJob,
+            createAllowedJob(CustomerSegmentId.TanMediaList, 5), changeTanMediumJob,
+            createAllowedJob(CustomerSegmentId.Balance, 7),
+            createAllowedJob(CustomerSegmentId.CreditCardTransactions, 2),
+            SepaAccountInfoParameters(createAllowedJob(CustomerSegmentId.SepaBankTransfer, 1), true, true, true, true, 35, listOf("pain.001.001.03")),
+            SepaAccountInfoParameters(createAllowedJob(CustomerSegmentId.SepaRealTimeTransfer, 1), true, true, true, true, 35, listOf("pain.001.001.03")),
+        )
+        bank.pinInfo = PinInfo(getTransactionsJob, null, null, null, null, null, listOf(
+            JobTanConfiguration(CustomerSegmentId.Balance.id, true),
+            JobTanConfiguration(CustomerSegmentId.AccountTransactionsMt940.id, true),
+            JobTanConfiguration(CustomerSegmentId.CreditCardTransactions.id, true),
+            JobTanConfiguration(CustomerSegmentId.SepaBankTransfer.id, true),
+            JobTanConfiguration(CustomerSegmentId.SepaRealTimeTransfer.id, true)
+        ))
+        bank.changeTanMediumParameters = ChangeTanMediaParameters(changeTanMediumJob, false, false, false, false, false, listOf())
+
+        val checkingAccount = AccountData(CustomerId, null, BankCountryCode, BankCode, "ABCDDEBBXXX", CustomerId, AccountType.Girokonto, "EUR", "", null, null, bank.supportedJobs.map { it.jobName }, bank.supportedJobs)
+        bank.addAccount(checkingAccount)
+
+        val creditCardAccountJobs = bank.supportedJobs.filterNot { it.jobName == CustomerSegmentId.AccountTransactionsMt940.id }
+        val creditCardAccount = AccountData(CustomerId + "_CreditCard", null, BankCountryCode, BankCode, "ABCDDEBBXXX", CustomerId, AccountType.Kreditkartenkonto, "EUR", "", null, null, creditCardAccountJobs.map { it.jobName }, creditCardAccountJobs)
+        bank.addAccount(creditCardAccount)
+
+        return bank
+    }
+
+
+    protected fun createRandomMessage(index: Int, context: JobContext, messageBuilder: MessageBuilder = MessageBuilder(), bank: BankData = context.bank, account: AccountData = bank.accounts.first()): MessageBuilderResult = when (index % 14) {
+        0 -> messageBuilder.createAnonymousDialogInitMessage(context)
+        2 -> messageBuilder.createInitDialogMessage(context)
+        3 -> messageBuilder.createInitDialogMessageWithoutStrongCustomerAuthentication(context, null)
+        4 -> messageBuilder.createSynchronizeCustomerSystemIdMessage(context)
+        5 -> messageBuilder.createGetTanMediaListMessage(context)
+        6 -> messageBuilder.createChangeTanMediumMessage(context, TanGeneratorTanMedium(TanMediumKlasse.TanGenerator, TanMediumStatus.Aktiv, "", null, null, null, null, null), null, null)
+        7 -> messageBuilder.createGetBalanceMessage(context, account)
+        8 -> messageBuilder.createGetTransactionsMessage(context, GetAccountTransactionsParameter(bank, account, true))
+        9 -> messageBuilder.createGetTransactionsMessage(context, GetAccountTransactionsParameter(bank, bank.accounts[1], true))
+        10 -> messageBuilder.createBankTransferMessage(context, BankTransferData("", "", "", Money.Zero, null), account)
+        11 -> messageBuilder.createBankTransferMessage(context, BankTransferData("", "", "", Money.Zero, null, true), account)
+        12 -> messageBuilder.createSendEnteredTanMessage(context, "", TanResponse(TanProcess.TanProcess2, null, null, null, null, null, null, "HITAN:5:6:4+4++4937-10-13-02.30.03.700259+Sie möchten eine \"Umsatzabfrage\" freigeben?: Bitte bestätigen Sie den \"Startcode 80085335\" mit der Taste \"OK\".+@12@100880085335++Kartennummer ******0892"))
+        13 -> messageBuilder.createDialogEndMessage(context)
+        else -> messageBuilder.createAnonymousDialogEndMessage(context)
     }
 
 }
