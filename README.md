@@ -4,34 +4,48 @@ fints4k is an implementation of the FinTS 3.0 online banking protocol used by mo
 
 It's fast, easy extendable and running on multiple platforms: JVM, Android, (iOS, JavaScript, Windows, MacOS, Linux).
 
-However it's not a full implementation of FinTS standard but implements all common use cases:
-
 ## Features
 - Retrieving account information, balances and turnovers (Kontoumsätze und -saldo).
 - Transfer money and real-time transfers (SEPA Überweisungen und Echtzeitüberweisung).
 - Supports TAN methods chipTAN manual, Flickercode, QrCode and Photo (Matrix code), pushTAN, smsTAN and appTAN.
+
+However, this is quite a low level implementation and in most cases not what you want to use.  
+In most cases you want to use a higher level abstraction like [FinTs4kBankingClient](https://git.dankito.net/codinux/BankingClient).
 
 ## Setup
 Not uploaded to Maven Central yet, will do this the next few days!
 
 Gradle:
 ```
+repositories {
+    mavenCentral()
+    maven {
+        setUrl("https://maven.dankito.net/api/packages/codinux/maven")
+    }
+}
+
+
 dependencies {
-  compile 'net.dankito.banking:fints4k:0.1.0'
+    implementation("net.codinux.banking:fints4k:1.0.0-Alpha-11")
 }
 ```
 
 Maven:
 ```
+
+// add Repository https://maven.dankito.net/api/packages/codinux/maven
+
 <dependency>
    <groupId>net.dankito.banking</groupId>
-   <artifactId>fints4k</artifactId>
-   <version>0.1.0</version>
+   <artifactId>fints4k-jvm</artifactId>
+   <version>1.0.0-Alpha-11</version>
 </dependency>
 ```
 
 
 ## Usage
+
+Quite outdated, have to update it. In most cases use [FinTs4kBankingClient](https://git.dankito.net/codinux/BankingClient).
 
 See e.g. [JavaShowcase](fints4k/src/test/java/net/dankito/banking/fints/JavaShowcase.java) or [FinTsClientTest](fints4k/src/test/kotlin/net/dankito/banking/fints/FinTsClientTest.kt).
 
