@@ -16,6 +16,7 @@ ext {
 buildscript {
     repositories {
         mavenCentral()
+        maven { url = "https://maven.dankito.net/api/packages/codinux/maven" }
         google()
     }
 

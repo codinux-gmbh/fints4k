@@ -136,3 +136,18 @@ kotlin {
 
     }
 }
+
+
+publishing {
+    repositories {
+        maven {
+            name = "codinux"
+            url = uri("https://maven.dankito.net/api/packages/codinux/maven")
+
+            credentials(PasswordCredentials) {
+                username = project.property("codinuxRegistryWriterUsername")
+                password = project.property("codinuxRegistryWriterPassword")
+            }
+        }
+    }
+}
