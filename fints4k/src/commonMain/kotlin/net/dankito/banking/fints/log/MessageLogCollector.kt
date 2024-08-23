@@ -66,7 +66,7 @@ open class MessageLogCollector(
         val type = MessageLogEntryType.Error
         val messageTrace = createMessageTraceString(type, context)
 
-        LoggerFactory.getLogger(loggingClass).error(e) { messageTrace + messageTrace }
+        LoggerFactory.getLogger(loggingClass).error(e) { messageTrace + message }
 
         addMessageLogEntry(type, context, messageTrace, message, e)
     }
