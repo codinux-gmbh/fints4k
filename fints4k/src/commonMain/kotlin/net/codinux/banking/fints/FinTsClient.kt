@@ -175,12 +175,12 @@ open class FinTsClient(
 
     val newUserInfoResponse = config.jobExecutor.retrieveBasicDataLikeUsersTanMethods(context, param.preferredTanMethods, param.preferredTanMedium)
 
+    /*      Second dialog, executed in retrieveBasicDataLikeUsersTanMethods() if required: some banks require that in order to initialize a dialog with
+    strong customer authorization TAN media is required       */
+
     if (newUserInfoResponse.successful == false) { // bank parameter (FinTS server address, ...) already seem to be wrong
       return GetAccountInfoResponse(context, newUserInfoResponse)
     }
-
-    /*      Second dialog, executed in retrieveBasicDataLikeUsersTanMethods() if required: some banks require that in order to initialize a dialog with
-    strong customer authorization TAN media is required       */
 
     val getAccountsResponse = config.jobExecutor.getAccounts(context)
 
