@@ -43,7 +43,7 @@ open class MessageLogCollector(
         val message = if (logEntry.type == MessageLogEntryType.Error) {
             logEntry.message + (if (logEntry.error != null) NewLine + getStackTrace(logEntry.error!!) else "")
         } else {
-            prettyPrintFinTsMessage(logEntry.message)
+            logEntry.message
         }
 
         return if (options.removeSensitiveDataFromMessageLog) {
@@ -57,9 +57,15 @@ open class MessageLogCollector(
     open fun addMessageLog(type: MessageLogEntryType, message: String, context: MessageContext) {
         val messageTrace = createMessageTraceString(type, context)
 
-        log.debug { "$messageTrace\n${prettyPrintFinTsMessage(message)}" }
+        val prettyPrintMessage = if (options.collectMessageLog || options.fireCallbackOnMessageLogs || log.isDebugEnabled) { // only use CPU cycles if message will ever be used / displayed
+            prettyPrintFinTsMessage(message)
+        } else {
+            message
+        }
 
-        addMessageLogEntry(type, context, messageTrace, message)
+        log.debug { "$messageTrace\n$prettyPrintMessage" }
+
+        addMessageLogEntry(type, context, messageTrace, prettyPrintMessage)
     }
 
     open fun logError(loggingClass: KClass<*>, message: String, context: MessageContext, e: Exception? = null) {
@@ -80,7 +86,6 @@ open class MessageLogCollector(
             }
 
             if (options.fireCallbackOnMessageLogs) {
-                // TODO: pretty print message
                 callback.messageLogAdded(newEntry)
             }
         }
