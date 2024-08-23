@@ -1,8 +1,8 @@
 package net.dankito.banking.client.model
 
 import kotlinx.serialization.Serializable
-import net.dankito.banking.fints.messages.datenelemente.implementierte.tan.TanMedium
-import net.dankito.banking.fints.model.TanMethod
+import net.codinux.banking.fints.messages.datenelemente.implementierte.tan.TanMedium
+import net.codinux.banking.fints.model.TanMethod
 
 //import net.dankito.banking.client.model.tan.TanMedium
 //import net.dankito.banking.client.model.tan.TanMethod

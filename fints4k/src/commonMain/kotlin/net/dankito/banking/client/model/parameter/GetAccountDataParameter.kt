@@ -1,8 +1,8 @@
 package net.dankito.banking.client.model.parameter
 
 import kotlinx.datetime.LocalDate
-import net.dankito.banking.fints.model.BankData
-import net.dankito.banking.fints.model.TanMethodType
+import net.codinux.banking.fints.model.BankData
+import net.codinux.banking.fints.model.TanMethodType
 import net.dankito.banking.client.model.BankAccountIdentifier
 
 

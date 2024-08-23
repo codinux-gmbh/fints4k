@@ -2,9 +2,9 @@ package net.dankito.banking.client.model
 
 import kotlinx.datetime.LocalDate
 import kotlinx.serialization.Serializable
-import net.dankito.banking.fints.model.Amount
-import net.dankito.banking.fints.model.Money
-import net.dankito.banking.fints.extensions.UnixEpochStart
+import net.codinux.banking.fints.model.Amount
+import net.codinux.banking.fints.model.Money
+import net.codinux.banking.fints.extensions.UnixEpochStart
 
 
 @Serializable

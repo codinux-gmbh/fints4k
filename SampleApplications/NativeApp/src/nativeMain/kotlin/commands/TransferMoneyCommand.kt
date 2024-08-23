@@ -5,10 +5,10 @@ import com.github.ajalt.clikt.core.requireObject
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.options.option
 import net.dankito.banking.client.model.parameter.TransferMoneyParameter
-import net.dankito.banking.fints.model.AccountData
-import net.dankito.banking.fints.model.Amount
-import net.dankito.banking.fints.model.Currency
-import net.dankito.banking.fints.model.Money
+import net.codinux.banking.fints.model.AccountData
+import net.codinux.banking.fints.model.Amount
+import net.codinux.banking.fints.model.Currency
+import net.codinux.banking.fints.model.Money
 
 
 class TransferMoneyCommand : CliktCommand("Transfers money from your account to a recipient", name = "transfer", printHelpOnEmptyArgs = true) {

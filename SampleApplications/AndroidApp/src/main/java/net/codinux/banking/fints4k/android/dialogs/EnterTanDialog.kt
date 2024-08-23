@@ -15,9 +15,9 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentActivity
 import net.codinux.banking.fints4k.android.Presenter
 import net.codinux.banking.fints4k.android.R
-import net.dankito.banking.fints.model.FlickerCodeTanChallenge
-import net.dankito.banking.fints.model.ImageTanChallenge
-import net.dankito.banking.fints.model.TanChallenge
+import net.codinux.banking.fints.model.FlickerCodeTanChallenge
+import net.codinux.banking.fints.model.ImageTanChallenge
+import net.codinux.banking.fints.model.TanChallenge
 import net.dankito.utils.android.extensions.getSpannedFromHtml
 import net.dankito.utils.android.extensions.show
 

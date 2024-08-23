@@ -2,7 +2,7 @@ package net.dankito.banking.client.model.response
 
 import net.dankito.banking.client.model.AccountTransaction
 import net.dankito.banking.client.model.CustomerAccount
-import net.dankito.banking.fints.model.*
+import net.codinux.banking.fints.model.*
 
 
 open class GetAccountDataResponse(

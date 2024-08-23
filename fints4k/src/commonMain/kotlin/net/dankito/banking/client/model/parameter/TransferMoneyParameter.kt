@@ -1,10 +1,10 @@
 package net.dankito.banking.client.model.parameter
 
 import net.dankito.banking.client.model.BankAccountIdentifier
-import net.dankito.banking.fints.model.AccountData
-import net.dankito.banking.fints.model.BankData
-import net.dankito.banking.fints.model.Money
-import net.dankito.banking.fints.model.TanMethodType
+import net.codinux.banking.fints.model.AccountData
+import net.codinux.banking.fints.model.BankData
+import net.codinux.banking.fints.model.Money
+import net.codinux.banking.fints.model.TanMethodType
 
 
 open class TransferMoneyParameter(

@@ -2,8 +2,8 @@ import io.ktor.util.encodeBase64
 import kotlinx.html.InputType
 import kotlinx.html.js.onChangeFunction
 import kotlinx.html.style
-import net.dankito.banking.fints.model.ImageTanChallenge
-import net.dankito.banking.fints.model.TanChallenge
+import net.codinux.banking.fints.model.ImageTanChallenge
+import net.codinux.banking.fints.model.TanChallenge
 import org.w3c.dom.HTMLInputElement
 import react.Props
 import react.RBuilder

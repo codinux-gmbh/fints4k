@@ -6,7 +6,7 @@ import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
-import net.dankito.banking.fints.model.Amount
+import net.codinux.banking.fints.model.Amount
 
 
 class AmountSerializer : KSerializer<Amount> {

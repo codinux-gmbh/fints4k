@@ -1,7 +1,7 @@
 package commands
 
 import NativeApp
-import net.dankito.banking.fints.model.TanMethodType
+import net.codinux.banking.fints.model.TanMethodType
 
 
 data class CommonConfig(

@@ -7,9 +7,9 @@ import kotlinx.coroutines.withContext
 import kotlinx.datetime.LocalDate
 import net.dankito.banking.client.model.parameter.GetAccountDataParameter
 import net.dankito.banking.client.model.response.GetAccountDataResponse
-import net.dankito.banking.fints.FinTsClient
-import net.dankito.banking.fints.callback.SimpleFinTsClientCallback
-import net.dankito.banking.fints.model.TanChallenge
+import net.codinux.banking.fints.FinTsClient
+import net.codinux.banking.fints.callback.SimpleFinTsClientCallback
+import net.codinux.banking.fints.model.TanChallenge
 import net.dankito.utils.multiplatform.extensions.millisSinceEpochAtSystemDefaultTimeZone
 import org.slf4j.LoggerFactory
 import java.math.BigDecimal

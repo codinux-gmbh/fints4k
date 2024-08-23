@@ -12,8 +12,8 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.minus
 import net.dankito.banking.client.model.parameter.GetAccountDataParameter
 import net.dankito.banking.client.model.parameter.RetrieveTransactions
-import net.dankito.banking.fints.model.TanMethodType
-import net.dankito.banking.fints.extensions.todayAtEuropeBerlin
+import net.codinux.banking.fints.model.TanMethodType
+import net.codinux.banking.fints.extensions.todayAtEuropeBerlin
 import util.OutputFormat
 
 

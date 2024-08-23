@@ -1,7 +1,7 @@
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import net.dankito.banking.client.model.AccountTransaction
-import net.dankito.banking.fints.model.TanChallenge
+import net.codinux.banking.fints.model.TanChallenge
 import react.*
 import react.dom.*
 import styled.styledDiv

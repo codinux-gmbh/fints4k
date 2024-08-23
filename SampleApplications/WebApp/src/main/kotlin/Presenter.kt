@@ -6,11 +6,11 @@ import net.dankito.banking.client.model.parameter.GetAccountDataParameter
 import net.dankito.banking.client.model.parameter.TransferMoneyParameter
 import net.dankito.banking.client.model.response.GetAccountDataResponse
 import net.dankito.banking.client.model.response.TransferMoneyResponse
-import net.dankito.banking.fints.FinTsClient
-import net.dankito.banking.fints.callback.SimpleFinTsClientCallback
-import net.dankito.banking.fints.model.*
-import net.dankito.banking.fints.webclient.KtorWebClient
-import net.dankito.banking.fints.webclient.ProxyingWebClient
+import net.codinux.banking.fints.FinTsClient
+import net.codinux.banking.fints.callback.SimpleFinTsClientCallback
+import net.codinux.banking.fints.model.*
+import net.codinux.banking.fints.webclient.KtorWebClient
+import net.codinux.banking.fints.webclient.ProxyingWebClient
 import net.dankito.utils.multiplatform.log.LoggerFactory
 
 open class Presenter {
