@@ -12,6 +12,7 @@ import net.dankito.banking.fints.webclient.IWebClient
 import net.dankito.banking.fints.webclient.KtorWebClient
 import net.dankito.banking.fints.webclient.WebClientResponse
 import net.dankito.banking.fints.extensions.getAllExceptionMessagesJoined
+import net.dankito.banking.fints.response.segments.ReceivedSegment
 
 
 open class RequestExecutor(
@@ -104,9 +105,11 @@ open class RequestExecutor(
             try {
                 val decodedResponse = decodeBase64Response(responseBody)
 
-                addMessageLog(context, MessageLogEntryType.Received, decodedResponse)
+                val parsedResponse = context.responseParser.parse(decodedResponse)
 
-                return context.responseParser.parse(decodedResponse)
+                addMessageLog(context, MessageLogEntryType.Received, decodedResponse, parsedResponse.receivedSegments)
+
+                return parsedResponse
             } catch (e: Exception) {
                 logError(context, "Could not decode responseBody:\r\n'$responseBody'", e)
 
@@ -164,8 +167,8 @@ open class RequestExecutor(
     }
 
 
-    protected open fun addMessageLog(context: JobContext, type: MessageLogEntryType, message: String) {
-        context.addMessageLog(type, message)
+    protected open fun addMessageLog(context: JobContext, type: MessageLogEntryType, message: String, parsedSegments: List<ReceivedSegment> = emptyList()) {
+        context.addMessageLog(type, message, parsedSegments)
     }
 
     protected open fun logError(context: JobContext, message: String, e: Exception?) {

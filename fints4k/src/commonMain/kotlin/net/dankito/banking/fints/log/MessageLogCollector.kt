@@ -10,6 +10,7 @@ import net.dankito.banking.fints.model.MessageLogEntryType
 import net.dankito.banking.fints.extensions.getInnerException
 import net.dankito.banking.fints.extensions.nthIndexOf
 import net.dankito.banking.fints.extensions.toStringWithMinDigits
+import net.dankito.banking.fints.response.segments.ReceivedSegment
 import net.dankito.banking.fints.util.FinTsUtils
 import kotlin.reflect.KClass
 
@@ -37,7 +38,7 @@ open class MessageLogCollector(
     // in either case remove sensitive data after response is parsed as otherwise some information like account holder name and accounts may is not set yet on BankData
     open val messageLog: List<MessageLogEntry>
         // safe CPU cycles by only formatting and removing sensitive data if messageLog is really requested
-        get() = _messageLog.map { MessageLogEntry(it.type, it.context, it.messageTrace, createMessageForLog(it), it.error, it.time) }
+        get() = _messageLog.map { MessageLogEntry(it.type, it.context, it.messageTrace, createMessageForLog(it), it.error, it.parsedSegments, it.time) }
 
     private fun createMessageForLog(logEntry: MessageLogEntry): String {
         val message = if (logEntry.type == MessageLogEntryType.Error) {
@@ -54,7 +55,7 @@ open class MessageLogCollector(
     }
 
 
-    open fun addMessageLog(type: MessageLogEntryType, message: String, context: MessageContext) {
+    open fun addMessageLog(type: MessageLogEntryType, message: String, context: MessageContext, parsedSegments: List<ReceivedSegment> = emptyList()) {
         val messageTrace = createMessageTraceString(type, context)
 
         val prettyPrintMessage = if (options.collectMessageLog || options.fireCallbackOnMessageLogs || log.isDebugEnabled) { // only use CPU cycles if message will ever be used / displayed
@@ -65,7 +66,7 @@ open class MessageLogCollector(
 
         log.debug { "$messageTrace\n$prettyPrintMessage" }
 
-        addMessageLogEntry(type, context, messageTrace, prettyPrintMessage)
+        addMessageLogEntry(type, context, messageTrace, prettyPrintMessage, null, parsedSegments)
     }
 
     open fun logError(loggingClass: KClass<*>, message: String, context: MessageContext, e: Exception? = null) {
@@ -77,9 +78,9 @@ open class MessageLogCollector(
         addMessageLogEntry(type, context, messageTrace, message, e)
     }
 
-    protected open fun addMessageLogEntry(type: MessageLogEntryType, context: MessageContext, messageTrace: String, message: String, error: Throwable? = null) {
+    protected open fun addMessageLogEntry(type: MessageLogEntryType, context: MessageContext, messageTrace: String, message: String, error: Throwable? = null, parsedSegments: List<ReceivedSegment> = emptyList()) {
         if (options.collectMessageLog || options.fireCallbackOnMessageLogs) {
-            val newEntry = MessageLogEntry(type, context, messageTrace, message, error)
+            val newEntry = MessageLogEntry(type, context, messageTrace, message, error, parsedSegments)
 
             if (options.collectMessageLog) {
                 _messageLog.add(newEntry)

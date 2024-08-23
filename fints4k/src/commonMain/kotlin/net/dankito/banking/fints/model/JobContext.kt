@@ -9,6 +9,7 @@ import net.dankito.banking.fints.log.MessageLogCollector
 import net.dankito.banking.fints.messages.datenelemente.implementierte.signatur.VersionDesSicherheitsverfahrens
 import net.dankito.banking.fints.response.BankResponse
 import net.dankito.banking.fints.response.ResponseParser
+import net.dankito.banking.fints.response.segments.ReceivedSegment
 import net.dankito.banking.fints.transactions.IAccountTransactionsParser
 import net.dankito.banking.fints.transactions.Mt940AccountTransactionsParser
 import net.dankito.banking.fints.transactions.mt940.Mt940Parser
@@ -72,8 +73,8 @@ open class JobContext(
     }
 
 
-    open fun addMessageLog(type: MessageLogEntryType, message: String) {
-        messageLogCollector.addMessageLog(type, message, createMessageContext())
+    open fun addMessageLog(type: MessageLogEntryType, message: String, parsedSegments: List<ReceivedSegment> = emptyList()) {
+        messageLogCollector.addMessageLog(type, message, createMessageContext(), parsedSegments)
     }
 
     override fun logError(loggingClass: KClass<*>, message: String, e: Exception?) {
