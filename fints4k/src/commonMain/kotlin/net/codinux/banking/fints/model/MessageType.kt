@@ -17,8 +17,6 @@ enum class MessageType {
 
     Tan,
 
-    AddAccount,
-
     GetBalance,
 
     GetTransactions,
