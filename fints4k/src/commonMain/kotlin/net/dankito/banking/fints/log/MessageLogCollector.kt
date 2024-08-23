@@ -41,9 +41,9 @@ open class MessageLogCollector(
 
     private fun createMessageForLog(logEntry: MessageLogEntry): String {
         val message = if (logEntry.type == MessageLogEntryType.Error) {
-            logEntry.messageTrace + logEntry.message + (if (logEntry.error != null) NewLine + getStackTrace(logEntry.error!!) else "")
+            logEntry.message + (if (logEntry.error != null) NewLine + getStackTrace(logEntry.error!!) else "")
         } else {
-            logEntry.messageTrace + "\n" + prettyPrintFinTsMessage(logEntry.message)
+            prettyPrintFinTsMessage(logEntry.message)
         }
 
         return if (options.removeSensitiveDataFromMessageLog) {

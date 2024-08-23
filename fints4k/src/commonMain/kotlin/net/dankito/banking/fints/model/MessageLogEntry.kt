@@ -14,6 +14,9 @@ open class MessageLogEntry(
     open val time: Instant = Clock.System.now()
 ) {
 
+    val messageIncludingMessageTrace: String
+        get() = messageTrace + "\n" + message
+
     override fun toString(): String {
         return "$type $message"
     }
