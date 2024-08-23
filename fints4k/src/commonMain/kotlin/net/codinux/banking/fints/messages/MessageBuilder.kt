@@ -536,8 +536,7 @@ open class MessageBuilder(protected val utils: FinTsUtils = FinTsUtils()) {
     }
 
     protected open fun isTanRequiredForJob(context: JobContext, segmentId: CustomerSegmentId): Boolean {
-        return context.bank.pinInfo?.jobTanConfiguration?.first { it.segmentId == segmentId.id }?.tanRequired
-            ?: false // TODO: actually in this case it's not allowed to execute job via PIN/TAN at all
+        return context.bank.doesJobRequireTan(segmentId)
     }
 
     protected open fun getSepaUrnFor(segmentId: CustomerSegmentId, bank: BankData, sepaDataFormat: String): String? {

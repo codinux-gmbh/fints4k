@@ -4,6 +4,7 @@ import net.codinux.banking.fints.messages.datenelemente.abgeleiteteformate.Laend
 import net.codinux.banking.fints.messages.datenelemente.implementierte.*
 import net.codinux.banking.fints.messages.datenelemente.implementierte.signatur.Sicherheitsfunktion
 import net.codinux.banking.fints.messages.datenelemente.implementierte.tan.TanMedium
+import net.codinux.banking.fints.messages.segmente.id.ISegmentId
 import net.codinux.banking.fints.response.segments.ChangeTanMediaParameters
 import net.codinux.banking.fints.response.segments.JobParameters
 import net.codinux.banking.fints.response.segments.PinInfo
@@ -30,7 +31,6 @@ open class BankData(
     open var tanMedia: List<TanMedium> = listOf(),
     open var selectedTanMedium: TanMedium? = null,
     open var changeTanMediumParameters: ChangeTanMediaParameters? = null,
-    open var pinInfo: PinInfo? = null,
 
     open var supportedLanguages: List<Dialogsprache> = listOf(),
     open var selectedLanguage: Dialogsprache = Dialogsprache.Default,
@@ -81,6 +81,21 @@ open class BankData(
         _accounts.remove(account)
     }
 
+
+    open var jobsRequiringTan: Set<String> = emptySet()
+        protected set
+
+    open var pinInfo: PinInfo? = null
+        set(value) {
+            field = value
+            // TODO: in case of null: actually in this case it's not allowed to execute job via PIN/TAN at all
+            jobsRequiringTan = value?.jobTanConfiguration.orEmpty().filter { it.tanRequired }.map { it.segmentId }.toSet()
+        }
+
+    open fun doesJobRequireTan(segmentId: ISegmentId): Boolean = doesJobRequireTan(segmentId.id)
+
+    open fun doesJobRequireTan(segmentId: String): Boolean =
+        jobsRequiringTan.contains(segmentId)
 
     /**
      * Some banks use a special bank code for online banking that doesn't match bank's bank code, e. g. Hypo Vereinsbank
