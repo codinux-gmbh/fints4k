@@ -27,4 +27,11 @@ interface FinTsClientCallback {
      */
     suspend fun enterTanGeneratorAtc(bank: BankData, tanMedium: TanGeneratorTanMedium): EnterTanGeneratorAtcResult
 
+    /**
+     * Gets fired when a FinTS message get sent to bank server, a FinTS message is received from bank server or an error occurred.
+     *
+     * Be aware, in order that this message gets fired [net.dankito.banking.fints.config.FinTsClientOptions.fireCallbackOnMessageLogs] has to be set to true.
+     */
+    fun messageLogAdded(messageLogEntry: MessageLogEntry)
+
 }

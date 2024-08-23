@@ -18,4 +18,8 @@ open class NoOpFinTsClientCallback : FinTsClientCallback {
         return EnterTanGeneratorAtcResult.userDidNotEnterAtc()
     }
 
+    override fun messageLogAdded(messageLogEntry: MessageLogEntry) {
+
+    }
+
 }

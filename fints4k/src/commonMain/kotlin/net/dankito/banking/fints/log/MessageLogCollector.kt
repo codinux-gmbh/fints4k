@@ -2,6 +2,7 @@ package net.dankito.banking.fints.log
 
 import net.codinux.log.LoggerFactory
 import net.codinux.log.logger
+import net.dankito.banking.fints.callback.FinTsClientCallback
 import net.dankito.banking.fints.config.FinTsClientOptions
 import net.dankito.banking.fints.model.BankData
 import net.dankito.banking.fints.model.MessageLogEntry
@@ -14,6 +15,7 @@ import kotlin.reflect.KClass
 
 
 open class MessageLogCollector(
+    private val callback: FinTsClientCallback,
     private val options: FinTsClientOptions = FinTsClientOptions(),
     private val finTsUtils: FinTsUtils = FinTsUtils()
 ) {
@@ -55,9 +57,9 @@ open class MessageLogCollector(
     open fun addMessageLog(type: MessageLogEntryType, message: String, context: MessageContext) {
         val messageTrace = createMessageTraceString(type, context)
 
-        addMessageLogEntry(type, context, messageTrace, message)
-
         log.debug { "$messageTrace\n${prettyPrintFinTsMessage(message)}" }
+
+        addMessageLogEntry(type, context, messageTrace, message)
     }
 
     open fun logError(loggingClass: KClass<*>, message: String, context: MessageContext, e: Exception? = null) {
@@ -70,7 +72,14 @@ open class MessageLogCollector(
     }
 
     protected open fun addMessageLogEntry(type: MessageLogEntryType, context: MessageContext, messageTrace: String, message: String, error: Throwable? = null) {
-        _messageLog.add(MessageLogEntry(type, context, messageTrace, message, error))
+        val newEntry = MessageLogEntry(type, context, messageTrace, message, error)
+
+        _messageLog.add(newEntry)
+
+        if (options.fireCallbackOnMessageLogs) {
+            // TODO: pretty print message
+            callback.messageLogAdded(newEntry)
+        }
     }
 
 

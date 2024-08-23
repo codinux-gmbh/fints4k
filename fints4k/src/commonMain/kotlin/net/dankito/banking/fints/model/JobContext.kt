@@ -24,7 +24,7 @@ open class JobContext(
      * Only set if the current context is for a specific account (like get account's transactions).
      */
     open val account: AccountData? = null,
-    protected open val messageLogCollector: MessageLogCollector = MessageLogCollector(config.options)
+    protected open val messageLogCollector: MessageLogCollector = MessageLogCollector(callback, config.options)
 ) : MessageBaseData(bank, config.options.product), IMessageLogAppender {
 
     companion object {
