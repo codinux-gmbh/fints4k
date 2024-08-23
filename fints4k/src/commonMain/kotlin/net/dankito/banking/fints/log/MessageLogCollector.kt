@@ -72,13 +72,17 @@ open class MessageLogCollector(
     }
 
     protected open fun addMessageLogEntry(type: MessageLogEntryType, context: MessageContext, messageTrace: String, message: String, error: Throwable? = null) {
-        val newEntry = MessageLogEntry(type, context, messageTrace, message, error)
+        if (options.collectMessageLog || options.fireCallbackOnMessageLogs) {
+            val newEntry = MessageLogEntry(type, context, messageTrace, message, error)
 
-        _messageLog.add(newEntry)
+            if (options.collectMessageLog) {
+                _messageLog.add(newEntry)
+            }
 
-        if (options.fireCallbackOnMessageLogs) {
-            // TODO: pretty print message
-            callback.messageLogAdded(newEntry)
+            if (options.fireCallbackOnMessageLogs) {
+                // TODO: pretty print message
+                callback.messageLogAdded(newEntry)
+            }
         }
     }
 

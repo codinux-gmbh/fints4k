@@ -18,6 +18,10 @@ open class FinTsClientResponse(
     open val isStrongAuthenticationRequired: Boolean,
     open val tanRequired: TanResponse? = null,
 
+    /**
+     * Collected FinTS messages sent to and received from bank servers and error messages. Will only be available if
+     * [net.dankito.banking.fints.config.FinTsClientOptions.collectMessageLog] is set to true (is disabled by default).
+     */
     open val messageLog: List<MessageLogEntry>,
 
     /**
