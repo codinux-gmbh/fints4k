@@ -10,7 +10,7 @@ import net.dankito.banking.fints.extensions.UnixEpochStart
 @Serializable
 open class AccountTransaction(
     val amount: Money, // TODO: if we decide to stick with Money, create own type, don't use that one from fints.model (or move over from)
-    val unparsedReference: String,
+    val unparsedReference: String, // alternative names: purpose, reason
     val bookingDate: LocalDate,
     val otherPartyName: String?,
     val otherPartyBankCode: String?,
