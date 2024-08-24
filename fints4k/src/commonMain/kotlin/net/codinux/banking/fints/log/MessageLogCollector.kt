@@ -107,9 +107,9 @@ open class MessageLogCollector(
 
     protected open fun getMessageTypeString(type: MessageLogEntryType): String {
         return when (type) {
-            MessageLogEntryType.Sent -> "Sending message"
-            MessageLogEntryType.Received -> "Received message"
-            MessageLogEntryType.Error -> "Error"
+            MessageLogEntryType.Sent -> "01 Sending message"
+            MessageLogEntryType.Received -> "02 Received message"
+            MessageLogEntryType.Error -> "03 Error"
         }
     }
 
