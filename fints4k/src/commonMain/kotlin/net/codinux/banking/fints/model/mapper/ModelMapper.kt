@@ -31,8 +31,6 @@ open class ModelMapper(
                 // just as fallback as this value contains a lot of confusing and irrelevant names (like DB24 for Deutsche Bank and Rechenzentrum Bayer. Gen. for Bavarian Raiffeisen banks)
                 bank.bankName = bankParameters.bankName
             }
-
-//            bank.bic = bankParameters. // TODO: where's the BIC?
         }
 
         response.getFirstSegmentById<PinInfo>(InstituteSegmentId.PinInfo)?.let { pinInfo ->
@@ -51,7 +49,7 @@ open class ModelMapper(
 
         response.getFirstSegmentById<SepaAccountInfo>(InstituteSegmentId.SepaAccountInfo)?.let { sepaAccountInfo ->
             sepaAccountInfo.account.bic?.let {
-                bank.bic = it // TODO: really set BIC on bank then?
+                bank.bic = it
             }
         }
 
