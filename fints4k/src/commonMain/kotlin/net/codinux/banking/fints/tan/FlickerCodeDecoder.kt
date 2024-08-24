@@ -84,7 +84,7 @@ open class FlickerCodeDecoder {
         }
 
         if (encoding == FlickerCodeEncoding.ASCII) {
-            data = data.map { toHex(it.toInt(), 2) }.joinToString("")
+            data = data.map { toHex(it.code, 2) }.joinToString("")
         }
 
         if (encoding == FlickerCodeEncoding.BCD && data.length % 2 != 0) {
@@ -193,7 +193,7 @@ open class FlickerCodeDecoder {
 
 
     protected open fun toHex(number: Int, minLength: Int): String {
-        var result = number.toString (16).toUpperCase()
+        var result = number.toString (16).uppercase()
 
         while (result.length < minLength) {
             result = '0' + result

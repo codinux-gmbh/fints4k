@@ -37,9 +37,9 @@ open class Base64 {
 
         (string.indices step 3).forEach { index ->
             val number: Int =
-                (0xFF.and(string[index    ].toInt()) shl 16) +
-                (0xFF.and(string[index + 1].toInt()) shl  8) +
-                 0xFF.and(string[index + 2].toInt())
+                (0xFF.and(string[index    ].code) shl 16) +
+                (0xFF.and(string[index + 1].code) shl  8) +
+                 0xFF.and(string[index + 2].code)
 
             encoded.append(Base64Chars[(number shr 18) and 0x3F])
             encoded.append(Base64Chars[(number shr 12) and 0x3F])

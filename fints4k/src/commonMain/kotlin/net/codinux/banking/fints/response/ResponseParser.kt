@@ -498,7 +498,7 @@ open class ResponseParser(
         }
 
         try {
-            val lowerCaseMayDkTanMethod = mayDkTanMethod.toLowerCase()
+            val lowerCaseMayDkTanMethod = mayDkTanMethod.lowercase()
 
             if (lowerCaseMayDkTanMethod == "mobiletan" || lowerCaseMayDkTanMethod == "mtan") {
                 return DkTanMethod.mobileTAN

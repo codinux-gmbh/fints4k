@@ -184,7 +184,7 @@ open class ModelMapper(
         val methodName = parameters.methodName
 
         // we filter out iTAN and Einschritt-Verfahren as they are not permitted anymore according to PSD2
-        if (methodName.toLowerCase() == "itan") {
+        if (methodName.lowercase() == "itan") {
             return null
         }
 
@@ -196,7 +196,7 @@ open class ModelMapper(
     }
 
     protected open fun mapToTanMethodType(parameters: TanMethodParameters): TanMethodType? {
-        val name = parameters.methodName.toLowerCase()
+        val name = parameters.methodName.lowercase()
 
         return when {
             // names are like 'chipTAN (comfort) manuell', 'Smart(-)TAN plus (manuell)' and
@@ -254,7 +254,7 @@ open class ModelMapper(
 
     protected open fun tanMethodNameContains(name: String, vararg namesToTest: String): Boolean {
         namesToTest.forEach { nameToTest ->
-            if (name.contains(nameToTest.toLowerCase())) {
+            if (name.contains(nameToTest.lowercase())) {
                 return true
             }
         }

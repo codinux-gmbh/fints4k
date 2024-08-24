@@ -1,3 +1,5 @@
+@file:Suppress("UNCHECKED_CAST")
+
 package net.codinux.banking.fints.response
 
 import net.codinux.banking.fints.messages.MessageBuilderResult
