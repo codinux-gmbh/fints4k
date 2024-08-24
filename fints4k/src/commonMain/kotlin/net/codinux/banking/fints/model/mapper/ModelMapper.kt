@@ -72,6 +72,13 @@ open class ModelMapper(
             }
         }
 
+        response.getFirstSegmentById<CommunicationInfo>(InstituteSegmentId.CommunicationInfo)?.let { communicationInfo ->
+            // actually it's the default language, not the selected one, but we don't offer a way to select language
+            // and expect in first message, where language is set to 0 = signal that we don't know bank server's supported
+            // languages, we simply use bank's default language, which is returned in BPD (and is always except one bank German anyway)
+            bank.selectedLanguage = communicationInfo.defaultLanguage
+        }
+
         response.getFirstSegmentById<ReceivedSynchronization>(InstituteSegmentId.Synchronization)?.let { synchronization ->
             synchronization.customerSystemId?.let {
                 bank.customerSystemId = it
@@ -122,12 +129,6 @@ open class ModelMapper(
             }
 
             // TODO: may also make use of other info
-        }
-
-        response.getFirstSegmentById<CommunicationInfo>(InstituteSegmentId.CommunicationInfo)?.let { communicationInfo ->
-            if (bank.selectedLanguage != communicationInfo.defaultLanguage) {
-                bank.selectedLanguage = communicationInfo.defaultLanguage
-            }
         }
 
         val supportedJobs = response.supportedJobs
