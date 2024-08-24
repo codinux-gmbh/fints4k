@@ -31,19 +31,6 @@ open class FinTsClientDeprecated(
      *
      * On success [bank] parameter is updated afterwards.
      */
-    open fun getAnonymousBankInfoAsync(bank: BankData, callback: (FinTsClientResponse) -> Unit) {
-
-        GlobalScope.launch {
-            callback(getAnonymousBankInfo(bank))
-        }
-    }
-
-    /**
-     * Retrieves information about bank (e.g. supported HBCI versions, FinTS server address,
-     * supported jobs, ...).
-     *
-     * On success [bank] parameter is updated afterwards.
-     */
     open suspend fun getAnonymousBankInfo(bank: BankData): FinTsClientResponse {
         val context = JobContext(JobContextType.AnonymousBankInfo, this.callback, config, bank)
 
