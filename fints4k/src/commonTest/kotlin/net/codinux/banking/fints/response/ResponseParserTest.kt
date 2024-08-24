@@ -799,7 +799,7 @@ class ResponseParserTest : FinTsTestBase() {
         ?: run { fail("No segment of type TanInfo found in ${result.receivedSegments}") }
     }
 
-    private fun assertTanMethodParameter(parsedTanMethodParameters: List<nTanMethodParameters>, index: Int, securityFunction: Sicherheitsfunktion,
+    private fun assertTanMethodParameter(parsedTanMethodParameters: List<TanMethodParameters>, index: Int, securityFunction: Sicherheitsfunktion,
                                          tanMethod: DkTanMethod?, methodName: String) {
 
         val tanMethodParameters = parsedTanMethodParameters[index]
