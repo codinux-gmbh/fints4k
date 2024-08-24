@@ -14,8 +14,16 @@ open class BankParameters(
     val bankName: String,
 
     /**
+     * Anzahl Geschäftsvorfallsarten:
      * Maximale Anzahl an Geschäftsvorfallsarten, die pro Nachricht zulässig ist.
      * Der Wert ‚0’ gibt an, dass keine Restriktionen bzgl. der Anzahl an Geschäftsvorfallsarten bestehen.
+     *
+     * In einer Nachricht sind Aufträge beliebiger unterschiedlicher Geschäftsvorfallsarten
+     * zugelassen (z. B. drei Segmente HKCCS und ein Segment HKSAL). Eine Einschränkung ist mit Hilfe des Feldes „Anzahl Geschäftsvorfallsarten“ im Segment
+     * „Bankparameter allgemein“ möglich.
+     *
+     * Maximale Anzahl aller Geschäftsvorfallsarten pro Nachricht: „Anzahl Geschäftsvorfallsarten“ (BPA, also dieser Wert hier).
+     * Maximale Anzahl eines bestimmten Segments pro Nachricht: „Maximale Anzahl Aufträge“ (JobParameter des jeweiligen Segments).
      */
     val countMaxJobsPerMessage: Int,
 
