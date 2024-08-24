@@ -75,8 +75,8 @@ open class ModelMapper(
         response.getFirstSegmentById<ReceivedSynchronization>(InstituteSegmentId.Synchronization)?.let { synchronization ->
             synchronization.customerSystemId?.let {
                 bank.customerSystemId = it
-
-                bank.customerSystemStatus = KundensystemStatusWerte.Benoetigt // TODO: didn't find out for sure yet, but i think i read somewhere, that this has to be set when customerSystemId is set
+                // now that we have a Kundensystem-ID, Kundensystem-Status has to be set to 1 = Benoetigt
+                bank.customerSystemStatus = KundensystemStatusWerte.Benoetigt
             }
         }
 
