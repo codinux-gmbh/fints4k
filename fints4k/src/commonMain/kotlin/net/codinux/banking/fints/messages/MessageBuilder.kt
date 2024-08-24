@@ -133,7 +133,7 @@ open class MessageBuilder(protected val utils: FinTsUtils = FinTsUtils()) {
         }
 
         if (context.bank.customerSystemId == KundensystemID.Anonymous) {
-            segments.add(Synchronisierung(segments.size + 3, Synchronisierungsmodus.NeueKundensystemIdZurueckmelden))
+            segments.add(Synchronisierung(SignedMessagePayloadFirstSegmentNumber + segments.size, Synchronisierungsmodus.NeueKundensystemIdZurueckmelden))
         }
 
         return createSignedMessageBuilderResult(context, MessageType.DialogInit, segments)
@@ -394,7 +394,7 @@ open class MessageBuilder(protected val utils: FinTsUtils = FinTsUtils()) {
         return createSignedMessage(context, null, payloadSegments)
     }
 
-    open fun createSignedMessage(context: JobContext, tan: String? = null, payloadSegments: List<Segment>): String {
+    protected open fun createSignedMessage(context: JobContext, tan: String? = null, payloadSegments: List<Segment>): String {
 
         val date = utils.formatDateTodayAsInt()
         val time = utils.formatTimeNowAsInt()
@@ -406,7 +406,7 @@ open class MessageBuilder(protected val utils: FinTsUtils = FinTsUtils()) {
         return createMessage(context, encryptedPayload, payloadSegments.size)
     }
 
-    open fun createMessage(context: JobContext, payloadSegments: List<Segment>, countWrappedSegments: Int = 0): String {
+    protected open fun createMessage(context: JobContext, payloadSegments: List<Segment>, countWrappedSegments: Int = 0): String {
 
         val dialog = context.dialog
         dialog.increaseMessageNumber()
