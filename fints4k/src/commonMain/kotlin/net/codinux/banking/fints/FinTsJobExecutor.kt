@@ -307,6 +307,7 @@ open class FinTsJobExecutor(
 
             bank.selectedTanMedium = preferredTanMedium?.let { bank.tanMedia.firstOrNull { it.mediumName == preferredTanMedium } }
                 ?: bank.selectedTanMedium?.let { selected -> bank.tanMedia.firstOrNull { it.mediumName == selected.mediumName } } // try to find selectedTanMedium in new TanMedia instances
+                ?: bank.tanMedia.firstOrNull { it.status == TanMediumStatus.Aktiv && it.mediumName != null }
                 ?: bank.tanMedia.firstOrNull { it.mediumName != null }
         }
 
