@@ -34,7 +34,7 @@ kotlin {
         browser {
             testTask {
                 useKarma {
-//                    useChromeHeadless()
+                    useChromeHeadless()
                     useFirefoxHeadless()
                 }
             }
@@ -43,10 +43,13 @@ kotlin {
         nodejs()
     }
 
+//    wasmJs() // ktor is not available for wasmJs yet
+
 
     linuxX64()
     mingwX64()
 
+    iosX64()
     iosArm64()
     iosSimulatorArm64()
     macosX64()
