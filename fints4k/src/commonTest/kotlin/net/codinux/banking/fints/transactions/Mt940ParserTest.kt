@@ -38,7 +38,11 @@ class Mt940ParserTest : FinTsTestBase() {
         val AccountStatement1With2TransactionsClosingBalanceAmount = Amount("13148,13")
     }
 
-    private val underTest = Mt940Parser()
+    private val underTest = object : Mt940Parser() {
+        public override fun parseMt940Date(dateString: String): LocalDate {
+            return super.parseMt940Date(dateString)
+        }
+    }
 
 
     @Test
@@ -309,6 +313,21 @@ class Mt940ParserTest : FinTsTestBase() {
             assertEquals("?,3SQNdUbxm9z7dB)+gKYDJAKzCM0G", mandateReference)
             assertContains(sepaReference ?: "", "IBAN: DE87300308801234567890 BIC: TUBDDEDD")
         }
+    }
+
+
+    @Test
+    fun parseDate() {
+        val result = underTest.parseMt940Date("240507")
+
+        assertEquals(LocalDate(2024, 5, 7), result)
+    }
+
+    @Test
+    fun parseDateBeforeYear2000() {
+        val result = underTest.parseMt940Date("990507")
+
+        assertEquals(LocalDate(1999, 5, 7), result)
     }
 
 

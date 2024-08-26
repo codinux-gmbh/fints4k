@@ -53,7 +53,7 @@ open class Mt940Parser(
 
         val DateFormatter = DateFormatter("yyMMdd") // TODO: replace with LocalDate.Format { }
 
-        val CurrentYearTwoDigit = LocalDate.todayAtEuropeBerlin().year - 2000
+        val CurrentYearTwoDigit = LocalDate.todayAtEuropeBerlin().year
 
         val CreditDebitCancellationRegex = Regex("C|D|RC|RD")
 
@@ -455,7 +455,7 @@ open class Mt940Parser(
         // this really simple date format on my own
         if (dateString.length == 6) {
             try {
-                var year = dateString.substring(0, 2).toInt()
+                var year = dateString.substring(0, 2).toInt() + 2000
                 val month = dateString.substring(2, 4).toInt()
                 val day = dateString.substring(4, 6).toInt()
 
@@ -463,7 +463,7 @@ open class Mt940Parser(
                     year -= 100
                 }
 
-                return LocalDate(year + 2000, month, day) // java.util.Date years start at 1900 at month at 0 not at 1
+                return LocalDate(year , month, day)
             } catch (e: Exception) {
                 logError("Could not parse dateString '$dateString'", e)
             }
