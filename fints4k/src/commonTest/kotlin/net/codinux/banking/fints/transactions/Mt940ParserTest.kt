@@ -330,6 +330,20 @@ class Mt940ParserTest : FinTsTestBase() {
         assertEquals(LocalDate(1999, 5, 7), result)
     }
 
+    @Test
+    fun parseDate_FixSparkasse29thOFFebruaryInNonLeapYearBug() {
+        val result = underTest.parseMt940Date("230229")
+
+        assertEquals(LocalDate(2023, 3, 1), result)
+    }
+
+    @Test
+    fun parseDate_FixSparkasse30thOfFebruaryBug() {
+        val result = underTest.parseMt940Date("230229")
+
+        assertEquals(LocalDate(2023, 3, 1), result)
+    }
+
 
     private fun assertBalance(balance: Balance, isCredit: Boolean, bookingDate: LocalDate, amount: Amount) {
         assertEquals(isCredit, balance.isCredit)

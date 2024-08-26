@@ -463,6 +463,10 @@ open class Mt940Parser(
                     year -= 100
                 }
 
+                if (month == 2 && (day > 29 || (day > 28 && year % 4 != 0))) {
+                    return LocalDate(year, 3, 1)
+                }
+
                 return LocalDate(year , month, day)
             } catch (e: Exception) {
                 logError("Could not parse dateString '$dateString'", e)
