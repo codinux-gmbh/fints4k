@@ -463,7 +463,10 @@ open class Mt940Parser(
                     year -= 100
                 }
 
-                if (month == 2 && (day > 29 || (day > 28 && year % 4 != 0))) {
+                // ah, here we go, banks (in Germany) calculate with 30 days each month, so yes, it can happen that dates
+                // like 30th of February or 29th of February in non-leap years occur, see:
+                // https://de.m.wikipedia.org/wiki/30._Februar#30._Februar_in_der_Zinsberechnung
+                if (month == 2 && (day > 29 || (day > 28 && year % 4 != 0))) { // fix that for banks each month has 30 days
                     return LocalDate(year, 3, 1)
                 }
 
