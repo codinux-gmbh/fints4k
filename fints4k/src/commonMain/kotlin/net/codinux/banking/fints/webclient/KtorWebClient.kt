@@ -18,7 +18,7 @@ open class KtorWebClient(
     private val log by logger()
 
 
-    protected val client = HttpClient {
+    protected open val client = HttpClient {
         install(HttpTimeout) {
             this.connectTimeoutMillis = connectTimeoutMillis
             this.requestTimeoutMillis = requestTimeoutMillis
@@ -37,7 +37,7 @@ open class KtorWebClient(
     }
 
 
-    suspend fun get(url: String): WebClientResponse {
+    open suspend fun get(url: String): WebClientResponse {
         val clientResponse = client.get(url)
 
         val responseBody = clientResponse.bodyAsText()
