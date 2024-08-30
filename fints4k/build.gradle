@@ -73,7 +73,7 @@ kotlin {
 
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$kotlinxSerializationVersion")
 
-                implementation("net.codinux.log:kmp-log:$klfVersion")
+                implementation("net.codinux.log:klf:$klfVersion")
             }
         }
 
