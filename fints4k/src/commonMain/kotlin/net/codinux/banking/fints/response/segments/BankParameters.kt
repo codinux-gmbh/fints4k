@@ -24,6 +24,15 @@ open class BankParameters(
      *
      * Maximale Anzahl aller Geschäftsvorfallsarten pro Nachricht: „Anzahl Geschäftsvorfallsarten“ (BPA, also dieser Wert hier).
      * Maximale Anzahl eines bestimmten Segments pro Nachricht: „Maximale Anzahl Aufträge“ (JobParameter des jeweiligen Segments).
+     *
+     * Jedoch, 07 PINTAN, S. 60:
+     * "Desweiteren ist vom Kundenprodukt sicherzustellen, dass eine Nachricht entweder nur einen einzelnen Geschäftsvorfall enthält,
+     * für den eine TAN erforderlich ist, oder nur solche Geschäftsvorfälle, für die keine TAN erforderlich ist. Andernfalls ist
+     * die eindeutige Zuordnung der übergebenen TAN zu den Geschäftsvorfällen nicht sichergestellt.
+     * Eine Mischung von Geschäftsvorfällen, die eine TAN erfordern, mit solchen, die keine erfordern, ist generell nicht zulässig."
+     *
+     * -> ist praktisch nutzlos, da allenfalls nur mehr als ein nicht-TAN pflichtiger Geschäftsvorall pro Nachricht
+     * gesendent werden kann, jedoch nicht mehrere TAN-pflichtige und damit 99 % aller Geschäftsvorfälle.
      */
     val countMaxJobsPerMessage: Int,
 
