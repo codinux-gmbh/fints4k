@@ -9,11 +9,13 @@ import net.dankito.banking.client.model.response.TransferMoneyResponse
 import net.codinux.banking.fints.callback.FinTsClientCallback
 import net.codinux.banking.fints.config.FinTsClientConfiguration
 import net.codinux.banking.fints.mapper.FinTsModelMapper
+import net.codinux.banking.fints.messages.datenelemente.implementierte.KundensystemID
 import net.codinux.banking.fints.model.*
 import net.codinux.banking.fints.response.client.FinTsClientResponse
 import net.codinux.banking.fints.response.client.GetAccountInfoResponse
 import net.codinux.banking.fints.response.client.GetAccountTransactionsResponse
 import net.codinux.banking.fints.response.segments.AccountType
+import net.codinux.banking.fints.response.segments.BankParameters
 import net.codinux.banking.fints.util.BicFinder
 
 
@@ -40,50 +42,39 @@ open class FinTsClient(
   }
 
   open suspend fun getAccountDataAsync(param: GetAccountDataParameter): GetAccountDataResponse {
-    val finTsServerAddress = config.finTsServerAddressFinder.findFinTsServerAddress(param.bankCode)
-    if (finTsServerAddress.isNullOrBlank()) {
-      return GetAccountDataResponse(ErrorCode.BankDoesNotSupportFinTs3, "Either bank does not support FinTS 3.0 or we don't know its FinTS server address", null, listOf())
-    }
+    val basicAccountDataResponse = getRequiredDataToSendUserJobs(param)
 
-    val bank = mapper.mapToBankData(param, finTsServerAddress)
-    val accounts = param.accounts
-
-    if (accounts.isNullOrEmpty() || param.retrieveOnlyAccountInfo) { // then first retrieve customer's bank accounts
-      val getAccountInfoResponse = getAccountInfo(param, bank)
-
-      if (getAccountInfoResponse.successful == false || param.retrieveOnlyAccountInfo) {
-        return GetAccountDataResponse(mapper.mapErrorCode(getAccountInfoResponse), mapper.mapErrorMessages(getAccountInfoResponse), null,
-          getAccountInfoResponse.messageLog, bank)
-      } else {
-        return getAccountData(param, getAccountInfoResponse.bank, getAccountInfoResponse.bank.accounts, getAccountInfoResponse)
-      }
+    if (basicAccountDataResponse.successful == false || param.retrieveOnlyAccountInfo || basicAccountDataResponse.finTsModel == null) {
+      return GetAccountDataResponse(basicAccountDataResponse.error, basicAccountDataResponse.errorMessage, null,
+        basicAccountDataResponse.messageLogWithoutSensitiveData, basicAccountDataResponse.finTsModel)
     } else {
-      return getAccountData(param, bank, accounts.map { mapper.mapToAccountData(it, param) }, null)
+      val bank = basicAccountDataResponse.finTsModel!!
+      return getAccountData(param, bank, bank.accounts, basicAccountDataResponse.messageLogWithoutSensitiveData)
     }
   }
 
-  protected open suspend fun getAccountData(param: GetAccountDataParameter, bank: BankData, accounts: List<AccountData>, previousJobResponse: FinTsClientResponse?): GetAccountDataResponse {
+  protected open suspend fun getAccountData(param: GetAccountDataParameter, bank: BankData, accounts: List<AccountData>, previousJobMessageLog: List<MessageLogEntry>?): GetAccountDataResponse {
     val retrievedTransactionsResponses = mutableListOf<GetAccountTransactionsResponse>()
 
     val accountsSupportingRetrievingTransactions = accounts.filter { it.supportsRetrievingBalance || it.supportsRetrievingAccountTransactions }
 
     if (accountsSupportingRetrievingTransactions.isEmpty()) {
       val errorMessage = "None of the accounts ${accounts.map { it.productName }} supports retrieving balance or transactions" // TODO: translate
-      return GetAccountDataResponse(ErrorCode.NoneOfTheAccountsSupportsRetrievingData, errorMessage, mapper.map(bank), previousJobResponse?.messageLog ?: listOf(), bank)
+      return GetAccountDataResponse(ErrorCode.NoneOfTheAccountsSupportsRetrievingData, errorMessage, mapper.map(bank), previousJobMessageLog ?: listOf(), bank)
     }
 
     accountsSupportingRetrievingTransactions.forEach { account ->
-      retrievedTransactionsResponses.add(getAccountData(param, bank, account))
+      retrievedTransactionsResponses.add(getAccountTransactions(param, bank, account))
     }
 
     val unsuccessfulJob = retrievedTransactionsResponses.firstOrNull { it.successful == false }
     val errorCode = unsuccessfulJob?.let { mapper.mapErrorCode(it) }
       ?: if (retrievedTransactionsResponses.size < accountsSupportingRetrievingTransactions.size) ErrorCode.DidNotRetrieveAllAccountData else null
-    return GetAccountDataResponse(errorCode, mapper.mapErrorMessages(unsuccessfulJob), mapper.map(bank, retrievedTransactionsResponses),
-      mapper.mergeMessageLog(previousJobResponse, *retrievedTransactionsResponses.toTypedArray()), bank)
+    return GetAccountDataResponse(errorCode, mapper.mapErrorMessages(unsuccessfulJob), mapper.map(bank, retrievedTransactionsResponses, param.retrieveTransactionsTo),
+      mapper.mergeMessageLog(previousJobMessageLog, *retrievedTransactionsResponses.map { it.messageLog }.toTypedArray()), bank)
   }
 
-  protected open suspend fun getAccountData(param: GetAccountDataParameter, bank: BankData, account: AccountData): GetAccountTransactionsResponse {
+  protected open suspend fun getAccountTransactions(param: GetAccountDataParameter, bank: BankData, account: AccountData): GetAccountTransactionsResponse {
     val context = JobContext(JobContextType.GetTransactions, this.callback, config, bank, account)
 
     return config.jobExecutor.getTransactionsAsync(context, mapper.toGetAccountTransactionsParameter(param, bank, account))
@@ -161,6 +152,44 @@ open class FinTsClient(
     }
 
     return null
+  }
+
+  /**
+   * Ensures all basic data to initialize a dialog with strong customer authorization is retrieved so you can send your
+   * actual jobs (Geschäftsvorfälle) to your bank's FinTS server.
+   *
+   * These data include:
+   * - Bank communication data like FinTS server address, BIC, bank name, bank code used for FinTS.
+   * - BPD (BankParameterDaten): bank name, BPD version, supported languages, supported HBCI versions, supported TAN methods,
+   * max count jobs per message (Anzahl Geschäftsvorfallsarten) (see [BankParameters] [BankParameters](src/commonMain/kotlin/net/codinux/banking/fints/response/segmentsBankParameters) ).
+   * - Min and max online banking password length, min TAN length, hint for login name (for all: if available)
+   * - UPD (UserParameterDaten): username, UPD version.
+   * - Customer system ID (Kundensystem-ID, see [KundensystemID]), TAN methods available for user and may user's TAN media.
+   * - Which jobs the bank supports and which jobs need strong customer authorization (= require HKTAN segment).
+   * - Which jobs the user is allowed to use.
+   * - Which jobs can be called for a specific bank account.
+   *
+   * When implementing your own jobs, call this method first, then send an init dialog message and in next message your actual jobs.
+   *
+   * More or less implements everything of 02 FinTS_3.0_Formals.pdf so that you can start directly with the jobs from
+   * 04 FinTS_3.0_Messages_Geschaeftsvorfaelle.pdf
+   */
+  open suspend fun getRequiredDataToSendUserJobs(param: FinTsClientParameter): net.dankito.banking.client.model.response.FinTsClientResponse {
+    if (param.finTsModel != null) {
+      return net.dankito.banking.client.model.response.FinTsClientResponse(null, null, emptyList(), param.finTsModel)
+    }
+
+    val finTsServerAddress = config.finTsServerAddressFinder.findFinTsServerAddress(param.bankCode)
+    if (finTsServerAddress.isNullOrBlank()) {
+      return net.dankito.banking.client.model.response.FinTsClientResponse(ErrorCode.BankDoesNotSupportFinTs3, "Either bank does not support FinTS 3.0 or we don't know its FinTS server address", emptyList(), null)
+    }
+
+    val bank = mapper.mapToBankData(param, finTsServerAddress)
+
+    val getAccountInfoResponse = getAccountInfo(param, bank)
+
+    return net.dankito.banking.client.model.response.FinTsClientResponse(mapper.mapErrorCode(getAccountInfoResponse), mapper.mapErrorMessages(getAccountInfoResponse),
+      getAccountInfoResponse.messageLog, bank)
   }
 
   protected open suspend fun getAccountInfo(param: FinTsClientParameter, bank: BankData): GetAccountInfoResponse {
