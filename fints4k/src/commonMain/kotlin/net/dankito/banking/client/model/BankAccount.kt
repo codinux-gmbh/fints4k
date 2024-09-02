@@ -1,6 +1,7 @@
 package net.dankito.banking.client.model
 
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalDateTime
 import kotlinx.serialization.Serializable
 import net.codinux.banking.fints.model.Currency
 import net.codinux.banking.fints.model.Money
@@ -35,7 +36,7 @@ open class BankAccount(
 
     open var retrievedTransactionsFrom: LocalDate? = null
 
-    open var retrievedTransactionsTo: LocalDate? = null
+    open var lastTransactionRetrievalTime: LocalDateTime? = null
 
     open var bookedTransactions: List<AccountTransaction> = listOf()
 

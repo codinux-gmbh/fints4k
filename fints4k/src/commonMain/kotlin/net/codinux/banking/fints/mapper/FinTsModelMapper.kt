@@ -1,6 +1,7 @@
 package net.codinux.banking.fints.mapper
 
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.atTime
 import net.dankito.banking.client.model.*
 import net.dankito.banking.client.model.AccountTransaction
 import net.dankito.banking.client.model.parameter.FinTsClientParameter
@@ -70,7 +71,7 @@ open class FinTsModelMapper {
     }
   }
 
-  open fun map(bank: BankData, retrievedTransactionsResponses: List<GetAccountTransactionsResponse>): CustomerAccount {
+  open fun map(bank: BankData, retrievedTransactionsResponses: List<GetAccountTransactionsResponse>, retrieveTransactionsTo: LocalDate? = null): CustomerAccount {
     val customerAccount = map(bank)
     val retrievedData = retrievedTransactionsResponses.mapNotNull { it.retrievedData }
 
@@ -78,7 +79,10 @@ open class FinTsModelMapper {
       retrievedData.firstOrNull { it.account.accountIdentifier == bankAccount.identifier }?.let { accountTransactionsResponse ->
         bankAccount.balance = accountTransactionsResponse.balance ?: Money.Zero
         bankAccount.retrievedTransactionsFrom = accountTransactionsResponse.retrievedTransactionsFrom
-        bankAccount.retrievedTransactionsTo = accountTransactionsResponse.retrievedTransactionsTo
+        val retrievalTime = if (retrieveTransactionsTo == null) accountTransactionsResponse.retrievalTime else retrieveTransactionsTo.atTime(0, 0)
+        if (bankAccount.lastTransactionRetrievalTime == null || bankAccount.lastTransactionRetrievalTime!! <= retrievalTime) { // if retrieveTransactionsTo is set it may is older than current account's lastTransactionRetrievalTime
+          bankAccount.lastTransactionRetrievalTime = retrievalTime
+        }
         bankAccount.bookedTransactions = map(accountTransactionsResponse)
       }
     }
@@ -155,6 +159,10 @@ open class FinTsModelMapper {
 
     return if (errorMessages.isEmpty()) null
     else errorMessages.joinToString("\r\n")
+  }
+
+  open fun mergeMessageLog(vararg messageLogs: List<MessageLogEntry>?): List<MessageLogEntry> {
+    return messageLogs.filterNotNull().flatten()
   }
 
   open fun mergeMessageLog(vararg responses: FinTsClientResponse?): List<MessageLogEntry> {
