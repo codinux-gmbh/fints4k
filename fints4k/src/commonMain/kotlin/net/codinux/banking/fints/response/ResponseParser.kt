@@ -431,7 +431,7 @@ open class ResponseParser(
         }
 
         if (parsedMethodParameters.dkTanMethod == DkTanMethod.Decoupled) {
-            if (parsedMethodParameters.periodicStateRequestsAllowedForDecoupled != null) {
+            if (parsedMethodParameters.periodicDecoupledStateRequestsAllowed != null) {
                 return 26
             }
             else if (parsedMethodParameters.manualConfirmationAllowedForDecoupled != null) {

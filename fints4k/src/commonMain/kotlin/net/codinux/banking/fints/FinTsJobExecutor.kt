@@ -21,6 +21,8 @@ import net.codinux.banking.fints.util.TanMethodSelector
 import net.codinux.banking.fints.extensions.minusDays
 import net.codinux.banking.fints.extensions.todayAtEuropeBerlin
 import net.codinux.banking.fints.extensions.todayAtSystemDefaultTimeZone
+import kotlin.math.max
+import kotlin.time.Duration.Companion.seconds
 
 
 /**
@@ -413,16 +415,60 @@ open class FinTsJobExecutor(
         }
     }
 
-    protected open fun mayRetrieveAutomaticallyIfUserEnteredDecoupledTan(context: JobContext, tanChallenge: TanChallenge, tanResponse: TanResponse) {
+    protected open suspend fun mayRetrieveAutomaticallyIfUserEnteredDecoupledTan(context: JobContext, tanChallenge: TanChallenge, tanResponse: TanResponse) {
         context.bank.selectedTanMethod.decoupledParameters?.let { decoupledTanMethodParameters ->
-            if (tanResponse.tanProcess == TanProcess.AppTan && decoupledTanMethodParameters.periodicStateRequestsAllowed) {
-                automaticallyRetrieveIfUserEnteredDecoupledTan(context, tanChallenge)
+            if (decoupledTanMethodParameters.periodicStateRequestsAllowed) {
+                val responseAfterApprovingDecoupledTan =
+                    automaticallyRetrieveIfUserEnteredDecoupledTan(context, tanChallenge, tanResponse, decoupledTanMethodParameters)
+
+                if (responseAfterApprovingDecoupledTan != null) {
+                    tanChallenge.userApprovedDecoupledTan(responseAfterApprovingDecoupledTan)
+                } else {
+                    tanChallenge.userDidNotEnterTan()
+                }
             }
         }
     }
 
-    protected open fun automaticallyRetrieveIfUserEnteredDecoupledTan(context: JobContext, tanChallenge: TanChallenge) {
+    protected open suspend fun automaticallyRetrieveIfUserEnteredDecoupledTan(context: JobContext, tanChallenge: TanChallenge, tanResponse: TanResponse, parameters: DecoupledTanMethodParameters): BankResponse? {
         log.info { "automaticallyRetrieveIfUserEnteredDecoupledTan() called for $tanChallenge" }
+
+        delay(max(5, parameters.initialDelayInSecondsForStateRequest).seconds)
+
+        var iteration = 0
+        val minWaitTime = when {
+            parameters.maxNumberOfStateRequests <= 10 -> 30
+            parameters.maxNumberOfStateRequests <= 24 -> 10
+            else -> 3
+        }
+        val delayForNextStateRequest = max(minWaitTime, parameters.delayInSecondsForNextStateRequest).seconds
+
+        while (iteration < parameters.maxNumberOfStateRequests) {
+            try {
+                val message = messageBuilder.createDecoupledTanStatusMessage(context, tanResponse)
+
+                val response = getAndHandleResponseForMessage(context, message)
+
+                val tanFeedbacks = response.segmentFeedbacks.filter { it.referenceSegmentNumber == MessageBuilder.SignedMessagePayloadFirstSegmentNumber }
+                if (tanFeedbacks.isNotEmpty()) {
+                    // new feedback code for Decoupled TAN: 0900 Sicherheitsfreigabe gültig
+                    val isTanApproved = tanFeedbacks.any { it.feedbacks.any { it.responseCode == 900 } }
+                    if (isTanApproved) {
+                        return response
+                    }
+                }
+
+                iteration++
+                // sometimes delayInSecondsForNextStateRequests is only 1 or 2 seconds, that's too fast i think
+                delay(delayForNextStateRequest)
+            } catch (e: Throwable) {
+                log.error(e) { "Could not check status of Decoupled TAN" }
+
+                return null
+            }
+        }
+
+        return null
     }
 
     protected open suspend fun handleEnterTanResult(context: JobContext, enteredTanResult: EnterTanResult, tanResponse: TanResponse,
@@ -430,19 +476,18 @@ open class FinTsJobExecutor(
 
         if (enteredTanResult.changeTanMethodTo != null) {
             return handleUserAsksToChangeTanMethodAndResendLastMessage(context, enteredTanResult.changeTanMethodTo)
-        }
-        else if (enteredTanResult.changeTanMediumTo is TanGeneratorTanMedium) {
+        } else if (enteredTanResult.changeTanMediumTo is TanGeneratorTanMedium) {
             return handleUserAsksToChangeTanMediumAndResendLastMessage(context, enteredTanResult.changeTanMediumTo,
                 enteredTanResult.changeTanMediumResultCallback)
-        }
-        else if (enteredTanResult.enteredTan == null) {
+        } else if (enteredTanResult.userApprovedDecoupledTan == true && enteredTanResult.responseAfterApprovingDecoupledTan != null) {
+            return enteredTanResult.responseAfterApprovingDecoupledTan
+        } else if (enteredTanResult.enteredTan == null) {
             // i tried to send a HKTAN with cancelJob = true but then i saw there are no tan methods that support cancellation (at least not at my bank)
             // but it's not required anyway, tan times out after some time. Simply don't respond anything and close dialog
             response.tanRequiredButUserDidNotEnterOne = true
 
             return response
-        }
-        else {
+        } else {
             return sendTanToBank(context, enteredTanResult.enteredTan, tanResponse)
         }
     }

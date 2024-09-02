@@ -19,16 +19,17 @@ open class ZweiSchrittTanEinreichung(
     jobReference: String? = null,
     furtherTanFollows: Boolean? = false,
     cancelJob: Boolean? = null,
-    tanMediaIdentifier: String? = null
+    tanMediaIdentifier: String? = null,
+    segmentVersion: Int = 6
 
 ) : Segment(listOf(
-        Segmentkopf(CustomerSegmentId.Tan, 6, segmentNumber),
+        Segmentkopf(CustomerSegmentId.Tan, segmentVersion, segmentNumber),
         TANProzessDatenelement(process),
         Segmentkennung(segmentIdForWhichTanShouldGetGenerated?.id ?: ""), // M: bei TAN-Prozess=1. M: bei TAN-Prozess=4 und starker Authentifizierung. N: sonst
         NotAllowedDatenelement(), // Kontoverbindung // M: bei TAN-Prozess=1 und "Auftraggeberkonto erforderlich"=2 und Kontoverbindung im Auftrag enthalten. N: sonst
         AuftragsHashwert(jobHashValue ?: "", Existenzstatus.NotAllowed), // M: bei AuftragsHashwertverfahren<>0 und TAN-Prozess=1. N: sonst
-        Auftragsreferenz(jobReference ?: "", Existenzstatus.Mandatory), // M: bei TAN-Prozess=2, 3, 4. O: bei TAN-Prozess=1
-        JaNein(furtherTanFollows, if (process == TanProcess.TanProcess1 || process == TanProcess.TanProcess2) Existenzstatus.Mandatory else Existenzstatus.NotAllowed), // M: bei TAN-Prozess=1, 2. N: bei TAN-Prozess=3, 4
+        Auftragsreferenz(jobReference ?: "", if (process == TanProcess.TanProcess2 || process == TanProcess.TanProcess3 || process == TanProcess.AppTan) Existenzstatus.Mandatory else Existenzstatus.Optional), // M: bei TAN-Prozess=2, 3, 4. O: bei TAN-Prozess=1
+        JaNein(furtherTanFollows, if (process == TanProcess.TanProcess1 || process == TanProcess.TanProcess2 || process == TanProcess.AppTan) Existenzstatus.Mandatory else Existenzstatus.NotAllowed), // M: bei TAN-Prozess=1, 2. N: bei TAN-Prozess=3, 4
         JaNein(cancelJob, if (process == TanProcess.TanProcess2 && cancelJob != null) Existenzstatus.Optional else Existenzstatus.NotAllowed), // O: bei TAN-Prozess=2 und „Auftragsstorno erlaubt“=J. N: sonst
         NotAllowedDatenelement(), // TODO: SMS-Abbuchungskonto // M: Bei TAN-Process=1, 3, 4 und „SMS-Abbuchungskonto erforderlich“=2. O: sonst
         NotAllowedDatenelement(), // TODO: Challenge-Klasse // M: bei TAN-Prozess=1 und „Challenge-Klasse erforderlich“=J. N: sonst

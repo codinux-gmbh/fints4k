@@ -41,7 +41,7 @@ open class MessageBuilder(protected val utils: FinTsUtils = FinTsUtils()) {
 
         private const val SignatureHeaderSegmentNumber = MessageHeaderSegmentNumber + 1
 
-        private const val SignedMessagePayloadFirstSegmentNumber = SignatureHeaderSegmentNumber + 1
+        const val SignedMessagePayloadFirstSegmentNumber = SignatureHeaderSegmentNumber + 1
     }
 
 
@@ -295,10 +295,20 @@ open class MessageBuilder(protected val utils: FinTsUtils = FinTsUtils()) {
 
         val segments = listOf(
             ZweiSchrittTanEinreichung(SignedMessagePayloadFirstSegmentNumber, tanProcess, null,
-                tanResponse.jobHashValue, tanResponse.jobReference, false, null, tanResponse.tanMediaIdentifier)
+                tanResponse.jobHashValue, tanResponse.jobReference, false, null, tanResponse.tanMediaIdentifier, tanResponse.segmentVersion)
         )
 
         return createSignedMessageBuilderResult(context, MessageType.Tan, createSignedMessage(context, enteredTan, segments), segments)
+    }
+
+    open fun createDecoupledTanStatusMessage(context: JobContext, tanResponse: TanResponse): MessageBuilderResult {
+
+        val segments = listOf(
+            ZweiSchrittTanEinreichung(SignedMessagePayloadFirstSegmentNumber, TanProcess.AppTan,
+                jobReference = tanResponse.jobReference, furtherTanFollows = false, segmentVersion = 7, tanMediaIdentifier = tanResponse.tanMediaIdentifier)
+        )
+
+        return createSignedMessageBuilderResult(context, MessageType.CheckDecoupledTanStatus, createSignedMessage(context, null, segments), segments)
     }
 
 
@@ -521,8 +531,10 @@ open class MessageBuilder(protected val utils: FinTsUtils = FinTsUtils()) {
     }
 
     protected open fun createTwoStepTanSegment(context: JobContext, segmentId: CustomerSegmentId, segmentNumber: Int): ZweiSchrittTanEinreichung {
+        val bank = context.bank
+
         return ZweiSchrittTanEinreichung(segmentNumber, TanProcess.TanProcess4, segmentId,
-            tanMediaIdentifier = getTanMediaIdentifierIfRequired(context))
+            tanMediaIdentifier = getTanMediaIdentifierIfRequired(context), segmentVersion = bank.selectedTanMethod.hktanVersion)
     }
 
     protected open fun getTanMediaIdentifierIfRequired(context: JobContext): String? {

@@ -799,6 +799,26 @@ class ResponseParserTest : FinTsTestBase() {
         ?: run { fail("No segment of type TanInfo found in ${result.receivedSegments}") }
     }
 
+    @Test
+    fun parseTanInfo7_DecoupledTanMethod() {
+
+        // when
+        val result = underTest.parse("HITANS:50:7:4+1+1+1+N:N:0:946:2:DECOUPLED:Decoupled::SecureGo plus (Direktfreigabe):::TAN:2048:J:1:N:0:2:N:J:00:0:N:1:150:2:2:J:J'")
+
+        // then
+        assertSuccessfullyParsedSegment(result, InstituteSegmentId.TanInfo, 50, 7, 4)
+
+        result.getFirstSegmentById<TanInfo>(InstituteSegmentId.TanInfo)?.let { segment ->
+            val tanMethodParameters = segment.tanProcedureParameters.methodParameters
+            assertSize(1, tanMethodParameters)
+
+            assertTanMethodParameter(tanMethodParameters, 0, Sicherheitsfunktion.PIN_TAN_946, DkTanMethod.Decoupled, "SecureGo plus (Direktfreigabe)")
+
+            assertEquals("DECOUPLED", tanMethodParameters[0].technicalTanMethodIdentification)
+        }
+            ?: run { fail("No segment of type TanInfo found in ${result.receivedSegments}") }
+    }
+
     private fun assertTanMethodParameter(parsedTanMethodParameters: List<TanMethodParameters>, index: Int, securityFunction: Sicherheitsfunktion,
                                          tanMethod: DkTanMethod?, methodName: String) {
 

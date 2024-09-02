@@ -50,6 +50,11 @@ enum class TanProcess(override val code: String) : ICodeEnum {
      */
     TanProcess4("4"),
 
-    AppTan("S") // TODO: what is this?
+    /**
+     * kann nur nach dem ersten Schritt auftreten. Er dient im DecoupledVerfahren der Statusabfrage der vom Kunden zu
+     * tätigenden Sicherheitsfreigabe auf einem anderen Gerät mittels HKTAN. Dieser Geschäftsvorfall wird mit HITAN,
+     * TAN-Prozess=S beantwortet.
+     */
+    AppTan("S")
 
 }

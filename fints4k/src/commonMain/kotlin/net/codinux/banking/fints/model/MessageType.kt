@@ -15,6 +15,8 @@ enum class MessageType {
 
     SynchronizeCustomerSystemId,
 
+    CheckDecoupledTanStatus,
+
     Tan,
 
     GetBalance,

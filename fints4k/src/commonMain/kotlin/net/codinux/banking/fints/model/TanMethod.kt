@@ -14,6 +14,7 @@ open class TanMethod(
     open val maxTanInputLength: Int? = null,
     open val allowedTanFormat: AllowedTanFormat? = null,
     open val nameOfTanMediumRequired: Boolean = false,
+    open val hktanVersion: Int = 6,
     open val decoupledParameters: DecoupledTanMethodParameters? = null
 ) {
 

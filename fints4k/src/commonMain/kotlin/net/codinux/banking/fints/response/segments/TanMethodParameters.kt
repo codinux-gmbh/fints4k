@@ -27,10 +27,10 @@ open class TanMethodParameters(
     val hhdUcResponseRequired: Boolean, // TODO: wird hierueber gesteuert ob eine TAN eingegeben werden muss (z. B. beim EasyTAN Verfahren muss ja keine eingegeben werden)
     val countSupportedActiveTanMedia: Int?,
     val maxNumberOfStateRequestsForDecoupled: Int? = null,
-    val initialDelayInSecondsForStateRequestsForDecoupled: Int? = null,
-    val delayInSecondsForNextStateRequestsForDecoupled: Int? = null,
+    val initialDelayInSecondsForDecoupledStateRequest: Int? = null,
+    val delayInSecondsForNextDecoupledStateRequests: Int? = null,
     val manualConfirmationAllowedForDecoupled: Boolean? = null,
-    val periodicStateRequestsAllowedForDecoupled: Boolean? = null
+    val periodicDecoupledStateRequestsAllowed: Boolean? = null
 ) {
 
 

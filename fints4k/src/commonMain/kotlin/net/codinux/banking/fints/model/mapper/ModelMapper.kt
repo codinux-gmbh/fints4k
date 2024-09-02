@@ -176,11 +176,11 @@ open class ModelMapper(
 
     protected open fun mapToTanMethods(tanInfo: TanInfo): List<TanMethod> {
         return tanInfo.tanProcedureParameters.methodParameters.mapNotNull {
-            mapToTanMethod(it)
+            mapToTanMethod(it, tanInfo.segmentVersion)
         }
     }
 
-    protected open fun mapToTanMethod(parameters: TanMethodParameters): TanMethod? {
+    protected open fun mapToTanMethod(parameters: TanMethodParameters, hktanVersion: Int): TanMethod? {
         val methodName = parameters.methodName
 
         // we filter out iTAN and Einschritt-Verfahren as they are not permitted anymore according to PSD2
@@ -192,7 +192,7 @@ open class ModelMapper(
             mapToTanMethodType(parameters) ?: TanMethodType.EnterTan, mapHhdVersion(parameters),
             parameters.maxTanInputLength, parameters.allowedTanFormat,
             parameters.nameOfTanMediumRequired == BezeichnungDesTanMediumsErforderlich.BezeichnungDesTanMediumsMussAngegebenWerden,
-            mapDecoupledTanMethodParameters(parameters))
+            hktanVersion, mapDecoupledTanMethodParameters(parameters))
     }
 
     protected open fun mapToTanMethodType(parameters: TanMethodParameters): TanMethodType? {
@@ -276,10 +276,10 @@ open class ModelMapper(
         parameters.manualConfirmationAllowedForDecoupled?.let { manualConfirmationAllowed ->
             return DecoupledTanMethodParameters(
                 manualConfirmationAllowed,
-                parameters.periodicStateRequestsAllowedForDecoupled ?: false, // this and the following values are all set when manualConfirmationAllowedForDecoupled is set
+                parameters.periodicDecoupledStateRequestsAllowed ?: false, // this and the following values are all set when manualConfirmationAllowedForDecoupled is set
                 parameters.maxNumberOfStateRequestsForDecoupled ?: 0,
-                parameters.initialDelayInSecondsForStateRequestsForDecoupled ?: Int.MAX_VALUE,
-                parameters.delayInSecondsForNextStateRequestsForDecoupled ?: Int.MAX_VALUE
+                parameters.initialDelayInSecondsForDecoupledStateRequest ?: Int.MAX_VALUE,
+                parameters.delayInSecondsForNextDecoupledStateRequests ?: Int.MAX_VALUE
             )
         }
 
