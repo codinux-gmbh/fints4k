@@ -230,6 +230,10 @@ open class ModelMapper(
 
             tanMethodNameContains(name, "SMS", "mobile", "mTAN") -> TanMethodType.SmsTan
 
+            parameters.dkTanMethod == DkTanMethod.Decoupled -> TanMethodType.DecoupledTan
+
+            parameters.dkTanMethod == DkTanMethod.DecoupledPush -> TanMethodType.DecoupledPushTan
+
             // 'flateXSecure' identifies itself as 'PPTAN' instead of 'AppTAN'
             // 'activeTAN-Verfahren' can actually be used either with an app or a reader; it's like chipTAN QR but without a chip card
             parameters.dkTanMethod == DkTanMethod.App

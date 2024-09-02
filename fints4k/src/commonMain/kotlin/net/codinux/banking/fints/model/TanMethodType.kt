@@ -19,6 +19,10 @@ enum class TanMethodType {
 
     AppTan,
 
+    DecoupledTan,
+
+    DecoupledPushTan,
+
     photoTan,
 
     QrCode

@@ -8,7 +8,7 @@ open class TanMethodSelector {
 
   companion object {
 
-    val NonVisual = listOf(TanMethodType.AppTan, TanMethodType.SmsTan, TanMethodType.ChipTanManuell, TanMethodType.EnterTan)
+    val NonVisual = listOf(TanMethodType.DecoupledTan, TanMethodType.DecoupledPushTan, TanMethodType.AppTan, TanMethodType.SmsTan, TanMethodType.ChipTanManuell, TanMethodType.EnterTan)
 
     val ImageBased = listOf(TanMethodType.QrCode, TanMethodType.ChipTanQrCode, TanMethodType.photoTan, TanMethodType.ChipTanPhotoTanMatrixCode)
 
@@ -16,7 +16,7 @@ open class TanMethodSelector {
 
 
   open fun getSuggestedTanMethod(tanMethods: List<TanMethod>): TanMethod? {
-    return tanMethods.firstOrNull { it.decoupledParameters != null } // decoupled TAN method is the most simplistic TAN method, user only has to confirm the action in her TAN app, no manual TAN entering required
+    return tanMethods.firstOrNull { it.type == TanMethodType.DecoupledPushTan || it.type == TanMethodType.DecoupledTan } // decoupled TAN method is the most simplistic TAN method, user only has to confirm the action in her TAN app, no manual TAN entering required
       ?: tanMethods.firstOrNull { it.type == TanMethodType.AppTan } // that's the second most simplistic TAN method: user has to confirm action in her TAN app and then enter the displayed TAN
       ?: tanMethods.firstOrNull { it.type != TanMethodType.ChipTanUsb && it.type != TanMethodType.SmsTan && it.type != TanMethodType.ChipTanManuell }
       ?: tanMethods.firstOrNull { it.type != TanMethodType.ChipTanUsb && it.type != TanMethodType.SmsTan }

@@ -941,10 +941,10 @@ class ResponseParserTest : FinTsTestBase() {
             assertEquals(2, decoupledPushTanMethod.countSupportedActiveTanMedia)
 
             assertEquals(180, decoupledPushTanMethod.maxNumberOfStateRequestsForDecoupled)
-            assertEquals(1, decoupledPushTanMethod.initialDelayInSecondsForStateRequestsForDecoupled)
-            assertEquals(1, decoupledPushTanMethod.delayInSecondsForNextStateRequestsForDecoupled)
+            assertEquals(1, decoupledPushTanMethod.initialDelayInSecondsForDecoupledStateRequest)
+            assertEquals(1, decoupledPushTanMethod.delayInSecondsForNextDecoupledStateRequests)
             assertEquals(true, decoupledPushTanMethod.manualConfirmationAllowedForDecoupled)
-            assertEquals(true, decoupledPushTanMethod.periodicStateRequestsAllowedForDecoupled)
+            assertEquals(true, decoupledPushTanMethod.periodicDecoupledStateRequestsAllowed)
         }
         ?: run { fail("No segment of type TanInfo found in ${result.receivedSegments}") }
     }
