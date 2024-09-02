@@ -37,8 +37,9 @@ open class ModelMapper(
             bank.pinInfo = pinInfo
         }
 
-        response.getFirstSegmentById<TanInfo>(InstituteSegmentId.TanInfo)?.let { tanInfo ->
-            bank.tanMethodsSupportedByBank = mapToTanMethods(tanInfo)
+        val tanInfos = response.getSegmentsById<TanInfo>(InstituteSegmentId.TanInfo)
+        if (tanInfos.isNotEmpty()) {
+            bank.tanMethodsSupportedByBank = tanInfos.flatMap { tanInfo -> mapToTanMethods(tanInfo) }
         }
 
         response.getFirstSegmentById<CommunicationInfo>(InstituteSegmentId.CommunicationInfo)?.let { communicationInfo ->
