@@ -452,7 +452,8 @@ open class FinTsJobExecutor(
                 val tanFeedbacks = response.segmentFeedbacks.filter { it.referenceSegmentNumber == MessageBuilder.SignedMessagePayloadFirstSegmentNumber }
                 if (tanFeedbacks.isNotEmpty()) {
                     // new feedback code for Decoupled TAN: 0900 Sicherheitsfreigabe gültig
-                    val isTanApproved = tanFeedbacks.any { it.feedbacks.any { it.responseCode == 900 } }
+                    // Sparkasse responds for pushTan with: HIRMS:4:2:3+0020::Der Auftrag wurde ausgeführt.+0020::Die gebuchten Umsätze wurden übermittelt.'
+                    val isTanApproved = tanFeedbacks.any { it.feedbacks.any { it.responseCode == 900 || it.responseCode == 20 } }
                     if (isTanApproved) {
                         return response
                     }
