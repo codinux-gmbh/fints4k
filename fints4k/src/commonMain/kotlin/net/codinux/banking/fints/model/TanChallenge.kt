@@ -21,6 +21,8 @@ open class TanChallenge(
     open val isEnteringTanDone: Boolean
         get() = enterTanResult != null
 
+    private val userApprovedDecoupledTanCallbacks = mutableListOf<() -> Unit>()
+
 
     fun userEnteredTan(enteredTan: String) {
         this.enterTanResult = EnterTanResult(enteredTan.replace(" ", ""))
@@ -28,6 +30,9 @@ open class TanChallenge(
 
     internal fun userApprovedDecoupledTan(responseAfterApprovingDecoupledTan: BankResponse) {
         this.enterTanResult = EnterTanResult(null, true, responseAfterApprovingDecoupledTan)
+
+        userApprovedDecoupledTanCallbacks.forEach { it.invoke() }
+        userApprovedDecoupledTanCallbacks.clear()
     }
 
     fun userDidNotEnterTan() {
@@ -40,6 +45,15 @@ open class TanChallenge(
 
     fun userAsksToChangeTanMedium(changeTanMediumTo: TanMedium, changeTanMediumResultCallback: ((FinTsClientResponse) -> Unit)?) {
         this.enterTanResult = EnterTanResult(null, changeTanMediumTo = changeTanMediumTo, changeTanMediumResultCallback = changeTanMediumResultCallback)
+    }
+
+
+    fun addUserApprovedDecoupledTanCallback(callback: () -> Unit) {
+        if (isEnteringTanDone == false) {
+            this.userApprovedDecoupledTanCallbacks.add(callback)
+        } else if (enterTanResult != null && enterTanResult!!.userApprovedDecoupledTan == true) {
+            callback()
+        }
     }
 
 
