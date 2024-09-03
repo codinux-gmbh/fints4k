@@ -9,7 +9,7 @@ fun LocalDateTime.Companion.nowAtUtc(): LocalDateTime {
 }
 
 fun LocalDateTime.Companion.nowAtEuropeBerlin(): LocalDateTime {
-  return nowAt(TimeZone.europeBerlin)
+  return nowAt(TimeZone.EuropeBerlin)
 }
 
 fun LocalDateTime.Companion.nowAt(timeZone: TimeZone): LocalDateTime {

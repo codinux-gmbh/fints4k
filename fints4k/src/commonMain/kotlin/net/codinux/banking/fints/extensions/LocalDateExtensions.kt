@@ -12,7 +12,7 @@ fun LocalDate.Companion.todayAtSystemDefaultTimeZone(): LocalDate {
 }
 
 fun LocalDate.Companion.todayAtEuropeBerlin(): LocalDate {
-  return nowAt(TimeZone.europeBerlin)
+  return nowAt(TimeZone.EuropeBerlin)
 }
 
 @JsName("nowAtForDate")
