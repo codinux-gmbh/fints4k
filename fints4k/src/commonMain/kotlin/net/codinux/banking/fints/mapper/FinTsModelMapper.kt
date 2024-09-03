@@ -1,7 +1,10 @@
 package net.codinux.banking.fints.mapper
 
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atTime
+import kotlinx.datetime.toInstant
+import net.codinux.banking.fints.extensions.EuropeBerlin
 import net.dankito.banking.client.model.*
 import net.dankito.banking.client.model.AccountTransaction
 import net.dankito.banking.client.model.parameter.FinTsClientParameter
@@ -86,7 +89,8 @@ open class FinTsModelMapper {
           bankAccount.retrievedTransactionsFrom = accountTransactionsResponse.retrievedTransactionsFrom
         }
 
-        val retrievalTime = if (retrieveTransactionsTo == null) accountTransactionsResponse.retrievalTime else retrieveTransactionsTo.atTime(0, 0)
+        val retrievalTime = if (retrieveTransactionsTo == null) accountTransactionsResponse.retrievalTime
+                            else retrieveTransactionsTo.atTime(0, 0).toInstant(TimeZone.EuropeBerlin)
         if (bankAccount.lastTransactionsRetrievalTime == null || bankAccount.lastTransactionsRetrievalTime!! <= retrievalTime) { // if retrieveTransactionsTo is set it may is older than current account's lastTransactionsRetrievalTime
           bankAccount.lastTransactionsRetrievalTime = retrievalTime
         }

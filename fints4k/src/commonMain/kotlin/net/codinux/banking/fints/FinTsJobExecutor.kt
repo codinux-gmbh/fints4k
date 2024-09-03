@@ -1,8 +1,8 @@
 package net.codinux.banking.fints
 
 import kotlinx.coroutines.delay
+import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.LocalDateTime
 import net.codinux.log.logger
 import net.codinux.banking.fints.messages.MessageBuilder
 import net.codinux.banking.fints.messages.MessageBuilderResult
@@ -20,7 +20,6 @@ import net.codinux.banking.fints.tan.FlickerCodeDecoder
 import net.codinux.banking.fints.tan.TanImageDecoder
 import net.codinux.banking.fints.util.TanMethodSelector
 import net.codinux.banking.fints.extensions.minusDays
-import net.codinux.banking.fints.extensions.nowAtEuropeBerlin
 import net.codinux.banking.fints.extensions.todayAtEuropeBerlin
 import net.codinux.banking.fints.extensions.todayAtSystemDefaultTimeZone
 import kotlin.math.max
@@ -232,7 +231,7 @@ open class FinTsJobExecutor(
             }
         }
 
-        val startTime = LocalDateTime.nowAtEuropeBerlin()
+        val startTime = Clock.System.now()
 
         val response = getAndHandleResponseForMessage(context, message)
 
