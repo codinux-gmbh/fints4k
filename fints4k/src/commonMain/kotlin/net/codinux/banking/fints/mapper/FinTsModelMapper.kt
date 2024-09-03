@@ -77,12 +77,20 @@ open class FinTsModelMapper {
 
     customerAccount.accounts.forEach { bankAccount ->
       retrievedData.firstOrNull { it.account.accountIdentifier == bankAccount.identifier }?.let { accountTransactionsResponse ->
-        bankAccount.balance = accountTransactionsResponse.balance ?: Money.Zero
-        bankAccount.retrievedTransactionsFrom = accountTransactionsResponse.retrievedTransactionsFrom
+        accountTransactionsResponse.balance?.let { balance ->
+          bankAccount.balance = balance
+        }
+
+        if (accountTransactionsResponse.retrievedTransactionsFrom != null && (bankAccount.retrievedTransactionsFrom == null ||
+                  accountTransactionsResponse.retrievedTransactionsFrom!! < bankAccount.retrievedTransactionsFrom!!)) {
+          bankAccount.retrievedTransactionsFrom = accountTransactionsResponse.retrievedTransactionsFrom
+        }
+
         val retrievalTime = if (retrieveTransactionsTo == null) accountTransactionsResponse.retrievalTime else retrieveTransactionsTo.atTime(0, 0)
         if (bankAccount.lastTransactionRetrievalTime == null || bankAccount.lastTransactionRetrievalTime!! <= retrievalTime) { // if retrieveTransactionsTo is set it may is older than current account's lastTransactionRetrievalTime
           bankAccount.lastTransactionRetrievalTime = retrievalTime
         }
+
         bankAccount.bookedTransactions = map(accountTransactionsResponse)
       }
     }
