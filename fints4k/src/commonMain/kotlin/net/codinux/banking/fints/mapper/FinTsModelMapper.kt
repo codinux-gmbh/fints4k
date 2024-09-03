@@ -87,8 +87,8 @@ open class FinTsModelMapper {
         }
 
         val retrievalTime = if (retrieveTransactionsTo == null) accountTransactionsResponse.retrievalTime else retrieveTransactionsTo.atTime(0, 0)
-        if (bankAccount.lastTransactionRetrievalTime == null || bankAccount.lastTransactionRetrievalTime!! <= retrievalTime) { // if retrieveTransactionsTo is set it may is older than current account's lastTransactionRetrievalTime
-          bankAccount.lastTransactionRetrievalTime = retrievalTime
+        if (bankAccount.lastTransactionsRetrievalTime == null || bankAccount.lastTransactionsRetrievalTime!! <= retrievalTime) { // if retrieveTransactionsTo is set it may is older than current account's lastTransactionsRetrievalTime
+          bankAccount.lastTransactionsRetrievalTime = retrievalTime
         }
 
         bankAccount.bookedTransactions = map(accountTransactionsResponse)

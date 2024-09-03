@@ -36,7 +36,7 @@ open class BankAccount(
 
     open var retrievedTransactionsFrom: LocalDate? = null
 
-    open var lastTransactionRetrievalTime: LocalDateTime? = null
+    open var lastTransactionsRetrievalTime: LocalDateTime? = null
 
     open var bookedTransactions: List<AccountTransaction> = listOf()
 
