@@ -91,7 +91,11 @@ open class FinTsModelMapper {
           bankAccount.lastTransactionsRetrievalTime = retrievalTime
         }
 
-        bankAccount.bookedTransactions = map(accountTransactionsResponse)
+        if (accountTransactionsResponse.bookedTransactions.isNotEmpty()) {
+          bankAccount.bookedTransactions = bankAccount.bookedTransactions.toMutableList().apply {
+            addAll(map(accountTransactionsResponse))
+          }
+        }
       }
     }
 
