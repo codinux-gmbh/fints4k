@@ -29,6 +29,10 @@ open class AccountTransaction(
      * Buchungstext, z. B. DAUERAUFTRAG, BARGELDAUSZAHLUNG, ONLINE-UEBERWEISUNG, FOLGELASTSCHRIFT, ...
      */
     val postingText: String?,
+
+    val openingBalance: Money?,
+    val closingBalance: Money?,
+
     /**
      * Auszugsnummer
      */
@@ -37,9 +41,6 @@ open class AccountTransaction(
      * Blattnummer
      */
     val sheetNumber: Int?,
-
-    val openingBalance: Money?,
-    val closingBalance: Money?,
 
     /**
      * Kundenreferenz.
@@ -115,7 +116,7 @@ open class AccountTransaction(
 
     constructor(account: AccountData, amount: Money, unparsedReference: String, bookingDate: LocalDate, valueDate: LocalDate, otherPartyName: String?, otherPartyBankCode: String?, otherPartyAccountId: String?, postingText: String? = null)
         : this(account, amount, unparsedReference, bookingDate, valueDate, otherPartyName, otherPartyBankCode, otherPartyAccountId, postingText,
-        0, null, null, null,
+        null, null, 0, null,
         null, null, null, null, null, null, null, null, null, null, null,
         "", null, null, "", null, false)
 

@@ -60,11 +60,12 @@ open class Mt940AccountTransactionsParser(
             transaction.information?.otherPartyAccountId,
 
             transaction.information?.postingText,
-            statement.statementNumber,
-            statement.sheetNumber,
 
             Money(mapAmount(statement.openingBalance), currency),
             Money(mapAmount(statement.closingBalance), currency),
+
+            statement.statementNumber,
+            statement.sheetNumber,
 
             // :60: customer reference: Wenn „KREF+“ eingestellt ist, dann erfolgt die Angabe der Referenznummer in Tag :86: .
             transaction.information?.customerReference ?: transaction.statementLine.customerReference,

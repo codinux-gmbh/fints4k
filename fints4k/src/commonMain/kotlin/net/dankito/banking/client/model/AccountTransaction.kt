@@ -20,11 +20,12 @@ open class AccountTransaction(
     val otherPartyAccountId: String?,
 
     val postingText: String?,
-    val statementNumber: Int,
-    val sheetNumber: Int?,
 
     val openingBalance: Money?,
     val closingBalance: Money?,
+
+    val statementNumber: Int,
+    val sheetNumber: Int?,
 
     val customerReference: String?,
     val bankReference: String?,
@@ -51,7 +52,7 @@ open class AccountTransaction(
 
     constructor(amount: Money, unparsedReference: String, bookingDate: LocalDate, valueDate: LocalDate, otherPartyName: String?, otherPartyBankCode: String?, otherPartyAccountId: String?, postingText: String?)
         : this(amount, unparsedReference, bookingDate, valueDate, otherPartyName, otherPartyBankCode, otherPartyAccountId, postingText,
-        0, null, null, null,
+        null, null, 0, null,
         null, null, null, null, null, null, null, null, null, null, null,  null,
         null, null, null, null)
 

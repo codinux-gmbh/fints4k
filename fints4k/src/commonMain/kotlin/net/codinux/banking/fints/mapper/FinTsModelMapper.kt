@@ -116,8 +116,11 @@ open class FinTsModelMapper {
       transaction.bookingDate, transaction.valueDate,
       transaction.otherPartyName, transaction.otherPartyBankCode, transaction.otherPartyAccountId,
 
-      transaction.postingText, transaction.statementNumber, transaction.sheetNumber,
+      transaction.postingText,
+
       transaction.openingBalance, transaction.closingBalance,
+
+      transaction.statementNumber, transaction.sheetNumber,
 
       transaction.customerReference, transaction.bankReference, transaction.furtherInformation,
 
