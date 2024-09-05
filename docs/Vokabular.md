@@ -1,0 +1,26 @@
+|                                                                                      |                                                                                                                   |
+|--------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------|
+| Geschäftsvorfall                                                                     | Business Transaction / Job                                                                                        |
+| Verwendungszweck                                                                     | Remittance information, reference, (payment) purpose                                                              |
+| Überweisung                                                                          | Remittance (techn.), money transfer, bank transfer, wire transfer (Amerik.), credit transfer                      |
+| Buchungsschlüssel                                                                    | posting key                                                                                                       |
+| Buchungstext                                                                         | posting text                                                                                                      |
+|                                                                                      |                                                                                                                   |
+| Ende-zu-Ende Referenz                                                                | End to End Reference                                                                                              |
+| Kundenreferenz                                                                       | Reference of the submitting customer                                                                              |
+| Mandatsreferenz                                                                      | mandate reference                                                                                                 |
+| Creditor Identifier                                                                  | Creditor Identifier                                                                                               |
+| Originators Identification Code                                                      | Originators Identification Code                                                                                   |
+| Compensation Amount                                                                  | Compensation Amount                                                                                               |
+| Original Amount                                                                      | Original Amount                                                                                                   |
+| Abweichender Überweisender (CT-AT08) / Abweichender Zahlungsempfänger (DD-AT38)      | payer’s/debtor’s reference party (for credit transfer / payee’s / creditor’s reference party (for a direct debit) |
+| Abweichender Zahlungsempfänger (CT-AT28) / Abweichender Zahlungspflichtiger (DDAT15) | payee’s/creditor’s reference party / payer’s/debtor’s reference party                                             |
+|                                                                                      |                                                                                                                   |
+| Überweisender                                                                        | Payer, debtor                                                                                                     |
+| Zahlungsempfänger                                                                    | Payee, creditor                                                                                                   |
+| Zahlungseingang                                                                      | Payment receipt                                                                                                   |
+| Lastschrift                                                                          | direct debit                                                                                                      |
+|                                                                                      |                                                                                                                   |
+|                                                                                      |                                                                                                                   |
+| Primanoten-Nr.                                                                       | Journal no.                                                                                                       |
+|                                                                                      |                                                                                                                   |

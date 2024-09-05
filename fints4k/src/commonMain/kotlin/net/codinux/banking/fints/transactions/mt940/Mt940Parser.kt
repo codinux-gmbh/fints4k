@@ -269,10 +269,10 @@ open class Mt940Parser(
          */
         val transactionType = fieldValue.substring(amountEndIndex, amountEndIndex + 1) // transaction type is 'N', 'S' or 'F'
 
-        val bookingKeyStart = amountEndIndex + 1
-        val bookingKey = fieldValue.substring(bookingKeyStart, bookingKeyStart + 3) // TODO: parse codes, p. 178
+        val postingKeyStart = amountEndIndex + 1
+        val postingKey = fieldValue.substring(postingKeyStart, postingKeyStart + 3) // TODO: parse codes, p. 178
 
-        val customerAndBankReference = fieldValue.substring(bookingKeyStart + 3).split("//")
+        val customerAndBankReference = fieldValue.substring(postingKeyStart + 3).split("//")
         val customerReference = customerAndBankReference[0]
 
         /**
@@ -282,17 +282,17 @@ open class Mt940Parser(
          * the case, Reference of the Account Servicing Institution, subfield 8 may be omitted.
          */
         var bankReference = if (customerAndBankReference.size > 1) customerAndBankReference[1] else customerReference // TODO: or use null?
-        var supplementaryDetails: String? = null
+        var furtherInformation: String? = null
 
         val bankReferenceAndSupplementaryDetails = bankReference.split("\n")
         if (bankReferenceAndSupplementaryDetails.size > 1) {
             bankReference = bankReferenceAndSupplementaryDetails[0].trim()
             // TODO: parse /OCMT/ and /CHGS/, see page 518
-            supplementaryDetails = bankReferenceAndSupplementaryDetails[1].trim()
+            furtherInformation = bankReferenceAndSupplementaryDetails[1].trim()
         }
 
-        return StatementLine(!!!isDebit, isCancellation, valueDate, bookingDate, null, amount, bookingKey,
-            customerReference, bankReference, supplementaryDetails)
+        return StatementLine(!!!isDebit, isCancellation, valueDate, bookingDate, null, amount, postingKey,
+            customerReference, bankReference, furtherInformation)
     }
 
     protected open fun parseNullableInformationToAccountOwner(informationToAccountOwnerString: String): InformationToAccountOwner? {

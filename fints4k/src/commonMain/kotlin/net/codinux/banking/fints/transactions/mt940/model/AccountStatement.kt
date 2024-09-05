@@ -11,7 +11,7 @@ open class AccountStatement(
      *
      * Max length = 16
      */
-    val transactionReferenceNumber: String,
+    val orderReferenceNumber: String,
 
     /**
      * Bezugsreferenz oder „NONREF“.
@@ -20,7 +20,7 @@ open class AccountStatement(
      *
      * Max length = 16
      */
-    val relatedReferenceNumber: String?,
+    val referenceNumber: String?,
 
     /**
      * xxxxxxxxxxx/Konto-Nr. oder yyyyyyyy/Konto-Nr.
@@ -50,7 +50,7 @@ open class AccountStatement(
      *
      * Max length = 5
      */
-    val sequenceNumber: Int?,
+    val sheetNumber: Int?,
 
     val openingBalance: Balance,
 
@@ -72,7 +72,7 @@ open class AccountStatement(
      *
      * Max length = 65
      */
-    val multipurposeField: String? = null
+    val remittanceInformationField: String? = null
 
 ) {
 

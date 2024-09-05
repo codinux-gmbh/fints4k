@@ -42,26 +42,63 @@ open class StatementLine(
     val currencyType: String?,
 
     /**
-     * Codes see p. 177 bottom - 179
-     *
-     * After constant „N“
+     * in Kontowährung
      *
      * Max length = 15
      */
     val amount: Amount,
 
     /**
-     * in Kontowährung
+     * Codes see p. 177 bottom - 179
+     *
+     * After constant „N“
      *
      * Length = 3
      */
-    val bookingKey: String,
+    val postingKey: String,
 
-    val referenceForTheAccountOwner: String,
+    /**
+     * Kundenreferenz. Bei
+     * Nichtbelegung wird
+     * „NONREF“ eingestellt,
+     * zum Beispiel bei Schecknummer
+     * Wenn „KREF+“ eingestellt
+     * ist, dann erfolgt die
+     * Angabe der
+     * Referenznummer in Tag
+     * :86: .
+     */
+    val customerReference: String,
 
-    val referenceOfTheAccountServicingInstitution: String?,
+    /**
+     * Bankreferenz
+     */
+    val bankReference: String?,
 
-    val supplementaryDetails: String? = null
+    /**
+     * Währungsart und Umsatzbetrag in Ursprungswährung (original currency
+     * amount) in folgendem
+     * Format:
+     * /OCMT/3a..15d/
+     * sowie Währungsart und
+     * Gebührenbetrag
+     * (charges) in folgendem
+     * Format:
+     * /CHGS/3a..15d/
+     * 3a = 3-stelliger
+     * Währungscode gemäß
+     * ISO 4217
+     * ..15d = Betrag mit Komma
+     * als Dezimalzeichen (gemäß SWIFT-Konvention).
+     * Im Falle von SEPALastschriftrückgaben ist
+     * das Feld /OCMT/ mit dem
+     * Originalbetrag und das
+     * Feld /CHGS/ mit der
+     * Summe aus Entgelten
+     * sowie Zinsausgleich zu
+     * belegen.
+     */
+    val furtherInformationOriginalAmountAndCharges: String? = null
 
 ) {
 

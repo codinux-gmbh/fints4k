@@ -20,7 +20,7 @@ open class Balance(
     val isCredit: Boolean,
 
     /**
-     * JJMMTT = Buchungsdatum des Saldos oder '0' beim ersten Auszug
+     * JJMMTT = Buchungsdatum des Saldos oder '000000' beim ersten Auszug
      *
      * Max length = 6
      */
