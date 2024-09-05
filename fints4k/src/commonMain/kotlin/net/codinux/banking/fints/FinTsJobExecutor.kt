@@ -227,7 +227,7 @@ open class FinTsJobExecutor(
 
             response.getFirstSegmentById<ReceivedCreditCardTransactionsAndBalance>(InstituteSegmentId.CreditCardTransactions)?.let { creditCardTransactionsSegment ->
                 balance = Money(creditCardTransactionsSegment.balance.amount, creditCardTransactionsSegment.balance.currency ?: "EUR")
-                bookedTransactions.addAll(creditCardTransactionsSegment.transactions.map { AccountTransaction(parameter.account, it.amount, it.description, it.bookingDate, it.transactionDescriptionBase ?: "", null, null, "", it.valueDate) })
+                bookedTransactions.addAll(creditCardTransactionsSegment.transactions.map { AccountTransaction(parameter.account, it.amount, it.description, it.bookingDate, it.valueDate, it.transactionDescriptionBase ?: "", null, null) })
             }
         }
 

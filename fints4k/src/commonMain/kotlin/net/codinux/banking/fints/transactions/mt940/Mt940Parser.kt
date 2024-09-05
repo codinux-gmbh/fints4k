@@ -273,7 +273,7 @@ open class Mt940Parser(
         val postingKey = fieldValue.substring(postingKeyStart, postingKeyStart + 3) // TODO: parse codes, p. 178
 
         val customerAndBankReference = fieldValue.substring(postingKeyStart + 3).split("//")
-        val customerReference = customerAndBankReference[0]
+        val customerReference = customerAndBankReference[0].takeIf { it != "NONREF" }
 
         /**
          * The content of this subfield is the account servicing institution's own reference for the transaction.
@@ -281,14 +281,14 @@ open class Mt940Parser(
          * reference may be identical to subfield 7, Reference for the Account Owner. If this is
          * the case, Reference of the Account Servicing Institution, subfield 8 may be omitted.
          */
-        var bankReference = if (customerAndBankReference.size > 1) customerAndBankReference[1] else customerReference // TODO: or use null?
+        var bankReference = if (customerAndBankReference.size > 1) customerAndBankReference[1] else null
         var furtherInformation: String? = null
 
-        val bankReferenceAndSupplementaryDetails = bankReference.split("\n")
-        if (bankReferenceAndSupplementaryDetails.size > 1) {
-            bankReference = bankReferenceAndSupplementaryDetails[0].trim()
+        if (bankReference != null && bankReference.contains('\n')) {
+            val bankReferenceAndFurtherInformation = bankReference.split("\n")
+            bankReference = bankReferenceAndFurtherInformation[0].trim()
             // TODO: parse /OCMT/ and /CHGS/, see page 518
-            furtherInformation = bankReferenceAndSupplementaryDetails[1].trim()
+            furtherInformation = bankReferenceAndFurtherInformation[1].trim()
         }
 
         return StatementLine(!!!isDebit, isCancellation, valueDate, bookingDate, null, amount, postingKey,

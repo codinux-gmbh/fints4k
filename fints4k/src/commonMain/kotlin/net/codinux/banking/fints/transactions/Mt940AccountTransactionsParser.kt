@@ -44,24 +44,33 @@ open class Mt940AccountTransactionsParser(
     protected open fun mapToAccountTransaction(statement: AccountStatement, transaction: Transaction, account: AccountData): AccountTransaction {
         val currency = statement.closingBalance.currency
 
+        // may parse postingKey to postingText (Buchungstext) according to table in 8.2.3 Buchungsschlüssel (Feld 61), S. 654 ff.
+
         return AccountTransaction(
             account,
             Money(mapAmount(transaction.statementLine), currency),
-            transaction.statementLine.isReversal,
             transaction.information?.unparsedReference ?: "",
+
             transaction.statementLine.bookingDate ?: statement.closingBalance.bookingDate,
+            transaction.statementLine.valueDate,
+
             transaction.information?.otherPartyName,
             transaction.information?.otherPartyBankCode,
             transaction.information?.otherPartyAccountId,
+
             transaction.information?.postingText,
-            transaction.statementLine.valueDate,
             statement.statementNumber,
             statement.sheetNumber,
-            Money(mapAmount(statement.openingBalance), currency), // TODO: that's not true, these are the opening and closing balance of
-            Money(mapAmount(statement.closingBalance), currency), // all transactions of this day, not this specific transaction's ones
+
+            Money(mapAmount(statement.openingBalance), currency),
+            Money(mapAmount(statement.closingBalance), currency),
+
+            // :60: customer reference: Wenn „KREF+“ eingestellt ist, dann erfolgt die Angabe der Referenznummer in Tag :86: .
+            transaction.information?.customerReference ?: transaction.statementLine.customerReference,
+            transaction.statementLine.bankReference,
+            transaction.statementLine.furtherInformationOriginalAmountAndCharges,
 
             transaction.information?.endToEndReference,
-            transaction.information?.customerReference,
             transaction.information?.mandateReference,
             transaction.information?.creditorIdentifier,
             transaction.information?.originatorsIdentificationCode,
@@ -74,14 +83,10 @@ open class Mt940AccountTransactionsParser(
             transaction.information?.journalNumber,
             transaction.information?.textKeyAddition,
 
-            transaction.statementLine.currencyType,
-            transaction.statementLine.postingKey,
-            transaction.statementLine.customerReference,
-            transaction.statementLine.bankReference,
-            transaction.statementLine.furtherInformationOriginalAmountAndCharges,
-
             statement.orderReferenceNumber,
-            statement.referenceNumber
+            statement.referenceNumber,
+
+            transaction.statementLine.isReversal,
         )
     }
 

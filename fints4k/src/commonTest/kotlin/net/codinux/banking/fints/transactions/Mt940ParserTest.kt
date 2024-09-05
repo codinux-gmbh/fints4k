@@ -3,7 +3,7 @@ package net.codinux.banking.fints.transactions
 import net.codinux.banking.fints.FinTsTestBase
 import net.codinux.banking.fints.transactions.mt940.Mt940Parser
 import net.codinux.banking.fints.transactions.mt940.model.Balance
-import net.codinux.banking.fints.transactions.mt940.model.InformationToAccountOwner
+import net.codinux.banking.fints.transactions.mt940.model.RemittanceInformationField
 import net.codinux.banking.fints.transactions.mt940.model.StatementLine
 import kotlinx.datetime.LocalDate
 import net.codinux.banking.fints.extensions.*
@@ -90,7 +90,7 @@ class Mt940ParserTest : FinTsTestBase() {
         assertEquals(BankCode, statement.bankCodeBicOrIban)
         assertEquals(CustomerId, statement.accountIdentifier)
         assertEquals(0, statement.statementNumber)
-        assertNull(statement.sequenceNumber)
+        assertNull(statement.sheetNumber)
 
         assertBalance(statement.openingBalance, true, bookingDate, Amount("0,00"))
         assertBalance(statement.closingBalance, isCredit, bookingDate, amount)
@@ -306,7 +306,7 @@ class Mt940ParserTest : FinTsTestBase() {
         assertSize(1, result.first().transactions)
 
         result.first().transactions[0].information?.apply {
-            assertEquals("BASISLASTSCHRIFT", bookingText)
+            assertEquals("BASISLASTSCHRIFT", postingText)
             assertEquals("TUBDDEDD", otherPartyBankCode)
             assertEquals("DE87300308801234567890", otherPartyAccountId)
             assertEquals("6MKL2OT30QENNLIU", endToEndReference)
@@ -362,7 +362,7 @@ class Mt940ParserTest : FinTsTestBase() {
         assertEquals(amount, statementLine.amount)
     }
 
-    private fun assertTransactionDetails(details: InformationToAccountOwner?, otherPartyName: String,
+    private fun assertTransactionDetails(details: RemittanceInformationField?, otherPartyName: String,
                                          otherPartyBankCode: String, otherPartyAccountId: String) {
 
         assertNotNull(details)

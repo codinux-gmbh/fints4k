@@ -58,17 +58,11 @@ open class StatementLine(
     val postingKey: String,
 
     /**
-     * Kundenreferenz. Bei
-     * Nichtbelegung wird
-     * „NONREF“ eingestellt,
-     * zum Beispiel bei Schecknummer
-     * Wenn „KREF+“ eingestellt
-     * ist, dann erfolgt die
-     * Angabe der
-     * Referenznummer in Tag
-     * :86: .
+     * Kundenreferenz.
+     * Bei Nichtbelegung wird „NONREF“ eingestellt, zum Beispiel bei Schecknummer
+     * Wenn „KREF+“ eingestellt ist, dann erfolgt die Angabe der Referenznummer in Tag :86: .
      */
-    val customerReference: String,
+    val customerReference: String?,
 
     /**
      * Bankreferenz

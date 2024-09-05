@@ -111,14 +111,23 @@ open class FinTsModelMapper {
   }
 
   open fun map(transaction: net.codinux.banking.fints.model.AccountTransaction): AccountTransaction {
-    return AccountTransaction(transaction.amount, transaction.unparsedReference, transaction.bookingDate,
-      transaction.otherPartyName, transaction.otherPartyBankCode, transaction.otherPartyAccountId, transaction.bookingText, transaction.valueDate,
-      transaction.statementNumber, transaction.sequenceNumber, transaction.openingBalance, transaction.closingBalance,
-      transaction.endToEndReference, transaction.customerReference, transaction.mandateReference, transaction.creditorIdentifier, transaction.originatorsIdentificationCode,
+    return AccountTransaction(
+      transaction.amount, transaction.unparsedReference,
+      transaction.bookingDate, transaction.valueDate,
+      transaction.otherPartyName, transaction.otherPartyBankCode, transaction.otherPartyAccountId,
+
+      transaction.postingText, transaction.statementNumber, transaction.sheetNumber,
+      transaction.openingBalance, transaction.closingBalance,
+
+      transaction.customerReference, transaction.bankReference, transaction.furtherInformation,
+
+      transaction.endToEndReference, transaction.mandateReference, transaction.creditorIdentifier, transaction.originatorsIdentificationCode,
       transaction.compensationAmount, transaction.originalAmount, transaction.sepaReference, transaction.deviantOriginator, transaction.deviantRecipient,
-      transaction.referenceWithNoSpecialType, transaction.primaNotaNumber, transaction.textKeySupplement,
-      transaction.currencyType, transaction.bookingKey, transaction.referenceForTheAccountOwner, transaction.referenceOfTheAccountServicingInstitution, transaction.supplementaryDetails,
-      transaction.transactionReferenceNumber, transaction.relatedReferenceNumber)
+      transaction.referenceWithNoSpecialType,
+
+      transaction.journalNumber, transaction.textKeyAddition,
+      transaction.orderReferenceNumber, transaction.referenceNumber
+    )
   }
 
 

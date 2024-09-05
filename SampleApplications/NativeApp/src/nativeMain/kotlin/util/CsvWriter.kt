@@ -41,7 +41,7 @@ open class CsvWriter {
   protected open suspend fun writeToFile(stream: AsyncStream, valueSeparator: String, customer: CustomerAccount, account: BankAccount, transaction: AccountTransaction) {
     val amount = if (valueSeparator == ";") transaction.amount.amount.string.replace('.', ',') else transaction.amount.amount.string.replace(',', '.')
 
-    stream.writeString(listOf(customer.bankName, account.identifier, transaction.valueDate, amount, transaction.amount.currency, ensureNotNull(transaction.bookingText), wrap(transaction.reference),
+    stream.writeString(listOf(customer.bankName, account.identifier, transaction.valueDate, amount, transaction.amount.currency, ensureNotNull(transaction.postingText), wrap(transaction.reference),
       ensureNotNull(transaction.otherPartyName), ensureNotNull(transaction.otherPartyBankCode), ensureNotNull(transaction.otherPartyAccountId)).joinToString(valueSeparator))
 
     stream.writeString(NewLine)

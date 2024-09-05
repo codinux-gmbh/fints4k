@@ -7,51 +7,118 @@ import net.codinux.banking.fints.extensions.UnixEpochStart
 open class AccountTransaction(
     val account: AccountData,
     val amount: Money,
-    val isReversal: Boolean,
     val unparsedReference: String,
+
     val bookingDate: LocalDate,
-    val otherPartyName: String?,
-    val otherPartyBankCode: String?,
-    val otherPartyAccountId: String?,
-    val bookingText: String?,
     val valueDate: LocalDate,
+
+    /**
+     * Name des Überweisenden oder Zahlungsempfängers
+     */
+    val otherPartyName: String?,
+    /**
+     * BIC des Überweisenden / Zahlungsempfängers
+     */
+    val otherPartyBankCode: String?,
+    /**
+     * IBAN des Überweisenden oder Zahlungsempfängers
+     */
+    val otherPartyAccountId: String?,
+
+    /**
+     * Buchungstext, z. B. DAUERAUFTRAG, BARGELDAUSZAHLUNG, ONLINE-UEBERWEISUNG, FOLGELASTSCHRIFT, ...
+     */
+    val postingText: String?,
+    /**
+     * Auszugsnummer
+     */
     val statementNumber: Int,
-    val sequenceNumber: Int?,
+    /**
+     * Blattnummer
+     */
+    val sheetNumber: Int?,
+
     val openingBalance: Money?,
     val closingBalance: Money?,
 
-    val endToEndReference: String?,
+    /**
+     * Kundenreferenz.
+     */
     val customerReference: String?,
+    /**
+     * Bankreferenz
+     */
+    val bankReference: String?,
+    /**
+     * Währungsart und Umsatzbetrag in Ursprungswährung
+     */
+    val furtherInformation: String?,
+
+
+    /*      Remittance information      */
+
+    val endToEndReference: String?,
     val mandateReference: String?,
     val creditorIdentifier: String?,
     val originatorsIdentificationCode: String?,
+    /**
+     * Summe aus Auslagenersatz und Bearbeitungsprovision bei einer nationalen Rücklastschrift
+     * sowie optionalem Zinsausgleich.
+     */
     val compensationAmount: String?,
+    /**
+     * Betrag der ursprünglichen Lastschrift
+     */
     val originalAmount: String?,
     val sepaReference: String?,
+    /**
+     * Abweichender Überweisender oder Zahlungsempfänger
+     */
     val deviantOriginator: String?,
+    /**
+     * Abweichender Zahlungsempfänger oder Zahlungspflichtiger
+     */
     val deviantRecipient: String?,
     val referenceWithNoSpecialType: String?,
-    val primaNotaNumber: String?,
-    val textKeySupplement: String?,
 
-    val currencyType: String?,
-    val bookingKey: String,
-    val referenceForTheAccountOwner: String,
-    val referenceOfTheAccountServicingInstitution: String?,
-    val supplementaryDetails: String?,
+    /**
+     * Primanoten-Nr.
+     */
+    val journalNumber: String?,
+    /**
+     * Bei R-Transaktionen siehe Tabelle der
+     * SEPA-Rückgabecodes, bei SEPALastschriften siehe optionale Belegung
+     * bei GVC 104 und GVC 105 (GVC = Geschäftsvorfallcode)
+     */
+    val textKeyAddition: String?,
 
-    val transactionReferenceNumber: String,
-    val relatedReferenceNumber: String?
+    /**
+     * Referenznummer, die vom Sender als eindeutige Kennung für die Nachricht vergeben wurde
+     * (z.B. als Referenz auf stornierte Nachrichten).
+     */
+    val orderReferenceNumber: String?,
+    /**
+     * Bezugsreferenz
+     */
+    val referenceNumber: String?,
+
+    /**
+     * Storno, ob die Buchung storniert wurde(?).
+     * Aus:
+     * „RC“ = Storno Haben
+     * „RD“ = Storno Soll
+     */
+    val isReversal: Boolean
 ) {
 
     // for object deserializers
-    internal constructor() : this(AccountData(), Money(Amount.Zero, ""), "", UnixEpochStart, null, null, null, null, UnixEpochStart)
+    internal constructor() : this(AccountData(), Money(Amount.Zero, ""), "", UnixEpochStart, UnixEpochStart, null, null, null, null)
 
-    constructor(account: AccountData, amount: Money, unparsedReference: String, bookingDate: LocalDate, otherPartyName: String?, otherPartyBankCode: String?, otherPartyAccountId: String?, bookingText: String?, valueDate: LocalDate)
-        : this(account, amount, false, unparsedReference, bookingDate, otherPartyName, otherPartyBankCode, otherPartyAccountId, bookingText, valueDate,
+    constructor(account: AccountData, amount: Money, unparsedReference: String, bookingDate: LocalDate, valueDate: LocalDate, otherPartyName: String?, otherPartyBankCode: String?, otherPartyAccountId: String?, postingText: String? = null)
+        : this(account, amount, unparsedReference, bookingDate, valueDate, otherPartyName, otherPartyBankCode, otherPartyAccountId, postingText,
         0, null, null, null,
-        null, null, null, null, null, null, null, null, null, null, null,  null, null,
-        null, "", "", null, null, "", null)
+        null, null, null, null, null, null, null, null, null, null, null,  null,
+        "", null, null, "", null, false)
 
 
     open val showOtherPartyName: Boolean
@@ -72,7 +139,7 @@ open class AccountTransaction(
         if (otherPartyName != other.otherPartyName) return false
         if (otherPartyBankCode != other.otherPartyBankCode) return false
         if (otherPartyAccountId != other.otherPartyAccountId) return false
-        if (bookingText != other.bookingText) return false
+        if (postingText != other.postingText) return false
         if (valueDate != other.valueDate) return false
 
         return true
@@ -86,7 +153,7 @@ open class AccountTransaction(
         result = 31 * result + (otherPartyName?.hashCode() ?: 0)
         result = 31 * result + (otherPartyBankCode?.hashCode() ?: 0)
         result = 31 * result + (otherPartyAccountId?.hashCode() ?: 0)
-        result = 31 * result + (bookingText?.hashCode() ?: 0)
+        result = 31 * result + (postingText?.hashCode() ?: 0)
         result = 31 * result + valueDate.hashCode()
         return result
     }
