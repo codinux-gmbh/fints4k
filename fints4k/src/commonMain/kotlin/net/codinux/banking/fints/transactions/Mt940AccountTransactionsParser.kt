@@ -49,7 +49,8 @@ open class Mt940AccountTransactionsParser(
         return AccountTransaction(
             account,
             Money(mapAmount(transaction.statementLine), currency),
-            transaction.information?.unparsedReference ?: "",
+            // either field :86: contains structured information, then sepaReference is a mandatory field, or :86: is unstructured, then the whole field value is the reference
+            transaction.information?.sepaReference ?: transaction.information?.unparsedReference ?: "",
 
             transaction.statementLine.bookingDate ?: statement.closingBalance.bookingDate,
             transaction.statementLine.valueDate,
@@ -76,7 +77,6 @@ open class Mt940AccountTransactionsParser(
             transaction.information?.originatorsIdentificationCode,
             transaction.information?.compensationAmount,
             transaction.information?.originalAmount,
-            transaction.information?.sepaReference,
             transaction.information?.deviantOriginator,
             transaction.information?.deviantRecipient,
             transaction.information?.referenceWithNoSpecialType,

@@ -112,7 +112,7 @@ open class FinTsModelMapper {
 
   open fun map(transaction: net.codinux.banking.fints.model.AccountTransaction): AccountTransaction {
     return AccountTransaction(
-      transaction.amount, transaction.unparsedReference,
+      transaction.amount, transaction.reference,
       transaction.bookingDate, transaction.valueDate,
       transaction.otherPartyName, transaction.otherPartyBankCode, transaction.otherPartyAccountId,
 
@@ -122,7 +122,7 @@ open class FinTsModelMapper {
       transaction.customerReference, transaction.bankReference, transaction.furtherInformation,
 
       transaction.endToEndReference, transaction.mandateReference, transaction.creditorIdentifier, transaction.originatorsIdentificationCode,
-      transaction.compensationAmount, transaction.originalAmount, transaction.sepaReference, transaction.deviantOriginator, transaction.deviantRecipient,
+      transaction.compensationAmount, transaction.originalAmount, transaction.deviantOriginator, transaction.deviantRecipient,
       transaction.referenceWithNoSpecialType,
 
       transaction.journalNumber, transaction.textKeyAddition,

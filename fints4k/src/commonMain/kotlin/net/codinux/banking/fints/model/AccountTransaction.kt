@@ -7,7 +7,7 @@ import net.codinux.banking.fints.extensions.UnixEpochStart
 open class AccountTransaction(
     val account: AccountData,
     val amount: Money,
-    val unparsedReference: String,
+    val reference: String?, // that was also new to me that reference may is null
 
     val bookingDate: LocalDate,
     val valueDate: LocalDate,
@@ -70,7 +70,6 @@ open class AccountTransaction(
      * Betrag der ursprünglichen Lastschrift
      */
     val originalAmount: String?,
-    val sepaReference: String?,
     /**
      * Abweichender Überweisender oder Zahlungsempfänger
      */
@@ -117,15 +116,12 @@ open class AccountTransaction(
     constructor(account: AccountData, amount: Money, unparsedReference: String, bookingDate: LocalDate, valueDate: LocalDate, otherPartyName: String?, otherPartyBankCode: String?, otherPartyAccountId: String?, postingText: String? = null)
         : this(account, amount, unparsedReference, bookingDate, valueDate, otherPartyName, otherPartyBankCode, otherPartyAccountId, postingText,
         0, null, null, null,
-        null, null, null, null, null, null, null, null, null, null, null,  null,
+        null, null, null, null, null, null, null, null, null, null, null,
         "", null, null, "", null, false)
 
 
     open val showOtherPartyName: Boolean
         get() = otherPartyName.isNullOrBlank() == false /* && type != "ENTGELTABSCHLUSS" && type != "AUSZAHLUNG" */ // TODO
-
-    val reference: String
-        get() = sepaReference ?: unparsedReference
 
 
     override fun equals(other: Any?): Boolean {
@@ -134,7 +130,7 @@ open class AccountTransaction(
 
         if (account != other.account) return false
         if (amount != other.amount) return false
-        if (unparsedReference != other.unparsedReference) return false
+        if (reference != other.reference) return false
         if (bookingDate != other.bookingDate) return false
         if (otherPartyName != other.otherPartyName) return false
         if (otherPartyBankCode != other.otherPartyBankCode) return false
@@ -148,7 +144,7 @@ open class AccountTransaction(
     override fun hashCode(): Int {
         var result = account.hashCode()
         result = 31 * result + amount.hashCode()
-        result = 31 * result + unparsedReference.hashCode()
+        result = 31 * result + reference.hashCode()
         result = 31 * result + bookingDate.hashCode()
         result = 31 * result + (otherPartyName?.hashCode() ?: 0)
         result = 31 * result + (otherPartyBankCode?.hashCode() ?: 0)
@@ -160,7 +156,7 @@ open class AccountTransaction(
 
 
     override fun toString(): String {
-        return "$valueDate $amount $otherPartyName: $unparsedReference"
+        return "$valueDate $amount $otherPartyName: $reference"
     }
 
 }
