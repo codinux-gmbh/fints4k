@@ -18,7 +18,7 @@ open class BankAccount(
     open val currency: String = Currency.DefaultCurrencyCode, // TODO: may parse to a value object
     open val accountLimit: String? = null,
 
-    open val countDaysForWhichTransactionsAreKept: Int? = null,
+    open val transactionsRetentionDays: Int? = null,
     open val isAccountTypeSupportedByApplication: Boolean = false,
     // TODO: create an enum AccountCapabilities [ RetrieveBalance, RetrieveTransactions, TransferMoney / MoneyTransfer(?), InstantPayment ]
     open val supportsRetrievingTransactions: Boolean = false,

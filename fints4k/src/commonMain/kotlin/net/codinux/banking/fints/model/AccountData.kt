@@ -32,7 +32,11 @@ open class AccountData(
                 || allowedJobNames.contains(CustomerSegmentId.AccountTransactionsMt940.id)
 
 
-    open var countDaysForWhichTransactionsAreKept: Int? = null
+
+    /**
+     * Count days for which transactions are stored on bank server (if available).
+     */
+    open var transactionsRetentionDays: Int? = null
 
 
     protected open val _supportedFeatures = mutableSetOf<AccountFeature>()
