@@ -34,9 +34,9 @@ open class Mt940Parser(
         val AccountStatementFieldSeparatorRegex = Regex("(?<!T\\d\\d(:\\d\\d)?):\\d\\d\\w?:")
 
 
-        const val TransactionReferenceNumberCode = "20"
+        const val OrderReferenceNumberCode = "20"
 
-        const val RelatedReferenceNumberCode = "21"
+        const val ReferenceNumberCode = "21"
 
         const val AccountIdentificationCode = "25"
 
@@ -46,7 +46,7 @@ open class Mt940Parser(
 
         const val StatementLineCode = "61"
 
-        const val InformationToAccountOwnerCode = "86"
+        const val RemittanceInformationFieldCode = "86"
 
         const val ClosingBalanceCode = "62"
 
@@ -61,7 +61,7 @@ open class Mt940Parser(
 
         val ReferenceTypeRegex = Regex("[A-Z]{4}\\+")
 
-        val InformationToAccountOwnerSubFieldRegex = Regex("\\?\\d\\d")
+        val RemittanceInformationSubFieldRegex = Regex("\\?\\d\\d")
 
 
         const val EndToEndReferenceKey = "EREF+"
@@ -169,8 +169,8 @@ open class Mt940Parser(
         val closingBalancePair = fieldsByCode.first { it.first.startsWith(ClosingBalanceCode) }
 
         return AccountStatement(
-            getFieldValue(fieldsByCode, TransactionReferenceNumberCode),
-            getOptionalFieldValue(fieldsByCode, RelatedReferenceNumberCode),
+            getFieldValue(fieldsByCode, OrderReferenceNumberCode),
+            getOptionalFieldValue(fieldsByCode, ReferenceNumberCode),
             accountIdentification[0],
             if (accountIdentification.size > 1) accountIdentification[1] else null,
             statementAndMaySequenceNumber[0].toInt(),
@@ -210,7 +210,7 @@ open class Mt940Parser(
                 val statementLine = parseStatementLine(pair.second)
 
                 val nextPair = if (index < fieldsByCode.size - 1) fieldsByCode.get(index + 1) else null
-                val information = if (nextPair?.first == InformationToAccountOwnerCode) parseNullableInformationToAccountOwner(nextPair.second) else null
+                val information = if (nextPair?.first == RemittanceInformationFieldCode) parseNullableRemittanceInformationField(nextPair.second) else null
 
                 transactions.add(Transaction(statementLine, information))
             }
@@ -295,24 +295,24 @@ open class Mt940Parser(
             customerReference, bankReference, furtherInformation)
     }
 
-    protected open fun parseNullableInformationToAccountOwner(informationToAccountOwnerString: String): InformationToAccountOwner? {
+    protected open fun parseNullableRemittanceInformationField(remittanceInformationFieldString: String): RemittanceInformationField? {
         try {
-            val information = parseInformationToAccountOwner(informationToAccountOwnerString)
+            val information = parseRemittanceInformationField(remittanceInformationFieldString)
 
             mapReference(information)
 
             return information
         } catch (e: Exception) {
-            logError("Could not parse InformationToAccountOwner from field value '$informationToAccountOwnerString'", e)
+            logError("Could not parse RemittanceInformationField from field value '$remittanceInformationFieldString'", e)
         }
 
         return null
     }
 
-    protected open fun parseInformationToAccountOwner(informationToAccountOwnerString: String): InformationToAccountOwner {
+    protected open fun parseRemittanceInformationField(remittanceInformationFieldString: String): RemittanceInformationField {
         // e. g. starts with 0 -> Inlandszahlungsverkehr, starts with '3' -> Wertpapiergeschäft
         // see Finanzdatenformate p. 209 - 215
-        val geschaeftsvorfallCode = informationToAccountOwnerString.substring(0, 2) // TODO: may map
+        val geschaeftsvorfallCode = remittanceInformationFieldString.substring(0, 2) // TODO: may map
 
         val referenceParts = mutableListOf<String>()
         val otherPartyName = StringBuilder()
@@ -322,11 +322,11 @@ open class Mt940Parser(
         var primaNotaNumber: String? = null
         var textKeySupplement: String? = null
 
-        val subFieldMatches = InformationToAccountOwnerSubFieldRegex.findAll(informationToAccountOwnerString).toList()
+        val subFieldMatches = RemittanceInformationSubFieldRegex.findAll(remittanceInformationFieldString).toList()
         subFieldMatches.forEachIndexed { index, matchResult ->
             val fieldCode = matchResult.value.substring(1, 3).toInt()
-            val endIndex = if (index + 1 < subFieldMatches.size) subFieldMatches[index + 1].range.start else informationToAccountOwnerString.length
-            val fieldValue = informationToAccountOwnerString.substring(matchResult.range.last + 1, endIndex)
+            val endIndex = if (index + 1 < subFieldMatches.size) subFieldMatches[index + 1].range.start else remittanceInformationFieldString.length
+            val fieldValue = remittanceInformationFieldString.substring(matchResult.range.last + 1, endIndex)
 
             when (fieldCode) {
                 0 -> bookingText = fieldValue
@@ -345,7 +345,7 @@ open class Mt940Parser(
 
         val otherPartyNameString = if (otherPartyName.isBlank()) null else otherPartyName.toString()
 
-        return InformationToAccountOwner(
+        return RemittanceInformationField(
             reference, otherPartyNameString, otherPartyBankCode, otherPartyAccountId,
             bookingText, primaNotaNumber, textKeySupplement
         )
@@ -396,7 +396,7 @@ open class Mt940Parser(
      *
      * Weitere 4 Verwendungszwecke können zu den Feldschlüsseln 60 bis 63 eingestellt werden.
      */
-    protected open fun mapReference(information: InformationToAccountOwner) {
+    protected open fun mapReference(information: RemittanceInformationField) {
         val referenceParts = getReferenceParts(information.unparsedReference)
 
         referenceParts.forEach { entry ->
@@ -431,7 +431,7 @@ open class Mt940Parser(
     }
 
     // TODO: there are more. See .pdf from Deutsche Bank
-    protected open fun setReferenceLineValue(information: InformationToAccountOwner, referenceType: String, typeValue: String) {
+    protected open fun setReferenceLineValue(information: RemittanceInformationField, referenceType: String, typeValue: String) {
         when (referenceType) {
             EndToEndReferenceKey -> information.endToEndReference = typeValue
             CustomerReferenceKey -> information.customerReference = typeValue

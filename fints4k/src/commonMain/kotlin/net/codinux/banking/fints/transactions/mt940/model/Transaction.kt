@@ -4,7 +4,7 @@ package net.codinux.banking.fints.transactions.mt940.model
 open class Transaction(
 
     val statementLine: StatementLine,
-    val information: InformationToAccountOwner? = null
+    val information: RemittanceInformationField? = null
 
 ) {
 

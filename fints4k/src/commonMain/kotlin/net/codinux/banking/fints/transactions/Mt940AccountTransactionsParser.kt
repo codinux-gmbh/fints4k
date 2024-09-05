@@ -53,10 +53,10 @@ open class Mt940AccountTransactionsParser(
             transaction.information?.otherPartyName,
             transaction.information?.otherPartyBankCode,
             transaction.information?.otherPartyAccountId,
-            transaction.information?.bookingText,
+            transaction.information?.postingText,
             transaction.statementLine.valueDate,
             statement.statementNumber,
-            statement.sequenceNumber,
+            statement.sheetNumber,
             Money(mapAmount(statement.openingBalance), currency), // TODO: that's not true, these are the opening and closing balance of
             Money(mapAmount(statement.closingBalance), currency), // all transactions of this day, not this specific transaction's ones
 
@@ -71,17 +71,17 @@ open class Mt940AccountTransactionsParser(
             transaction.information?.deviantOriginator,
             transaction.information?.deviantRecipient,
             transaction.information?.referenceWithNoSpecialType,
-            transaction.information?.primaNotaNumber,
-            transaction.information?.textKeySupplement,
+            transaction.information?.journalNumber,
+            transaction.information?.textKeyAddition,
 
             transaction.statementLine.currencyType,
-            transaction.statementLine.bookingKey,
-            transaction.statementLine.referenceForTheAccountOwner,
-            transaction.statementLine.referenceOfTheAccountServicingInstitution,
-            transaction.statementLine.supplementaryDetails,
+            transaction.statementLine.postingKey,
+            transaction.statementLine.customerReference,
+            transaction.statementLine.bankReference,
+            transaction.statementLine.furtherInformationOriginalAmountAndCharges,
 
-            statement.transactionReferenceNumber,
-            statement.relatedReferenceNumber
+            statement.orderReferenceNumber,
+            statement.referenceNumber
         )
     }
 

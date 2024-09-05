@@ -1,6 +1,6 @@
 package net.codinux.banking.fints.transactions.mt940.model
 
-open class InformationToAccountOwner(
+open class RemittanceInformationField(
     val unparsedReference: String,
     /**
      * AT 02 Name des Überweisenden
