@@ -114,7 +114,7 @@ open class FinTsModelMapper {
     return AccountTransaction(
       transaction.amount, transaction.reference,
       transaction.bookingDate, transaction.valueDate,
-      transaction.otherPartyName, transaction.otherPartyBankCode, transaction.otherPartyAccountId,
+      transaction.otherPartyName, transaction.otherPartyBankId, transaction.otherPartyAccountId,
 
       transaction.postingText,
 

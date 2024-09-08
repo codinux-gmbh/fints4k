@@ -316,7 +316,7 @@ open class Mt940Parser(
 
         val referenceParts = mutableListOf<String>()
         val otherPartyName = StringBuilder()
-        var otherPartyBankCode: String? = null
+        var otherPartyBankId: String? = null
         var otherPartyAccountId: String? = null
         var bookingText: String? = null
         var primaNotaNumber: String? = null
@@ -332,7 +332,7 @@ open class Mt940Parser(
                 0 -> bookingText = fieldValue
                 10 -> primaNotaNumber = fieldValue
                 in 20..29 -> referenceParts.add(fieldValue)
-                30 -> otherPartyBankCode = fieldValue
+                30 -> otherPartyBankId = fieldValue
                 31 -> otherPartyAccountId = fieldValue
                 32, 33 -> otherPartyName.append(fieldValue)
                 34 -> textKeySupplement = fieldValue
@@ -346,7 +346,7 @@ open class Mt940Parser(
         val otherPartyNameString = if (otherPartyName.isBlank()) null else otherPartyName.toString()
 
         return RemittanceInformationField(
-            reference, otherPartyNameString, otherPartyBankCode, otherPartyAccountId,
+            reference, otherPartyNameString, otherPartyBankId, otherPartyAccountId,
             bookingText, primaNotaNumber, textKeySupplement
         )
     }

@@ -56,7 +56,7 @@ open class Mt940AccountTransactionsParser(
             transaction.statementLine.valueDate,
 
             transaction.information?.otherPartyName,
-            transaction.information?.otherPartyBankCode,
+            transaction.information?.otherPartyBankId,
             transaction.information?.otherPartyAccountId,
 
             transaction.information?.postingText,

@@ -11,7 +11,7 @@ open class RemittanceInformationField(
      * BLZ Überweisender / Zahlungsempfänger
      * Bei SEPA-Zahlungen BIC des Überweisenden / Zahlungsempfängers.
      */
-    val otherPartyBankCode: String?,
+    val otherPartyBankId: String?,
     /**
      * AT 01 IBAN des Überweisenden (Zahlungseingang Überweisung)
      * AT 04 IBAN des Zahlungsempfängers (Eingang Lastschrift)

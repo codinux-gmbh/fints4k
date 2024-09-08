@@ -16,7 +16,7 @@ open class AccountTransaction(
     val valueDate: LocalDate,
 
     val otherPartyName: String?,
-    val otherPartyBankCode: String?,
+    val otherPartyBankId: String?,
     val otherPartyAccountId: String?,
 
     val postingText: String?,
@@ -50,8 +50,8 @@ open class AccountTransaction(
     // for object deserializers
     internal constructor() : this(Money(Amount.Zero, ""), "", UnixEpochStart, UnixEpochStart, null, null, null, null)
 
-    constructor(amount: Money, unparsedReference: String, bookingDate: LocalDate, valueDate: LocalDate, otherPartyName: String?, otherPartyBankCode: String?, otherPartyAccountId: String?, postingText: String?)
-        : this(amount, unparsedReference, bookingDate, valueDate, otherPartyName, otherPartyBankCode, otherPartyAccountId, postingText,
+    constructor(amount: Money, unparsedReference: String, bookingDate: LocalDate, valueDate: LocalDate, otherPartyName: String?, otherPartyBankId: String?, otherPartyAccountId: String?, postingText: String?)
+        : this(amount, unparsedReference, bookingDate, valueDate, otherPartyName, otherPartyBankId, otherPartyAccountId, postingText,
         null, null, 0, null,
         null, null, null, null, null, null, null, null, null, null, null,  null,
         null, null, null, null)
@@ -69,7 +69,7 @@ open class AccountTransaction(
         if (reference != other.reference) return false
         if (bookingDate != other.bookingDate) return false
         if (otherPartyName != other.otherPartyName) return false
-        if (otherPartyBankCode != other.otherPartyBankCode) return false
+        if (otherPartyBankId != other.otherPartyBankId) return false
         if (otherPartyAccountId != other.otherPartyAccountId) return false
         if (postingText != other.postingText) return false
         if (valueDate != other.valueDate) return false
@@ -82,7 +82,7 @@ open class AccountTransaction(
         result = 31 * result + reference.hashCode()
         result = 31 * result + bookingDate.hashCode()
         result = 31 * result + (otherPartyName?.hashCode() ?: 0)
-        result = 31 * result + (otherPartyBankCode?.hashCode() ?: 0)
+        result = 31 * result + (otherPartyBankId?.hashCode() ?: 0)
         result = 31 * result + (otherPartyAccountId?.hashCode() ?: 0)
         result = 31 * result + (postingText?.hashCode() ?: 0)
         result = 31 * result + valueDate.hashCode()
