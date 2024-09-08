@@ -966,7 +966,7 @@ class ResponseParserTest : FinTsTestBase() {
             assertEquals(TanResponse.NoJobReferenceResponse, segment.jobReference)
             assertEquals(TanResponse.NoChallengeResponse, segment.challenge)
             assertNull(segment.challengeHHD_UC)
-            assertEquals(null, segment.validityDateTimeForChallenge)
+            assertEquals(null, segment.tanExpirationTime)
             assertEquals(null, segment.tanMediaIdentifier)
         }
         ?: run { fail("No segment of type TanResponse found in ${result.receivedSegments}") }
@@ -995,7 +995,7 @@ class ResponseParserTest : FinTsTestBase() {
             assertEquals(jobReference, segment.jobReference)
             assertEquals(unmaskString(challenge), segment.challenge)
             assertEquals(challengeHHD_UC, segment.challengeHHD_UC)
-            assertEquals(null, segment.validityDateTimeForChallenge)
+            assertEquals(null, segment.tanExpirationTime)
             assertEquals(tanMediaIdentifier, segment.tanMediaIdentifier)
         }
         ?: run { fail("No segment of type TanResponse found in ${result.receivedSegments}") }
