@@ -129,7 +129,9 @@ open class FinTsModelMapper {
       transaction.referenceWithNoSpecialType,
 
       transaction.journalNumber, transaction.textKeyAddition,
-      transaction.orderReferenceNumber, transaction.referenceNumber
+      transaction.orderReferenceNumber, transaction.referenceNumber,
+
+      transaction.isReversal
     )
   }
 

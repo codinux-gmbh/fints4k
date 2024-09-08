@@ -46,7 +46,9 @@ open class AccountTransaction(
     val textKeyAddition: String?,
 
     val orderReferenceNumber: String?,
-    val referenceNumber: String?
+    val referenceNumber: String?,
+
+    val isReversal: Boolean
 ) {
 
     // for object deserializers
@@ -56,7 +58,7 @@ open class AccountTransaction(
         : this(amount, unparsedReference, bookingDate, valueDate, otherPartyName, otherPartyBankId, otherPartyAccountId, postingText,
         null, null, 0, null,
         null, null, null, null, null, null, null, null, null, null, null,  null,
-        null, null, null, null)
+        null, null, null, null, false)
 
 
     open val showOtherPartyName: Boolean
