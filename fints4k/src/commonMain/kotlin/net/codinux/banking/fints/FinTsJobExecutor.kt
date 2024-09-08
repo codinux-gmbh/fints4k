@@ -3,6 +3,7 @@ package net.codinux.banking.fints
 import kotlinx.coroutines.delay
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
+import net.codinux.banking.fints.extensions.*
 import net.codinux.log.logger
 import net.codinux.banking.fints.messages.MessageBuilder
 import net.codinux.banking.fints.messages.MessageBuilderResult
@@ -19,9 +20,6 @@ import net.codinux.banking.fints.response.segments.*
 import net.codinux.banking.fints.tan.FlickerCodeDecoder
 import net.codinux.banking.fints.tan.TanImageDecoder
 import net.codinux.banking.fints.util.TanMethodSelector
-import net.codinux.banking.fints.extensions.minusDays
-import net.codinux.banking.fints.extensions.todayAtEuropeBerlin
-import net.codinux.banking.fints.extensions.todayAtSystemDefaultTimeZone
 import kotlin.math.max
 import kotlin.time.Duration.Companion.seconds
 
@@ -389,7 +387,14 @@ open class FinTsJobExecutor(
         while (tanChallenge.isEnteringTanDone == false) {
             delay(500)
 
-            // TODO: add a timeout of e.g. 30 min
+            // most TANs a valid 5 - 15 minutes. So terminate wait process after that time
+            if (Instant.nowExt() > tanChallenge.timestamp.plusMinutes(15)) {
+                if (tanChallenge.isEnteringTanDone == false) {
+                    tanChallenge.userDidNotEnterTan()
+                }
+
+                break
+            }
         }
 
         val enteredTanResult = tanChallenge.enterTanResult!!
