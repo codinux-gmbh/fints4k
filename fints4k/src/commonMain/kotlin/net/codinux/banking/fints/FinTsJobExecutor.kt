@@ -1,7 +1,7 @@
 package net.codinux.banking.fints
 
 import kotlinx.coroutines.delay
-import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import net.codinux.log.logger
 import net.codinux.banking.fints.messages.MessageBuilder
@@ -231,7 +231,7 @@ open class FinTsJobExecutor(
             }
         }
 
-        val startTime = Clock.System.now()
+        val startTime = Instant.now()
 
         val response = getAndHandleResponseForMessage(context, message)
 

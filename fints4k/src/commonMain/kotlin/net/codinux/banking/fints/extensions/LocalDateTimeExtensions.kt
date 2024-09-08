@@ -13,5 +13,5 @@ fun LocalDateTime.Companion.nowAtEuropeBerlin(): LocalDateTime {
 }
 
 fun LocalDateTime.Companion.nowAt(timeZone: TimeZone): LocalDateTime {
-  return Clock.System.now().toLocalDateTime(timeZone)
+  return Instant.nowExt().toLocalDateTime(timeZone)
 }
