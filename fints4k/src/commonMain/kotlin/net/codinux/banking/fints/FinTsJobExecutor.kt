@@ -384,10 +384,10 @@ open class FinTsJobExecutor(
 
         context.callback.enterTan(tanChallenge)
 
-        while (tanChallenge.isEnteringTanDone == false) {
-            delay(250)
+        mayRetrieveAutomaticallyIfUserEnteredDecoupledTan(context, tanChallenge, tanResponse)
 
-            mayRetrieveAutomaticallyIfUserEnteredDecoupledTan(context, tanChallenge, tanResponse)
+        while (tanChallenge.isEnteringTanDone == false) {
+            delay(500)
 
             // TODO: add a timeout of e.g. 30 min
         }
