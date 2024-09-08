@@ -1,5 +1,7 @@
 package net.codinux.banking.fints.model
 
+import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
 import net.codinux.banking.fints.messages.datenelemente.implementierte.tan.TanMedium
 import net.codinux.banking.fints.response.BankResponse
 import net.codinux.banking.fints.response.client.FinTsClientResponse
@@ -12,7 +14,8 @@ open class TanChallenge(
     val tanMethod: TanMethod,
     val tanMediaIdentifier: String?,
     val bank: BankData,
-    val account: AccountData? = null
+    val account: AccountData? = null,
+    val timestamp: Instant = Clock.System.now()
 ) {
 
     var enterTanResult: EnterTanResult? = null
