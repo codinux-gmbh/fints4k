@@ -229,7 +229,7 @@ open class FinTsJobExecutor(
             }
         }
 
-        val startTime = Instant.now()
+        val startTime = Instant.nowExt()
 
         val response = getAndHandleResponseForMessage(context, message)
 
