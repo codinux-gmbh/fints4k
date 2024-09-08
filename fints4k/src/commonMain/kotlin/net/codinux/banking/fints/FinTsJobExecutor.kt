@@ -380,20 +380,19 @@ open class FinTsJobExecutor(
     protected open suspend fun handleEnteringTanRequired(context: JobContext, tanResponse: TanResponse, response: BankResponse): BankResponse {
         // on all platforms run on Dispatchers.Main, but on iOS skip this (or wrap in withContext(Dispatchers.IO) )
 //        val enteredTanResult = GlobalScope.async {
-            val tanChallenge = createTanChallenge(tanResponse, modelMapper.mapToActionRequiringTan(context.type), context.bank, context.account)
+        val tanChallenge = createTanChallenge(tanResponse, modelMapper.mapToActionRequiringTan(context.type), context.bank, context.account)
 
-            context.callback.enterTan(tanChallenge)
+        context.callback.enterTan(tanChallenge)
 
-            while (tanChallenge.enterTanResult == null) {
-                delay(250)
+        while (tanChallenge.isEnteringTanDone == false) {
+            delay(250)
 
-                mayRetrieveAutomaticallyIfUserEnteredDecoupledTan(context, tanChallenge, tanResponse)
+            mayRetrieveAutomaticallyIfUserEnteredDecoupledTan(context, tanChallenge, tanResponse)
 
-                // TODO: add a timeout of e.g. 30 min
-            }
+            // TODO: add a timeout of e.g. 30 min
+        }
 
         val enteredTanResult = tanChallenge.enterTanResult!!
-//        }
 
         return handleEnterTanResult(context, enteredTanResult, tanResponse, response)
     }
