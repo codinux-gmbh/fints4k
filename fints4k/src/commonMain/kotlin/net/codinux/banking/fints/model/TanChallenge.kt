@@ -32,18 +32,24 @@ open class TanChallenge(
         this.enterTanResult = EnterTanResult(null, true, responseAfterApprovingDecoupledTan)
 
         userApprovedDecoupledTanCallbacks.forEach { it.invoke() }
-        userApprovedDecoupledTanCallbacks.clear()
+        clearUserApprovedDecoupledTanCallbacks()
     }
 
     fun userDidNotEnterTan() {
+        clearUserApprovedDecoupledTanCallbacks()
+
         this.enterTanResult = EnterTanResult(null)
     }
 
     fun userAsksToChangeTanMethod(changeTanMethodTo: TanMethod) {
+        clearUserApprovedDecoupledTanCallbacks()
+
         this.enterTanResult = EnterTanResult(null, changeTanMethodTo = changeTanMethodTo)
     }
 
     fun userAsksToChangeTanMedium(changeTanMediumTo: TanMedium, changeTanMediumResultCallback: ((FinTsClientResponse) -> Unit)?) {
+        clearUserApprovedDecoupledTanCallbacks()
+
         this.enterTanResult = EnterTanResult(null, changeTanMediumTo = changeTanMediumTo, changeTanMediumResultCallback = changeTanMediumResultCallback)
     }
 
@@ -54,6 +60,10 @@ open class TanChallenge(
         } else if (enterTanResult != null && enterTanResult!!.userApprovedDecoupledTan == true) {
             callback()
         }
+    }
+
+    protected open fun clearUserApprovedDecoupledTanCallbacks() {
+        userApprovedDecoupledTanCallbacks.clear()
     }
 
 
