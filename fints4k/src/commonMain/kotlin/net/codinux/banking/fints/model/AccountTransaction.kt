@@ -62,6 +62,7 @@ open class AccountTransaction(
     val mandateReference: String?,
     val creditorIdentifier: String?,
     val originatorsIdentificationCode: String?,
+
     /**
      * Summe aus Auslagenersatz und Bearbeitungsprovision bei einer nationalen Rücklastschrift
      * sowie optionalem Zinsausgleich.

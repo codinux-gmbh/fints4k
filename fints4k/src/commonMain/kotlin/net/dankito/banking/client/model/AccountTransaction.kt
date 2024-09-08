@@ -35,13 +35,15 @@ open class AccountTransaction(
     val mandateReference: String?,
     val creditorIdentifier: String?,
     val originatorsIdentificationCode: String?,
+
     val compensationAmount: String?,
     val originalAmount: String?,
     val deviantOriginator: String?,
     val deviantRecipient: String?,
     val referenceWithNoSpecialType: String?,
-    val primaNotaNumber: String?,
-    val textKeySupplement: String?,
+
+    val journalNumber: String?,
+    val textKeyAddition: String?,
 
     val orderReferenceNumber: String?,
     val referenceNumber: String?
