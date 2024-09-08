@@ -1189,16 +1189,16 @@ class ResponseParserTest : FinTsTestBase() {
     fun parseAccountTransactionsMt940Parameters_Version4() {
 
         // given
-        val transactionsRetentionDays = 90
+        val serverTransactionsRetentionDays = 90
 
         // when
-        val result = underTest.parse("HIKAZS:21:4:4+20+1+$transactionsRetentionDays:N'")
+        val result = underTest.parse("HIKAZS:21:4:4+20+1+$serverTransactionsRetentionDays:N'")
 
         // then
         assertSuccessfullyParsedSegment(result, InstituteSegmentId.AccountTransactionsMt940Parameters, 21, 4, 4)
 
         result.getFirstSegmentById<RetrieveAccountTransactionsParameters>(InstituteSegmentId.AccountTransactionsMt940Parameters)?.let { segment ->
-            assertEquals(transactionsRetentionDays, segment.transactionsRetentionDays)
+            assertEquals(serverTransactionsRetentionDays, segment.serverTransactionsRetentionDays)
             assertFalse(segment.settingCountEntriesAllowed)
             assertFalse(segment.settingAllAccountAllowed)
         }
@@ -1209,16 +1209,16 @@ class ResponseParserTest : FinTsTestBase() {
     fun parseAccountTransactionsMt940Parameters_Version6() {
 
         // given
-        val transactionsRetentionDays = 90
+        val serverTransactionsRetentionDays = 90
 
         // when
-        val result = underTest.parse("HIKAZS:23:6:4+20+1+1+$transactionsRetentionDays:N:N'")
+        val result = underTest.parse("HIKAZS:23:6:4+20+1+1+$serverTransactionsRetentionDays:N:N'")
 
         // then
         assertSuccessfullyParsedSegment(result, InstituteSegmentId.AccountTransactionsMt940Parameters, 23, 6, 4)
 
         result.getFirstSegmentById<RetrieveAccountTransactionsParameters>(InstituteSegmentId.AccountTransactionsMt940Parameters)?.let { segment ->
-            assertEquals(transactionsRetentionDays, segment.transactionsRetentionDays)
+            assertEquals(serverTransactionsRetentionDays, segment.serverTransactionsRetentionDays)
             assertFalse(segment.settingCountEntriesAllowed)
             assertFalse(segment.settingAllAccountAllowed)
         }
@@ -1290,16 +1290,16 @@ class ResponseParserTest : FinTsTestBase() {
     fun parseCreditCardAccountTransactionsParameters() {
 
         // given
-        val transactionsRetentionDays = 9999
+        val serverTransactionsRetentionDays = 9999
 
         // when
-        val result = underTest.parse("DIKKUS:15:2:4+999+1+0+$transactionsRetentionDays:J:J'")
+        val result = underTest.parse("DIKKUS:15:2:4+999+1+0+$serverTransactionsRetentionDays:J:J'")
 
         // then
         assertSuccessfullyParsedSegment(result, InstituteSegmentId.CreditCardTransactionsParameters, 15, 2, 4)
 
         result.getFirstSegmentById<RetrieveAccountTransactionsParameters>(InstituteSegmentId.CreditCardTransactionsParameters)?.let { segment ->
-            assertEquals(transactionsRetentionDays, segment.transactionsRetentionDays)
+            assertEquals(serverTransactionsRetentionDays, segment.serverTransactionsRetentionDays)
             assertTrue(segment.settingCountEntriesAllowed)
             assertTrue(segment.settingAllAccountAllowed)
         }

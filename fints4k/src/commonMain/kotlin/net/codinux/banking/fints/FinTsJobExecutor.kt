@@ -238,7 +238,7 @@ open class FinTsJobExecutor(
         val successful = response.tanRequiredButWeWereToldToAbortIfSo
           || (response.successful && (parameter.alsoRetrieveBalance == false || balance != null))
         val fromDate = parameter.fromDate
-            ?: parameter.account.transactionsRetentionDays?.let { LocalDate.todayAtSystemDefaultTimeZone().minusDays(it) }
+            ?: parameter.account.serverTransactionsRetentionDays?.let { LocalDate.todayAtSystemDefaultTimeZone().minusDays(it) }
             ?: bookedTransactions.minByOrNull { it.valueDate }?.valueDate
         val retrievedData = RetrievedAccountData(parameter.account, successful, balance, bookedTransactions, unbookedTransactions, startTime, fromDate, parameter.toDate ?: LocalDate.todayAtEuropeBerlin(), response.internalError)
 

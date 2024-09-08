@@ -36,7 +36,7 @@ open class AccountData(
     /**
      * Count days for which transactions are stored on bank server (if available).
      */
-    open var transactionsRetentionDays: Int? = null
+    open var serverTransactionsRetentionDays: Int? = null
 
 
     protected open val _supportedFeatures = mutableSetOf<AccountFeature>()

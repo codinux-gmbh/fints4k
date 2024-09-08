@@ -102,7 +102,7 @@ open class ModelMapper(
                         accountInfo.accountLimit, accountInfo.allowedJobNames)
 
                     bank.supportedJobs.filterIsInstance<RetrieveAccountTransactionsParameters>().sortedByDescending { it.segmentVersion }.firstOrNull { newAccount.allowedJobNames.contains(it.jobName) }?.let { transactionsParameters ->
-                        newAccount.transactionsRetentionDays = transactionsParameters.transactionsRetentionDays
+                        newAccount.serverTransactionsRetentionDays = transactionsParameters.serverTransactionsRetentionDays
                     }
 
                     bank.addAccount(newAccount)

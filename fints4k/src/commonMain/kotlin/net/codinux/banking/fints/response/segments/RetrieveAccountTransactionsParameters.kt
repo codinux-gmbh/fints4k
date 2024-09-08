@@ -3,7 +3,7 @@ package net.codinux.banking.fints.response.segments
 
 open class RetrieveAccountTransactionsParameters(
     parameters: JobParameters,
-    open val transactionsRetentionDays: Int,
+    open val serverTransactionsRetentionDays: Int,
     open val settingCountEntriesAllowed: Boolean,
     open val settingAllAccountAllowed: Boolean
 ) : JobParameters(parameters) {
