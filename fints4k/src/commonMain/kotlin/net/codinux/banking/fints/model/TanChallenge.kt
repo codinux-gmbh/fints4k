@@ -1,6 +1,7 @@
 package net.codinux.banking.fints.model
 
 import kotlinx.datetime.Instant
+import kotlinx.datetime.LocalDateTime
 import net.codinux.banking.fints.extensions.nowExt
 import net.codinux.banking.fints.messages.datenelemente.implementierte.tan.TanMedium
 import net.codinux.banking.fints.response.BankResponse
@@ -15,6 +16,12 @@ open class TanChallenge(
     val tanMediaIdentifier: String?,
     val bank: BankData,
     val account: AccountData? = null,
+    /**
+     * Datum und Uhrzeit, bis zu welchem Zeitpunkt eine TAN auf Basis der gesendeten Challenge gültig ist. Nach Ablauf der Gültigkeitsdauer wird die entsprechende TAN entwertet.
+     *
+     * In server's time zone, that is Europe/Berlin.
+     */
+    val tanExpirationTime: LocalDateTime? = null,
     val challengeCreationTimestamp: Instant = Instant.nowExt()
 ) {
 

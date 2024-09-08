@@ -388,7 +388,7 @@ open class FinTsJobExecutor(
             delay(500)
 
             // most TANs a valid 5 - 15 minutes. So terminate wait process after that time
-            if (Instant.nowExt() > tanChallenge.timestamp.plusMinutes(15)) {
+            if (Instant.nowExt() > tanChallenge.challengeCreationTimestamp.plusMinutes(15)) {
                 if (tanChallenge.isEnteringTanDone == false) {
                     tanChallenge.userDidNotEnterTan()
                 }
@@ -412,13 +412,13 @@ open class FinTsJobExecutor(
             TanMethodType.ChipTanFlickercode ->
                 FlickerCodeTanChallenge(
                     FlickerCodeDecoder().decodeChallenge(challenge, tanMethod.hhdVersion ?: HHDVersion.HHD_1_4), // HHD 1.4 is currently the most used version
-                    forAction, messageToShowToUser, challenge, tanMethod, tanResponse.tanMediaIdentifier, bank, account)
+                    forAction, messageToShowToUser, challenge, tanMethod, tanResponse.tanMediaIdentifier, bank, account, tanResponse.tanExpirationTime)
 
             TanMethodType.ChipTanQrCode, TanMethodType.ChipTanPhotoTanMatrixCode,
             TanMethodType.QrCode, TanMethodType.photoTan ->
-                ImageTanChallenge(TanImageDecoder().decodeChallenge(challenge), forAction, messageToShowToUser, challenge, tanMethod, tanResponse.tanMediaIdentifier, bank, account)
+                ImageTanChallenge(TanImageDecoder().decodeChallenge(challenge), forAction, messageToShowToUser, challenge, tanMethod, tanResponse.tanMediaIdentifier, bank, account, tanResponse.tanExpirationTime)
 
-            else -> TanChallenge(forAction, messageToShowToUser, challenge, tanMethod, tanResponse.tanMediaIdentifier, bank, account)
+            else -> TanChallenge(forAction, messageToShowToUser, challenge, tanMethod, tanResponse.tanMediaIdentifier, bank, account, tanResponse.tanExpirationTime)
         }
     }
 

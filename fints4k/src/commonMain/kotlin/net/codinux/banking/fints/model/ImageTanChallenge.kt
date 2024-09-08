@@ -1,5 +1,6 @@
 package net.codinux.banking.fints.model
 
+import kotlinx.datetime.LocalDateTime
 import net.codinux.banking.fints.tan.TanImage
 
 
@@ -11,8 +12,9 @@ open class ImageTanChallenge(
     tanMethod: TanMethod,
     tanMediaIdentifier: String?,
     bank: BankData,
-    account: AccountData? = null
-) : TanChallenge(forAction, messageToShowToUser, challenge, tanMethod, tanMediaIdentifier, bank, account) {
+    account: AccountData? = null,
+    tanExpirationTime: LocalDateTime? = null
+) : TanChallenge(forAction, messageToShowToUser, challenge, tanMethod, tanMediaIdentifier, bank, account, tanExpirationTime) {
 
     override fun toString(): String {
         return "$tanMethod (medium: $tanMediaIdentifier) $image: $messageToShowToUser"

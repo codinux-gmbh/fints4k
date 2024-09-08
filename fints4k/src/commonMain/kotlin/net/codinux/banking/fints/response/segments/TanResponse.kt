@@ -31,7 +31,13 @@ open class TanResponse(
     val challenge: String?, // M: bei TAN-Prozess=1, 3, 4. O: bei TAN-Prozess=2
 
     val challengeHHD_UC: String?,
-    val validityDateTimeForChallenge: LocalDateTime?,
+
+    /**
+     * Datum und Uhrzeit, bis zu welchem Zeitpunkt eine TAN auf Basis der gesendeten Challenge gültig ist. Nach Ablauf der Gültigkeitsdauer wird die entsprechende TAN entwertet.
+     *
+     * In server's time zone, that is Europe/Berlin.
+     */
+    val tanExpirationTime: LocalDateTime?,
     val tanMediaIdentifier: String? = null, // M: bei TAN-Prozess=1, 3, 4 und „Anzahl unterstützter aktiver TAN-Medien“ nicht vorhanden. O: sonst
 
     segmentString: String
