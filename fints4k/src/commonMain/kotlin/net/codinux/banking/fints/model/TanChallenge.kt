@@ -15,7 +15,7 @@ open class TanChallenge(
     val tanMediaIdentifier: String?,
     val bank: BankData,
     val account: AccountData? = null,
-    val timestamp: Instant = Instant.nowExt()
+    val challengeCreationTimestamp: Instant = Instant.nowExt()
 ) {
 
     var enterTanResult: EnterTanResult? = null
