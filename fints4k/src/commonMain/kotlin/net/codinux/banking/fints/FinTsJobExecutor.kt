@@ -387,8 +387,10 @@ open class FinTsJobExecutor(
         while (tanChallenge.isEnteringTanDone == false) {
             delay(500)
 
-            // most TANs a valid 5 - 15 minutes. So terminate wait process after that time
-            if (Instant.nowExt() > tanChallenge.challengeCreationTimestamp.plusMinutes(15)) {
+            val now = Instant.nowExt()
+            if ((tanChallenge.tanExpirationTime != null && now > tanChallenge.tanExpirationTime) ||
+                // most TANs a valid 5 - 15 minutes. So terminate wait process after that time
+                (tanChallenge.tanExpirationTime == null && now > tanChallenge.challengeCreationTimestamp.plusMinutes(15))) {
                 if (tanChallenge.isEnteringTanDone == false) {
                     tanChallenge.userDidNotEnterTan()
                 }
