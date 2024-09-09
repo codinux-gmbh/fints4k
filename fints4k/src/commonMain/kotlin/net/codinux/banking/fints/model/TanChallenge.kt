@@ -5,6 +5,7 @@ import net.codinux.banking.fints.extensions.nowExt
 import net.codinux.banking.fints.messages.datenelemente.implementierte.tan.TanMedium
 import net.codinux.banking.fints.response.BankResponse
 import net.codinux.banking.fints.response.client.FinTsClientResponse
+import net.codinux.log.Log
 
 
 open class TanChallenge(
@@ -30,6 +31,8 @@ open class TanChallenge(
     open val isEnteringTanDone: Boolean
         get() = enterTanResult != null
 
+    private val tanExpiredCallbacks = mutableListOf<() -> Unit>()
+
     private val userApprovedDecoupledTanCallbacks = mutableListOf<() -> Unit>()
 
 
@@ -40,7 +43,13 @@ open class TanChallenge(
     internal fun userApprovedDecoupledTan(responseAfterApprovingDecoupledTan: BankResponse) {
         this.enterTanResult = EnterTanResult(null, true, responseAfterApprovingDecoupledTan)
 
-        userApprovedDecoupledTanCallbacks.forEach { it.invoke() }
+        userApprovedDecoupledTanCallbacks.forEach {
+            try {
+                it.invoke()
+            } catch (e: Throwable) {
+                Log.error(e) { "Could not call userApprovedDecoupledTanCallback" }
+            }
+        }
         clearUserApprovedDecoupledTanCallbacks()
     }
 
@@ -48,6 +57,20 @@ open class TanChallenge(
         clearUserApprovedDecoupledTanCallbacks()
 
         this.enterTanResult = EnterTanResult(null)
+    }
+
+    internal fun tanExpired() {
+        tanExpiredCallbacks.forEach {
+            try {
+                it.invoke()
+            } catch (e: Throwable) {
+                Log.error(e) { "Could not call tanExpiredCallback" }
+            }
+        }
+
+        clearTanExpiredCallbacks()
+
+        userDidNotEnterTan()
     }
 
     fun userAsksToChangeTanMethod(changeTanMethodTo: TanMethod) {
@@ -62,6 +85,16 @@ open class TanChallenge(
         this.enterTanResult = EnterTanResult(null, changeTanMediumTo = changeTanMediumTo, changeTanMediumResultCallback = changeTanMediumResultCallback)
     }
 
+
+    fun addTanExpiredCallback(callback: () -> Unit) {
+        if (isEnteringTanDone == false) {
+            this.tanExpiredCallbacks.add(callback)
+        }
+    }
+
+    protected open fun clearTanExpiredCallbacks() {
+        tanExpiredCallbacks.clear()
+    }
 
     fun addUserApprovedDecoupledTanCallback(callback: () -> Unit) {
         if (isEnteringTanDone == false) {

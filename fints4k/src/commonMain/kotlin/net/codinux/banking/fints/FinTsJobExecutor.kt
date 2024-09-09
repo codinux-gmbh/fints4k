@@ -392,7 +392,7 @@ open class FinTsJobExecutor(
                 // most TANs a valid 5 - 15 minutes. So terminate wait process after that time
                 (tanChallenge.tanExpirationTime == null && now > tanChallenge.challengeCreationTimestamp.plusMinutes(15))) {
                 if (tanChallenge.isEnteringTanDone == false) {
-                    tanChallenge.userDidNotEnterTan()
+                    tanChallenge.tanExpired()
                 }
 
                 break
@@ -477,6 +477,8 @@ open class FinTsJobExecutor(
                 return null
             }
         }
+
+        tanChallenge.tanExpired()
 
         return null
     }
