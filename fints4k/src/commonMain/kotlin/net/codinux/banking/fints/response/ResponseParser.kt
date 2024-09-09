@@ -1,9 +1,7 @@
 package net.codinux.banking.fints.response
 
-import kotlinx.datetime.LocalDate
-import kotlinx.datetime.LocalDateTime
-import kotlinx.datetime.LocalTime
-import kotlinx.datetime.atTime
+import kotlinx.datetime.*
+import net.codinux.banking.fints.extensions.EuropeBerlin
 import net.codinux.log.logger
 import net.codinux.banking.fints.log.IMessageLogAppender
 import net.codinux.banking.fints.messages.Separators
@@ -577,7 +575,7 @@ open class ResponseParser(
             if (dataElementGroups.size > 3) parseStringToNullIfEmpty(dataElementGroups[3]) else null,
             if (dataElementGroups.size > 4) parseStringToNullIfEmpty(dataElementGroups[4]) else null,
             binaryChallengeHHD_UC?.let { extractBinaryData(it) },
-            if (dataElementGroups.size > 6) parseNullableDateTime(dataElementGroups[6]) else null,
+            if (dataElementGroups.size > 6) parseNullableDateTime(dataElementGroups[6])?.toInstant(TimeZone.EuropeBerlin) else null,
             if (dataElementGroups.size > 7) parseStringToNullIfEmpty(dataElementGroups[7]) else null,
             segment
         )

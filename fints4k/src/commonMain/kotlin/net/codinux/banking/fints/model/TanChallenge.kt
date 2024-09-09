@@ -1,7 +1,6 @@
 package net.codinux.banking.fints.model
 
 import kotlinx.datetime.Instant
-import kotlinx.datetime.LocalDateTime
 import net.codinux.banking.fints.extensions.nowExt
 import net.codinux.banking.fints.messages.datenelemente.implementierte.tan.TanMedium
 import net.codinux.banking.fints.response.BankResponse
@@ -21,7 +20,7 @@ open class TanChallenge(
      *
      * In server's time zone, that is Europe/Berlin.
      */
-    val tanExpirationTime: LocalDateTime? = null,
+    val tanExpirationTime: Instant? = null,
     val challengeCreationTimestamp: Instant = Instant.nowExt()
 ) {
 

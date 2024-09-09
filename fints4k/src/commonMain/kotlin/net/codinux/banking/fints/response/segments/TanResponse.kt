@@ -1,6 +1,6 @@
 package net.codinux.banking.fints.response.segments
 
-import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.Instant
 import net.codinux.banking.fints.messages.datenelemente.implementierte.tan.TanProcess
 
 
@@ -37,7 +37,7 @@ open class TanResponse(
      *
      * In server's time zone, that is Europe/Berlin.
      */
-    val tanExpirationTime: LocalDateTime?,
+    val tanExpirationTime: Instant?,
     val tanMediaIdentifier: String? = null, // M: bei TAN-Prozess=1, 3, 4 und „Anzahl unterstützter aktiver TAN-Medien“ nicht vorhanden. O: sonst
 
     segmentString: String
