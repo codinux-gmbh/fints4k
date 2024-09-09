@@ -63,8 +63,13 @@ open class FinTsClient(
       return GetAccountDataResponse(ErrorCode.NoneOfTheAccountsSupportsRetrievingData, errorMessage, mapper.map(bank), previousJobMessageLog ?: listOf(), bank)
     }
 
-    accountsSupportingRetrievingTransactions.forEach { account ->
-      retrievedTransactionsResponses.add(getAccountTransactions(param, bank, account))
+    for (account in accountsSupportingRetrievingTransactions) {
+      val response = getAccountTransactions(param, bank, account)
+      retrievedTransactionsResponses.add(response)
+
+      if (response.tanRequiredButWeWereToldToAbortIfSo || response.userCancelledAction) { // if user cancelled action or TAN is required but we were told to abort then, then don't continue with next account
+        break
+      }
     }
 
     val unsuccessfulJob = retrievedTransactionsResponses.firstOrNull { it.successful == false }
