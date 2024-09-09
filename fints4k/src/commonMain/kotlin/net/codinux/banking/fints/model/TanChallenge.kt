@@ -43,7 +43,7 @@ open class TanChallenge(
     internal fun userApprovedDecoupledTan(responseAfterApprovingDecoupledTan: BankResponse) {
         this.enterTanResult = EnterTanResult(null, true, responseAfterApprovingDecoupledTan)
 
-        userApprovedDecoupledTanCallbacks.forEach {
+        userApprovedDecoupledTanCallbacks.toTypedArray().forEach { // copy to avoid ConcurrentModificationException
             try {
                 it.invoke()
             } catch (e: Throwable) {
@@ -60,7 +60,7 @@ open class TanChallenge(
     }
 
     internal fun tanExpired() {
-        tanExpiredCallbacks.forEach {
+        tanExpiredCallbacks.toTypedArray().forEach {
             try {
                 it.invoke()
             } catch (e: Throwable) {
