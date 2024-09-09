@@ -184,12 +184,14 @@ open class FinTsClient(
       return net.dankito.banking.client.model.response.FinTsClientResponse(null, null, emptyList(), param.finTsModel)
     }
 
-    val finTsServerAddress = config.finTsServerAddressFinder.findFinTsServerAddress(param.bankCode)
+    val defaultValues = (param as? GetAccountDataParameter)?.defaultBankValues
+
+    val finTsServerAddress = defaultValues?.finTs3ServerAddress ?: config.finTsServerAddressFinder.findFinTsServerAddress(param.bankCode)
     if (finTsServerAddress.isNullOrBlank()) {
       return net.dankito.banking.client.model.response.FinTsClientResponse(ErrorCode.BankDoesNotSupportFinTs3, "Either bank does not support FinTS 3.0 or we don't know its FinTS server address", emptyList(), null)
     }
 
-    val bank = mapper.mapToBankData(param, finTsServerAddress)
+    val bank = mapper.mapToBankData(param, finTsServerAddress, defaultValues)
 
     val getAccountInfoResponse = getAccountInfo(param, bank)
 

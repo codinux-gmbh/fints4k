@@ -26,8 +26,11 @@ open class FinTsModelMapper {
   protected open val bicFinder = BicFinder()
 
 
-  open fun mapToBankData(param: FinTsClientParameter, finTsServerAddress: String): BankData {
-    return BankData(param.bankCode, param.loginName, param.password, finTsServerAddress, bicFinder.findBic(param.bankCode) ?: "")
+  open fun mapToBankData(param: FinTsClientParameter, finTsServerAddress: String, defaultValues: BankData? = null): BankData {
+    return BankData(
+      param.bankCode, param.loginName, param.password, finTsServerAddress,
+      defaultValues?.bic ?: bicFinder.findBic(param.bankCode) ?: "", defaultValues?.bankName ?: ""
+    )
   }
 
   open fun mapToAccountData(credentials: BankAccountIdentifier, param: FinTsClientParameter): AccountData {

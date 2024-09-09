@@ -23,7 +23,8 @@ open class GetAccountDataParameter(
     preferredTanMethods: List<TanMethodType>? = null,
     preferredTanMedium: String? = null,
     abortIfTanIsRequired: Boolean = false,
-    finTsModel: BankData? = null
+    finTsModel: BankData? = null,
+    open val defaultBankValues: BankData? = null
 ) : FinTsClientParameter(bankCode, loginName, password, preferredTanMethods, preferredTanMedium, abortIfTanIsRequired, finTsModel) {
 
     open val retrieveOnlyAccountInfo: Boolean
