@@ -55,7 +55,7 @@ open class JobContext(
     protected open var dialogNumber: Int = 0
 
 
-    open fun startNewDialog(closeDialog: Boolean = true, dialogId: String = DialogContext.InitialDialogId,
+    open fun startNewDialog(closeDialog: Boolean = config.options.closeDialogs, dialogId: String = DialogContext.InitialDialogId,
                        versionOfSecurityProcedure: VersionDesSicherheitsverfahrens = VersionDesSicherheitsverfahrens.Version_2,
                        chunkedResponseHandler: ((BankResponse) -> Unit)? = dialog.chunkedResponseHandler) : DialogContext {
 

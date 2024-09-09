@@ -26,6 +26,9 @@ data class FinTsClientOptions(
      * Defaults to true.
      */
     val removeSensitiveDataFromMessageLog: Boolean = true,
+
+    val closeDialogs: Boolean = true,
+
     val version: String = "1.0.0", // TODO: get version dynamically
     val productName: String = "15E53C26816138699C7B6A3E8"
 ) {
