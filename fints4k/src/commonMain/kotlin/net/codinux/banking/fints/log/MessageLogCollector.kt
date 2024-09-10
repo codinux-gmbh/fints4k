@@ -69,7 +69,7 @@ open class MessageLogCollector(
         addMessageLogEntry(type, context, messageTrace, prettyPrintMessage, null, parsedSegments)
     }
 
-    open fun logError(loggingClass: KClass<*>, message: String, context: MessageContext, e: Exception? = null) {
+    open fun logError(loggingClass: KClass<*>, message: String, context: MessageContext, e: Throwable? = null) {
         val type = MessageLogEntryType.Error
         val messageTrace = createMessageTraceString(type, context)
 

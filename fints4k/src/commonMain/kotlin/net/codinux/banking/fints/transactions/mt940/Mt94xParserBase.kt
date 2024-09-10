@@ -6,7 +6,6 @@ import net.codinux.log.logger
 import net.codinux.banking.fints.log.IMessageLogAppender
 import net.codinux.banking.fints.model.Amount
 import net.codinux.banking.fints.transactions.mt940.model.*
-import net.codinux.banking.fints.mapper.DateFormatter
 
 
 /*
@@ -65,8 +64,6 @@ abstract class Mt94xParserBase<T: AccountStatementCommon>(
 
         const val AmountOfCreditPostingsCode = "90C"
 
-
-        val DateFormatter = DateFormatter("yyMMdd") // TODO: replace with LocalDate.Format { }
 
         val CreditDebitCancellationRegex = Regex("C|D|RC|RD")
 
@@ -215,7 +212,7 @@ abstract class Mt94xParserBase<T: AccountStatementCommon>(
 
         val isDebit = fieldValue.startsWith("D")
         val bookingDateString = fieldValue.substring(1, 7)
-        val statementDate = parseMt940Date(bookingDateString)
+        val statementDate = parseDate(bookingDateString)
         val currency = fieldValue.substring(7, 10)
         val amountString = fieldValue.substring(10)
         val amount = parseAmount(amountString)
@@ -259,7 +256,7 @@ abstract class Mt94xParserBase<T: AccountStatementCommon>(
      */
     protected open fun parseStatementLine(fieldValue: String): StatementLine {
         val valueDateString = fieldValue.substring(0, 6)
-        val valueDate = parseMt940Date(valueDateString)
+        val valueDate = parseDate(valueDateString)
 
         val creditMarkMatchResult = CreditDebitCancellationRegex.find(fieldValue)
         val isDebit = creditMarkMatchResult?.value?.endsWith('D') == true
@@ -469,58 +466,51 @@ abstract class Mt94xParserBase<T: AccountStatementCommon>(
     }
 
 
-    open fun parseMt940Date(dateString: String): LocalDate {
-        // TODO: this should be necessary anymore, isn't it?
+    open fun parseDate(dateString: String): LocalDate {
+        try {
+            var year = dateString.substring(0, 2).toInt()
+            val month = dateString.substring(2, 4).toInt()
+            val day = dateString.substring(4, 6).toInt()
 
-        // SimpleDateFormat is not thread-safe. Before adding another library i decided to parse
-        // this really simple date format on my own
-        if (dateString.length == 6) {
-            try {
-                var year = dateString.substring(0, 2).toInt()
-                val month = dateString.substring(2, 4).toInt()
-                val day = dateString.substring(4, 6).toInt()
-
-                /**
-                 * Bei 6-stelligen Datumsangaben (d.h. JJMMTT) wird gemäß SWIFT zwischen dem 20. und 21.
-                 * Jahrhundert wie folgt unterschieden:
-                 * - Ist das Jahr (d.h. JJ) größer als 79, bezieht sich das Datum auf das 20. Jahrhundert. Ist
-                 * das Jahr 79 oder kleiner, bezieht sich das Datum auf das 21. Jahrhundert.
-                 * - Ist JJ > 79:JJMMTT = 19JJMMTT
-                 * - sonst: JJMMTT = 20JJMMTT
-                 * - Damit reicht die Spanne des sechsstelligen Datums von 1980 bis 2079.
-                 */
-                if (year > 79) {
-                    year += 1900
-                } else {
-                    year += 2000
-                }
-
-                // ah, here we go, banks (in Germany) calculate with 30 days each month, so yes, it can happen that dates
-                // like 30th of February or 29th of February in non-leap years occur, see:
-                // https://de.m.wikipedia.org/wiki/30._Februar#30._Februar_in_der_Zinsberechnung
-                if (month == 2 && (day > 29 || (day > 28 && year % 4 != 0))) { // fix that for banks each month has 30 days
-                    return LocalDate(year, 3, 1)
-                }
-
-                return LocalDate(year , month, day)
-            } catch (e: Exception) {
-                logError("Could not parse dateString '$dateString'", e)
+            /**
+             * Bei 6-stelligen Datumsangaben (d.h. JJMMTT) wird gemäß SWIFT zwischen dem 20. und 21.
+             * Jahrhundert wie folgt unterschieden:
+             * - Ist das Jahr (d.h. JJ) größer als 79, bezieht sich das Datum auf das 20. Jahrhundert. Ist
+             * das Jahr 79 oder kleiner, bezieht sich das Datum auf das 21. Jahrhundert.
+             * - Ist JJ > 79:JJMMTT = 19JJMMTT
+             * - sonst: JJMMTT = 20JJMMTT
+             * - Damit reicht die Spanne des sechsstelligen Datums von 1980 bis 2079.
+             */
+            if (year > 79) {
+                year += 1900
+            } else {
+                year += 2000
             }
-        }
 
-        return DateFormatter.parseDate(dateString)!! // fallback to not thread-safe SimpleDateFormat. Works in most cases but not all
+            // ah, here we go, banks (in Germany) calculate with 30 days each month, so yes, it can happen that dates
+            // like 30th of February or 29th of February in non-leap years occur, see:
+            // https://de.m.wikipedia.org/wiki/30._Februar#30._Februar_in_der_Zinsberechnung
+            if (month == 2 && (day > 29 || (day > 28 && year % 4 != 0))) { // fix that for banks each month has 30 days
+                return LocalDate(year, 3, 1)
+            }
+
+            return LocalDate(year , month, day)
+        } catch (e: Throwable) {
+            logError("Could not parse dateString '$dateString'", e)
+            throw e
+        }
     }
 
     /**
      * Booking date string consists only of MMDD -> we need to take the year from value date string.
      */
     protected open fun parseMt940BookingDate(bookingDateString: String, valueDateString: String, valueDate: LocalDate): LocalDate {
-        val bookingDate = parseMt940Date(valueDateString.substring(0, 2) + bookingDateString)
+        val bookingDate = parseDate(valueDateString.substring(0, 2) + bookingDateString)
 
         // there are rare cases that booking date is e.g. on 31.12.2019 and value date on 01.01.2020 -> booking date would be on 31.12.2020 (and therefore in the future)
         val bookingDateMonth = bookingDate.month
         if (bookingDateMonth != valueDate.month && bookingDateMonth == Month.DECEMBER) {
-            return parseMt940Date("" + (valueDate.year - 1 - 2000) + bookingDateString)
+            return parseDate("" + (valueDate.year - 1 - 2000) + bookingDateString)
         }
 
         return bookingDate
@@ -534,7 +524,7 @@ abstract class Mt94xParserBase<T: AccountStatementCommon>(
     }
 
     open fun parseDateTime(dateTimeString: String): Instant {
-        val date = parseMt940Date(dateTimeString.substring(0, 6))
+        val date = parseDate(dateTimeString.substring(0, 6))
 
         val time = parseTime(dateTimeString.substring(6, 10))
 
@@ -555,10 +545,8 @@ abstract class Mt94xParserBase<T: AccountStatementCommon>(
     }
 
 
-    protected open fun logError(message: String, e: Exception?) {
-        logAppender?.let { logAppender ->
-            logAppender.logError(Mt94xParserBase::class, message, e)
-        }
+    protected open fun logError(message: String, e: Throwable?) {
+        logAppender?.logError(Mt94xParserBase::class, message, e)
         ?: run {
             log.error(e) { message }
         }

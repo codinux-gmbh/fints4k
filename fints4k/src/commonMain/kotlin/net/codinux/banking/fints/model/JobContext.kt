@@ -82,7 +82,7 @@ open class JobContext(
         messageLogCollector.addMessageLog(type, message, createMessageContext(), parsedSegments)
     }
 
-    override fun logError(loggingClass: KClass<*>, message: String, e: Exception?) {
+    override fun logError(loggingClass: KClass<*>, message: String, e: Throwable?) {
         messageLogCollector.logError(loggingClass, message, createMessageContext(), e)
     }
 

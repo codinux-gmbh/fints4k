@@ -15,8 +15,8 @@ import kotlin.test.assertContains
 class Mt940ParserTest : MtParserTestBase() {
 
     private val underTest = object : Mt940Parser() {
-        public override fun parseMt940Date(dateString: String): LocalDate {
-            return super.parseMt940Date(dateString)
+        public override fun parseDate(dateString: String): LocalDate {
+            return super.parseDate(dateString)
         }
     }
 
@@ -229,28 +229,28 @@ class Mt940ParserTest : MtParserTestBase() {
 
     @Test
     fun parseDate() {
-        val result = underTest.parseMt940Date("240507")
+        val result = underTest.parseDate("240507")
 
         assertEquals(LocalDate(2024, 5, 7), result)
     }
 
     @Test
     fun parseDateBeforeYear2000() {
-        val result = underTest.parseMt940Date("990507")
+        val result = underTest.parseDate("990507")
 
         assertEquals(LocalDate(1999, 5, 7), result)
     }
 
     @Test
     fun parseDate_FixSparkasse29thOFFebruaryInNonLeapYearBug() {
-        val result = underTest.parseMt940Date("230229")
+        val result = underTest.parseDate("230229")
 
         assertEquals(LocalDate(2023, 3, 1), result)
     }
 
     @Test
     fun parseDate_FixSparkasse30thOfFebruaryBug() {
-        val result = underTest.parseMt940Date("230229")
+        val result = underTest.parseDate("230229")
 
         assertEquals(LocalDate(2023, 3, 1), result)
     }
