@@ -1,7 +1,7 @@
 package net.codinux.banking.fints.transactions.mt940
 
-import kotlinx.datetime.LocalDate
-import kotlinx.datetime.Month
+import kotlinx.datetime.*
+import net.codinux.banking.fints.extensions.EuropeBerlin
 import net.codinux.log.logger
 import net.codinux.banking.fints.log.IMessageLogAppender
 import net.codinux.banking.fints.model.Amount
@@ -469,7 +469,7 @@ abstract class Mt94xParserBase<T: AccountStatementCommon>(
     }
 
 
-    protected open fun parseMt940Date(dateString: String): LocalDate {
+    open fun parseMt940Date(dateString: String): LocalDate {
         // TODO: this should be necessary anymore, isn't it?
 
         // SimpleDateFormat is not thread-safe. Before adding another library i decided to parse
@@ -524,6 +524,30 @@ abstract class Mt94xParserBase<T: AccountStatementCommon>(
         }
 
         return bookingDate
+    }
+
+    open fun parseTime(timeString: String): LocalTime {
+        val hour = timeString.substring(0, 2).toInt()
+        val minute = timeString.substring(2, 4).toInt()
+
+        return LocalTime(hour, minute)
+    }
+
+    open fun parseDateTime(dateTimeString: String): Instant {
+        val date = parseMt940Date(dateTimeString.substring(0, 6))
+
+        val time = parseTime(dateTimeString.substring(6, 10))
+
+        val dateTime = LocalDateTime(date, time)
+
+        return if (dateTimeString.length == 15) { // actually mandatory, but by far not always stated: the time zone
+            val plus = dateTimeString[10] == '+'
+            val timeDifference = parseTime(dateTimeString.substring(11))
+
+            dateTime.toInstant(UtcOffset(if (plus) timeDifference.hour else timeDifference.hour * -1, timeDifference.minute))
+        } else { // we then assume the server states the DateTime in FinTS's default time zone, Europe/Berlin
+            dateTime.toInstant(TimeZone.EuropeBerlin)
+        }
     }
 
     protected open fun parseAmount(amountString: String): Amount {

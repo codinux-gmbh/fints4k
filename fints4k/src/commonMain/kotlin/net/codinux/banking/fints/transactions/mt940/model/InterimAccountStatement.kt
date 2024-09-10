@@ -1,7 +1,5 @@
 package net.codinux.banking.fints.transactions.mt940.model
 
-import kotlinx.datetime.Instant
-
 open class InterimAccountStatement(
     orderReferenceNumber: String,
     referenceNumber: String?,
@@ -12,11 +10,12 @@ open class InterimAccountStatement(
     statementNumber: Int,
     sheetNumber: Int?,
 
-    val smallestAmountOfReportedTransactions: AmountAndCurrency,
-
-    val smallestAmountOfReportedCreditTransactions: AmountAndCurrency? = null,
-
-    val creationTime: Instant,
+    // decided against parsing them, see Mt942Parser
+//    val smallestAmountOfReportedTransactions: AmountAndCurrency,
+//
+//    val smallestAmountOfReportedCreditTransactions: AmountAndCurrency? = null,
+//
+//    val creationTime: Instant,
 
     transactions: List<Transaction>,
 
@@ -27,11 +26,11 @@ open class InterimAccountStatement(
 ) : AccountStatementCommon(orderReferenceNumber, referenceNumber, bankCodeBicOrIban, accountIdentifier, statementNumber, sheetNumber, transactions) {
 
     // for object deserializers
-    private constructor() : this("", "", "", null, 0, null, AmountAndCurrency(), null, Instant.DISTANT_PAST, listOf())
+    private constructor() : this("", "", "", null, 0, null, listOf())
 
 
     override fun toString(): String {
-        return "$smallestAmountOfReportedTransactions ${super.toString()}"
+        return "${amountAndTotalOfDebitPostings?.amount} ${super.toString()}"
     }
 
 }

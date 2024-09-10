@@ -1,6 +1,5 @@
 package net.codinux.banking.fints.transactions.mt940
 
-import kotlinx.datetime.Instant
 import net.codinux.banking.fints.log.IMessageLogAppender
 import net.codinux.banking.fints.transactions.mt940.model.AmountAndCurrency
 import net.codinux.banking.fints.transactions.mt940.model.InterimAccountStatement
@@ -42,9 +41,12 @@ open class Mt942Parser(
         transactions: List<Transaction>,
         fieldsByCode: List<Pair<String, String>>
     ): InterimAccountStatement {
-        val smallestAmounts = fieldsByCode.filter { it.first.startsWith(SmallestAmountCode) } // should we parse it? i see no use in it
-            .mapIndexed { index, field -> parseAmountAndCurrency(field.second, index == 0) }
-        val creationTime = fieldsByCode.first { it.first == CreationTimeCode || it.first.startsWith(CreationTimeStartCode) } // should we parse it? i see no use in it
+        // also decided against parsing smallest amounts, i don't think they ever going to be used
+//        val smallestAmounts = fieldsByCode.filter { it.first.startsWith(SmallestAmountCode) } // should we parse it? i see no use in it
+//            .mapIndexed { index, field -> parseAmountAndCurrency(field.second, index == 0) }
+
+        // decided against parsing creation time as there are so many non specification confirm time formats that parsing is likely to fail 'cause of this unused value
+//        val creationTime = parseDateTime(fieldsByCode.first { it.first == CreationTimeCode || it.first.startsWith(CreationTimeStartCode) }.second)
 
         val numberAndTotalOfDebitPostings = fieldsByCode.firstOrNull { it.first.equals(AmountOfDebitPostingsCode) }
             ?.let { parseNumberAndTotalOfPostings(it.second) }
@@ -55,9 +57,6 @@ open class Mt942Parser(
             orderReferenceNumber, referenceNumber,
             bankCodeBicOrIban, accountIdentifier,
             statementNumber, sheetNumber,
-            smallestAmounts.first(),
-            if (smallestAmounts.size > 1) smallestAmounts[1] else null,
-            Instant.DISTANT_PAST,
             transactions,
             numberAndTotalOfDebitPostings,
             numberAndTotalOfCreditPostings
