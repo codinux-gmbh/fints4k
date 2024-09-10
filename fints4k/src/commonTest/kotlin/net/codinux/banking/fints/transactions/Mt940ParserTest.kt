@@ -106,13 +106,15 @@ class Mt940ParserTest : FinTsTestBase() {
     fun accountStatementWithTwoTransactions() {
 
         // when
-        val result = underTest.parseMt940String(AccountStatementWithTwoTransactions)
+        val (statements, remainder) = underTest.parseMt940Chunk(AccountStatementWithTwoTransactions)
 
 
         // then
-        assertSize(1, result)
+        assertEmpty(remainder)
 
-        val statement = result.first()
+        assertSize(1, statements)
+
+        val statement = statements.first()
 
         assertEquals(BankCode, statement.bankCodeBicOrIban)
         assertEquals(CustomerId, statement.accountIdentifier)
@@ -130,6 +132,33 @@ class Mt940ParserTest : FinTsTestBase() {
         assertTurnover(secondTransaction.statementLine, AccountStatement1BookingDate, AccountStatement1Transaction2Amount, false)
         assertTransactionDetails(secondTransaction.information, AccountStatement1Transaction2OtherPartyName,
             AccountStatement1Transaction2OtherPartyBankId, AccountStatement1Transaction2OtherPartyAccountId)
+    }
+
+    @Test
+    fun accountStatementWithPartialNextStatement() {
+
+        // when
+        val (statements, remainder) = underTest.parseMt940Chunk(AccountStatementWithSingleTransaction + "\r\n" + ":20:STARTUMSE")
+
+
+        // then
+        assertEquals(":20:STARTUMSE", remainder)
+
+        assertSize(1, statements)
+
+        val statement = statements.first()
+
+        assertEquals(BankCode, statement.bankCodeBicOrIban)
+        assertEquals(CustomerId, statement.accountIdentifier)
+        assertBalance(statement.openingBalance, true, AccountStatement1PreviousStatementBookingDate, AccountStatement1OpeningBalanceAmount)
+        assertBalance(statement.closingBalance, true, AccountStatement1BookingDate, AccountStatement1ClosingBalanceAmount)
+
+        assertSize(1, statement.transactions)
+
+        val transaction = statement.transactions.first()
+        assertTurnover(transaction.statementLine, AccountStatement1BookingDate, AccountStatement1Transaction1Amount)
+        assertTransactionDetails(transaction.information, AccountStatement1Transaction1OtherPartyName,
+            AccountStatement1Transaction1OtherPartyBankId, AccountStatement1Transaction1OtherPartyAccountId)
     }
 
     @Test
