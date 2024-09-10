@@ -41,13 +41,29 @@ abstract class Mt94xParserBase<T: AccountStatementCommon>(
 
         const val StatementNumberCode = "28C"
 
-        const val OpeningBalanceCode = "60"
-
         const val StatementLineCode = "61"
 
         const val RemittanceInformationFieldCode = "86"
 
+
+        // MT 940 codes
+
+        const val OpeningBalanceCode = "60"
+
         const val ClosingBalanceCode = "62"
+
+
+        // MT 942 codes
+
+        const val SmallestAmountCode = "34F"
+        const val SmallestAmountStartCode = "34"
+
+        const val CreationTimeCode = "13D"
+        const val CreationTimeStartCode = "13" // Deutsche Bank and Sparkasse both use "13" instead of correct "13D"
+
+        const val AmountOfDebitPostingsCode = "90D"
+
+        const val AmountOfCreditPostingsCode = "90C"
 
 
         val DateFormatter = DateFormatter("yyMMdd") // TODO: replace with LocalDate.Format { }
