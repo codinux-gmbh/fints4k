@@ -217,7 +217,7 @@ open class FinTsJobExecutor(
                     context.bank, parameter.account)
 
                 bookedTransactions.addAll(chunkTransaction)
-                remainingMt940String = remainder
+                remainingMt940String = remainder ?: ""
 
                 parameter.retrievedChunkListener?.invoke(bookedTransactions)
             }

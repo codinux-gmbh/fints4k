@@ -25,6 +25,6 @@ interface IMt940Parser {
      * be displayed immediately to user and the remainder then be passed together with next partial
      * HKKAZ response to this method till this whole MT 940 statement is parsed.
      */
-    fun parseMt940Chunk(mt940Chunk: String): Pair<List<AccountStatement>, String>
+    fun parseMt940Chunk(mt940Chunk: String): Pair<List<AccountStatement>, String?>
 
 }

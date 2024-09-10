@@ -110,7 +110,7 @@ class Mt940ParserTest : FinTsTestBase() {
 
 
         // then
-        assertEmpty(remainder)
+        assertNull(remainder)
 
         assertSize(1, statements)
 

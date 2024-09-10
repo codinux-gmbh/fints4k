@@ -13,6 +13,6 @@ interface IAccountTransactionsParser {
 
     fun parseTransactions(transactionsString: String, bank: BankData, account: AccountData): List<AccountTransaction>
 
-    fun parseTransactionsChunk(transactionsChunk: String, bank: BankData, account: AccountData): Pair<List<AccountTransaction>, String>
+    fun parseTransactionsChunk(transactionsChunk: String, bank: BankData, account: AccountData): Pair<List<AccountTransaction>, String?>
 
 }
