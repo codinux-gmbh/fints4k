@@ -1,7 +1,5 @@
 package net.codinux.banking.fints
 
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import kotlinx.datetime.*
 import net.codinux.banking.fints.callback.FinTsClientCallback
 import net.codinux.banking.fints.config.FinTsClientConfiguration
@@ -39,13 +37,13 @@ open class FinTsClientDeprecated(
     }
 
 
-    open suspend fun addAccountAsync(parameter: AddAccountParameter): AddAccountResponse {
-        val bank = parameter.bank
-        val context = JobContext(JobContextType.AddAccount, this.callback, config, bank)
+    open suspend fun addAccountAsync(param: AddAccountParameter): AddAccountResponse {
+        val bank = param.bank
+        val context = JobContext(JobContextType.AddAccount, this.callback, config, bank, null, param.preferredTanMethods, param.preferredTanMedium)
 
         /*      First dialog: Get user's basic data like BPD, customer system ID and her TAN methods     */
 
-        val newUserInfoResponse = config.jobExecutor.retrieveBasicDataLikeUsersTanMethods(context, parameter.preferredTanMethods, parameter.preferredTanMedium)
+        val newUserInfoResponse = config.jobExecutor.retrieveBasicDataLikeUsersTanMethods(context)
 
         if (newUserInfoResponse.successful == false) { // bank parameter (FinTS server address, ...) already seem to be wrong
             return AddAccountResponse(context, newUserInfoResponse)
@@ -54,7 +52,7 @@ open class FinTsClientDeprecated(
         /*      Second dialog, executed in retrieveBasicDataLikeUsersTanMethods() if required: some banks require that in order to initialize a dialog with
         strong customer authorization TAN media is required       */
 
-        return addAccountGetAccountsAndTransactions(context, parameter)
+        return addAccountGetAccountsAndTransactions(context, param)
     }
 
     protected open suspend fun addAccountGetAccountsAndTransactions(context: JobContext, parameter: AddAccountParameter): AddAccountResponse {
@@ -120,11 +118,11 @@ open class FinTsClientDeprecated(
         return GetAccountTransactionsParameter(bank, account, account.supportsRetrievingBalance, ninetyDaysAgo, abortIfTanIsRequired = true)
     }
 
-    open suspend fun getAccountTransactionsAsync(parameter: GetAccountTransactionsParameter): GetAccountTransactionsResponse {
+    open suspend fun getAccountTransactionsAsync(param: GetAccountTransactionsParameter): GetAccountTransactionsResponse {
 
-        val context = JobContext(JobContextType.GetTransactions, this.callback, config, parameter.bank, parameter.account)
+        val context = JobContext(JobContextType.GetTransactions, this.callback, config, param.bank, param.account)
 
-        return config.jobExecutor.getTransactionsAsync(context, parameter)
+        return config.jobExecutor.getTransactionsAsync(context, param)
     }
 
 

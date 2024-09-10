@@ -80,7 +80,7 @@ open class FinTsClient(
   }
 
   protected open suspend fun getAccountTransactions(param: GetAccountDataParameter, bank: BankData, account: AccountData): GetAccountTransactionsResponse {
-    val context = JobContext(JobContextType.GetTransactions, this.callback, config, bank, account)
+    val context = JobContext(JobContextType.GetTransactions, this.callback, config, bank, account, param.preferredTanMethods, param.preferredTanMedium)
 
     return config.jobExecutor.getTransactionsAsync(context, mapper.toGetAccountTransactionsParameter(param, bank, account))
   }
@@ -138,7 +138,7 @@ open class FinTsClient(
       accountToUse = selectedAccount
     }
 
-    val context = JobContext(JobContextType.TransferMoney, this.callback, config, bank, accountToUse)
+    val context = JobContext(JobContextType.TransferMoney, this.callback, config, bank, accountToUse, param.preferredTanMethods, param.preferredTanMedium)
 
     val response = config.jobExecutor.transferMoneyAsync(context, BankTransferData(param.recipientName, param.recipientAccountIdentifier, recipientBankIdentifier,
       param.amount, param.reference, param.instantPayment))
@@ -205,11 +205,11 @@ open class FinTsClient(
 //      return GetAccountInfoResponse(it)
     }
 
-    val context = JobContext(JobContextType.GetAccountInfo, this.callback, config, bank)
+    val context = JobContext(JobContextType.GetAccountInfo, this.callback, config, bank, null, param.preferredTanMethods, param.preferredTanMedium)
 
     /*      First dialog: Get user's basic data like BPD, customer system ID and her TAN methods     */
 
-    val newUserInfoResponse = config.jobExecutor.retrieveBasicDataLikeUsersTanMethods(context, param.preferredTanMethods, param.preferredTanMedium)
+    val newUserInfoResponse = config.jobExecutor.retrieveBasicDataLikeUsersTanMethods(context)
 
     /*      Second dialog, executed in retrieveBasicDataLikeUsersTanMethods() if required: some banks require that in order to initialize a dialog with
     strong customer authorization TAN media is required       */

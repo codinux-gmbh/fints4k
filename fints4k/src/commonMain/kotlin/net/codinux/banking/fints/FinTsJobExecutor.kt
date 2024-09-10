@@ -20,6 +20,7 @@ import net.codinux.banking.fints.response.segments.*
 import net.codinux.banking.fints.tan.FlickerCodeDecoder
 import net.codinux.banking.fints.tan.TanImageDecoder
 import net.codinux.banking.fints.util.TanMethodSelector
+import net.codinux.log.Log
 import kotlin.math.max
 import kotlin.time.Duration.Companion.seconds
 
@@ -73,8 +74,7 @@ open class FinTsJobExecutor(
      *
      * Be aware this method resets BPD, UPD and selected TAN method!
      */
-    open suspend fun retrieveBasicDataLikeUsersTanMethods(context: JobContext, preferredTanMethods: List<TanMethodType>? = null, preferredTanMedium: String? = null,
-                                                  closeDialog: Boolean = false): BankResponse {
+    open suspend fun retrieveBasicDataLikeUsersTanMethods(context: JobContext): BankResponse {
         val bank = context.bank
 
         // just to ensure settings are in its initial state and that bank sends us bank parameter (BPD),
@@ -90,7 +90,7 @@ open class FinTsJobExecutor(
         bank.resetSelectedTanMethod()
 
         // this is the only case where Einschritt-TAN-Verfahren is accepted: to get user's TAN methods
-        context.startNewDialog(closeDialog, versionOfSecurityProcedure = VersionDesSicherheitsverfahrens.Version_1)
+        context.startNewDialog(versionOfSecurityProcedure = VersionDesSicherheitsverfahrens.Version_1)
 
         val message = messageBuilder.createInitDialogMessage(context)
 
@@ -103,12 +103,10 @@ open class FinTsJobExecutor(
         if (bank.tanMethodsAvailableForUser.isEmpty()) { // could not retrieve supported tan methods for user
             return getTanMethodsResponse
         } else {
-            getUsersTanMethod(context, preferredTanMethods)
+            getUsersTanMethod(context)
 
-            if (bank.isTanMethodSelected == false) {
-                return getTanMethodsResponse
-            } else if (bank.tanMedia.isEmpty() && isJobSupported(bank, CustomerSegmentId.TanMediaList)) { // tan media not retrieved yet
-                getTanMediaList(context, TanMedienArtVersion.Alle, TanMediumKlasse.AlleMedien, preferredTanMedium)
+            if (bank.isTanMethodSelected && bank.tanMedia.isEmpty() && bank.tanMethodsAvailableForUser.any { it.nameOfTanMediumRequired } && isJobSupported(bank, CustomerSegmentId.TanMediaList)) { // tan media not retrieved yet
+                getTanMediaList(context, TanMedienArtVersion.Alle, TanMediumKlasse.AlleMedien, context.preferredTanMedium)
 
                 return getTanMethodsResponse // TODO: judge if bank requires selecting TAN media and if though evaluate getTanMediaListResponse
             } else {
@@ -384,14 +382,22 @@ open class FinTsJobExecutor(
 
         mayRetrieveAutomaticallyIfUserEnteredDecoupledTan(context, tanChallenge, tanResponse)
 
+        var invocationCount = 0 // TODO: remove again
+
         while (tanChallenge.isEnteringTanDone == false) {
             delay(500)
+
+            if (++invocationCount % 10 == 0) {
+                Log.info { "Waiting for TAN input invocation count: $invocationCount" }
+            }
 
             val now = Instant.nowExt()
             if ((tanChallenge.tanExpirationTime != null && now > tanChallenge.tanExpirationTime) ||
                 // most TANs a valid 5 - 15 minutes. So terminate wait process after that time
                 (tanChallenge.tanExpirationTime == null && now > tanChallenge.challengeCreationTimestamp.plusMinutes(15))) {
                 if (tanChallenge.isEnteringTanDone == false) {
+Log.info { "Terminating waiting for TAN input" } // TODO: remove again
+
                     tanChallenge.tanExpired()
                 }
 
@@ -624,7 +630,7 @@ open class FinTsJobExecutor(
 
     protected open suspend fun initDialogWithStrongCustomerAuthenticationAfterSuccessfulPreconditionChecks(context: JobContext): BankResponse {
 
-        context.startNewDialog(false) // don't know if it's ok for all invocations of this method to set closeDialog to false (was actually only set in getAccounts())
+        context.startNewDialog() // don't know if it's ok for all invocations of this method to set closeDialog to false (was actually only set in getAccounts())
 
         val message = messageBuilder.createInitDialogMessage(context)
 
@@ -700,7 +706,7 @@ open class FinTsJobExecutor(
         return BankResponse(true, noTanMethodSelected = noTanMethodSelected, internalError = errorMessage)
     }
 
-    open suspend fun getUsersTanMethod(context: JobContext, preferredTanMethods: List<TanMethodType>? = null): Boolean {
+    open suspend fun getUsersTanMethod(context: JobContext): Boolean {
         val bank = context.bank
 
         if (bank.tanMethodsAvailableForUser.size == 1) { // user has only one TAN method -> set it and we're done
@@ -708,7 +714,7 @@ open class FinTsJobExecutor(
             return true
         }
         else {
-            tanMethodSelector.findPreferredTanMethod(bank.tanMethodsAvailableForUser, preferredTanMethods)?.let {
+            tanMethodSelector.findPreferredTanMethod(bank.tanMethodsAvailableForUser, context.preferredTanMethods)?.let {
                 bank.selectedTanMethod = it
                 return true
             }
