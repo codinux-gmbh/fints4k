@@ -27,15 +27,17 @@ open class TanMethodSelector {
   }
 
 
-  open fun getSuggestedTanMethod(tanMethods: List<TanMethod>): TanMethod? {
-    return findPreferredTanMethod(tanMethods, NonVisualOrImageBased) // we use NonVisualOrImageBased as it provides a good default for most users
-      ?: tanMethods.firstOrNull()
+  open fun getSuggestedTanMethod(tanMethods: List<TanMethod>, tanMethodsNotSupportedByApplication: List<TanMethodType> = emptyList()): TanMethod? {
+    return findPreferredTanMethod(tanMethods, NonVisualOrImageBased, tanMethodsNotSupportedByApplication) // we use NonVisualOrImageBased as it provides a good default for most users
+      ?: tanMethods.firstOrNull { it.type !in tanMethodsNotSupportedByApplication }
   }
 
-  open fun findPreferredTanMethod(tanMethods: List<TanMethod>, preferredTanMethods: List<TanMethodType>?): TanMethod? {
+  open fun findPreferredTanMethod(tanMethods: List<TanMethod>, preferredTanMethods: List<TanMethodType>?, tanMethodsNotSupportedByApplication: List<TanMethodType> = emptyList()): TanMethod? {
     preferredTanMethods?.forEach { preferredTanMethodType ->
-      tanMethods.firstOrNull { it.type == preferredTanMethodType }?.let {
-        return it
+      if (preferredTanMethodType !in tanMethodsNotSupportedByApplication) {
+        tanMethods.firstOrNull { it.type == preferredTanMethodType }?.let {
+          return it
+        }
       }
     }
 

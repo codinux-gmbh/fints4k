@@ -39,7 +39,7 @@ open class FinTsClientDeprecated(
 
     open suspend fun addAccountAsync(param: AddAccountParameter): AddAccountResponse {
         val bank = param.bank
-        val context = JobContext(JobContextType.AddAccount, this.callback, config, bank, null, param.preferredTanMethods, param.preferredTanMedium)
+        val context = JobContext(JobContextType.AddAccount, this.callback, config, bank, null, param.preferredTanMethods, param.tanMethodsNotSupportedByApplication, param.preferredTanMedium)
 
         /*      First dialog: Get user's basic data like BPD, customer system ID and her TAN methods     */
 

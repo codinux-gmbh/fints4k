@@ -80,7 +80,7 @@ open class FinTsClient(
   }
 
   protected open suspend fun getAccountTransactions(param: GetAccountDataParameter, bank: BankData, account: AccountData): GetAccountTransactionsResponse {
-    val context = JobContext(JobContextType.GetTransactions, this.callback, config, bank, account, param.preferredTanMethods, param.preferredTanMedium)
+    val context = JobContext(JobContextType.GetTransactions, this.callback, config, bank, account, param.preferredTanMethods, param.tanMethodsNotSupportedByApplication, param.preferredTanMedium)
 
     return config.jobExecutor.getTransactionsAsync(context, mapper.toGetAccountTransactionsParameter(param, bank, account))
   }
@@ -138,7 +138,7 @@ open class FinTsClient(
       accountToUse = selectedAccount
     }
 
-    val context = JobContext(JobContextType.TransferMoney, this.callback, config, bank, accountToUse, param.preferredTanMethods, param.preferredTanMedium)
+    val context = JobContext(JobContextType.TransferMoney, this.callback, config, bank, accountToUse, param.preferredTanMethods, param.tanMethodsNotSupportedByApplication, param.preferredTanMedium)
 
     val response = config.jobExecutor.transferMoneyAsync(context, BankTransferData(param.recipientName, param.recipientAccountIdentifier, recipientBankIdentifier,
       param.amount, param.reference, param.instantPayment))
@@ -205,7 +205,7 @@ open class FinTsClient(
 //      return GetAccountInfoResponse(it)
     }
 
-    val context = JobContext(JobContextType.GetAccountInfo, this.callback, config, bank, null, param.preferredTanMethods, param.preferredTanMedium)
+    val context = JobContext(JobContextType.GetAccountInfo, this.callback, config, bank, null, param.preferredTanMethods, param.tanMethodsNotSupportedByApplication, param.preferredTanMedium)
 
     /*      First dialog: Get user's basic data like BPD, customer system ID and her TAN methods     */
 

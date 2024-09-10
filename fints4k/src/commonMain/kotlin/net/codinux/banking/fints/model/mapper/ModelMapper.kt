@@ -63,7 +63,7 @@ open class ModelMapper(
         }
     }
 
-    open fun updateCustomerData(bank: BankData, response: BankResponse) {
+    open fun updateCustomerData(bank: BankData, response: BankResponse, context: JobContext) {
         response.getFirstSegmentById<BankParameters>(InstituteSegmentId.BankParameters)?.let { bankParameters ->
             // TODO: ask user if there is more than one supported language? But it seems that almost all banks only support German.
             if (bank.selectedLanguage == Dialogsprache.Default && bankParameters.supportedLanguages.isNotEmpty()) {
@@ -146,6 +146,7 @@ open class ModelMapper(
 
         if (response.supportedTanMethodsForUser.isNotEmpty()) {
             bank.tanMethodsAvailableForUser = response.supportedTanMethodsForUser.mapNotNull { findTanMethod(it, bank) }
+                .filterNot { context.tanMethodsNotSupportedByApplication.contains(it.type) }
 
             if (bank.tanMethodsAvailableForUser.firstOrNull { it.securityFunction == bank.selectedTanMethod.securityFunction } == null) { // supportedTanMethods don't contain selectedTanMethod anymore
                 bank.resetSelectedTanMethod()

@@ -26,6 +26,7 @@ open class JobContext(
      */
     open val account: AccountData? = null,
     open val preferredTanMethods: List<TanMethodType>? = null,
+    tanMethodsNotSupportedByApplication: List<TanMethodType>? = null,
     open val preferredTanMedium: String? = null,
     protected open val messageLogCollector: MessageLogCollector = MessageLogCollector(callback, config.options)
 ) : MessageBaseData(bank, config.options.product), IMessageLogAppender {
@@ -36,6 +37,8 @@ open class JobContext(
 
 
     protected open val _dialogs = mutableListOf<DialogContext>()
+
+    open val tanMethodsNotSupportedByApplication: List<TanMethodType> = tanMethodsNotSupportedByApplication ?: emptyList()
 
     open val mt940Parser: IAccountTransactionsParser = Mt940AccountTransactionsParser(Mt940Parser(this), this)
 

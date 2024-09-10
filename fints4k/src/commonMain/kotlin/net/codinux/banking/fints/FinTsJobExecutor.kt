@@ -145,6 +145,7 @@ open class FinTsJobExecutor(
             return BankResponse(true, internalError = "Die TAN Verfahren der Bank konnten nicht ermittelt werden") // TODO: translate
         } else {
             bank.tanMethodsAvailableForUser = bank.tanMethodsSupportedByBank
+                .filterNot { context.tanMethodsNotSupportedByApplication.contains(it.type) }
 
             val didSelectTanMethod = getUsersTanMethod(context)
 
@@ -714,13 +715,13 @@ Log.info { "Terminating waiting for TAN input" } // TODO: remove again
             return true
         }
         else {
-            tanMethodSelector.findPreferredTanMethod(bank.tanMethodsAvailableForUser, context.preferredTanMethods)?.let {
+            tanMethodSelector.findPreferredTanMethod(bank.tanMethodsAvailableForUser, context.preferredTanMethods, context.tanMethodsNotSupportedByApplication)?.let {
                 bank.selectedTanMethod = it
                 return true
             }
 
             // we know user's supported tan methods, now ask user which one to select
-            val suggestedTanMethod = tanMethodSelector.getSuggestedTanMethod(bank.tanMethodsAvailableForUser)
+            val suggestedTanMethod = tanMethodSelector.getSuggestedTanMethod(bank.tanMethodsAvailableForUser, context.tanMethodsNotSupportedByApplication)
 
             val selectedTanMethod = context.callback.askUserForTanMethod(bank.tanMethodsAvailableForUser, suggestedTanMethod)
 
@@ -741,14 +742,14 @@ Log.info { "Terminating waiting for TAN input" } // TODO: remove again
 
     protected open fun updateBankAndCustomerDataIfResponseSuccessful(context: JobContext, response: BankResponse) {
         if (response.successful) {
-            updateBankAndCustomerData(context.bank, response)
+            updateBankAndCustomerData(context.bank, response, context)
         }
     }
 
-    protected open fun updateBankAndCustomerData(bank: BankData, response: BankResponse) {
+    protected open fun updateBankAndCustomerData(bank: BankData, response: BankResponse, context: JobContext) {
         updateBankData(bank, response)
 
-        modelMapper.updateCustomerData(bank, response)
+        modelMapper.updateCustomerData(bank, response, context)
     }
 
 

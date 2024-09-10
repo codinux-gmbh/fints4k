@@ -7,6 +7,7 @@ open class AddAccountParameter @JvmOverloads constructor(
     open val bank: BankData,
     open val fetchBalanceAndTransactions: Boolean = true,
     open val preferredTanMethods: List<TanMethodType>? = null,
+    open val tanMethodsNotSupportedByApplication: List<TanMethodType>? = null,
     open val preferredTanMedium: String? = null
 ) {
 

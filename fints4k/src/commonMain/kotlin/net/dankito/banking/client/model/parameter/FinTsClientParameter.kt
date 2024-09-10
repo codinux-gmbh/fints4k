@@ -12,6 +12,7 @@ open class FinTsClientParameter(
   password: String,
 
   open val preferredTanMethods: List<TanMethodType>? = null,
+  open val tanMethodsNotSupportedByApplication: List<TanMethodType>? = null,
   open val preferredTanMedium: String? = null, // the ID of the medium
   open val abortIfTanIsRequired: Boolean = false,
   open val finTsModel: BankData? = null
