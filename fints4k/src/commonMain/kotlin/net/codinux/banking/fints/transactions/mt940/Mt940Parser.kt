@@ -53,8 +53,6 @@ open class Mt940Parser(
 
         val DateFormatter = DateFormatter("yyMMdd") // TODO: replace with LocalDate.Format { }
 
-        val CurrentYearTwoDigit = LocalDate.todayAtEuropeBerlin().year
-
         val CreditDebitCancellationRegex = Regex("C|D|RC|RD")
 
         val AmountRegex = Regex("\\d+,\\d*")
@@ -455,12 +453,23 @@ open class Mt940Parser(
         // this really simple date format on my own
         if (dateString.length == 6) {
             try {
-                var year = dateString.substring(0, 2).toInt() + 2000
+                var year = dateString.substring(0, 2).toInt()
                 val month = dateString.substring(2, 4).toInt()
                 val day = dateString.substring(4, 6).toInt()
 
-                if (year > CurrentYearTwoDigit + 1) { // should be rarely the case: years before 2000
-                    year -= 100
+                /**
+                 * Bei 6-stelligen Datumsangaben (d.h. JJMMTT) wird gemäß SWIFT zwischen dem 20. und 21.
+                 * Jahrhundert wie folgt unterschieden:
+                 * - Ist das Jahr (d.h. JJ) größer als 79, bezieht sich das Datum auf das 20. Jahrhundert. Ist
+                 * das Jahr 79 oder kleiner, bezieht sich das Datum auf das 21. Jahrhundert.
+                 * - Ist JJ > 79:JJMMTT = 19JJMMTT
+                 * - sonst: JJMMTT = 20JJMMTT
+                 * - Damit reicht die Spanne des sechsstelligen Datums von 1980 bis 2079.
+                 */
+                if (year > 79) {
+                    year += 1900
+                } else {
+                    year += 2000
                 }
 
                 // ah, here we go, banks (in Germany) calculate with 30 days each month, so yes, it can happen that dates
