@@ -2,8 +2,10 @@ package net.codinux.banking.fints.transactions.swift.model
 
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
+import kotlinx.serialization.Serializable
 import net.codinux.banking.fints.model.Amount
 
+@Serializable
 data class Holding(
     val name: String,
     val isin: String?,

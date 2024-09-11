@@ -2,6 +2,7 @@ package net.codinux.banking.fints.model
 
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
+import net.codinux.banking.fints.transactions.swift.model.StatementOfHoldings
 
 
 open class RetrievedAccountData(
@@ -10,6 +11,7 @@ open class RetrievedAccountData(
     open val balance: Money?,
     open var bookedTransactions: Collection<AccountTransaction>,
     open var unbookedTransactions: Collection<Any>,
+    open var statementOfHoldings: List<StatementOfHoldings>,
     open val retrievalTime: Instant,
     open val retrievedTransactionsFrom: LocalDate?,
     open val retrievedTransactionsTo: LocalDate?,
@@ -19,7 +21,7 @@ open class RetrievedAccountData(
     companion object {
 
         fun unsuccessful(account: AccountData): RetrievedAccountData {
-            return RetrievedAccountData(account, false, null, listOf(), listOf(), Instant.DISTANT_PAST, null, null)
+            return RetrievedAccountData(account, false, null, listOf(), listOf(), listOf(), Instant.DISTANT_PAST, null, null)
         }
 
     }

@@ -202,6 +202,29 @@ open class FinTsJobExecutor(
         var balance: Money? = balanceResponse?.getFirstSegmentById<BalanceSegment>(InstituteSegmentId.Balance)?.let {
             Money(it.balance, it.currency)
         }
+
+        // TODO: for larger portfolios there can be a Aufsetzpunkt, but for balances we currently do not support sending multiple messages
+        val statementOfHoldings = balanceResponse?.getFirstSegmentById<SecuritiesAccountBalanceSegment>(InstituteSegmentId.SecuritiesAccountBalance)?.let {
+            val statementOfHoldings = it.statementOfHoldings
+            val statementOfHolding = statementOfHoldings.firstOrNull { it.totalBalance != null }
+            if (statementOfHolding != null) {
+                balance = Money(statementOfHolding.totalBalance!!, statementOfHolding.currency ?: Currency.DefaultCurrencyCode)
+            }
+            statementOfHoldings
+        } ?: emptyList()
+
+        if (parameter.account.supportsRetrievingAccountTransactions == false) {
+            if (balanceResponse == null) {
+                return GetAccountTransactionsResponse(context, BankResponse(false, "Balance could not be retrieved"), RetrievedAccountData.unsuccessful(parameter.account))
+            } else {
+                val successful = balance != null || balanceResponse.tanRequiredButWeWereToldToAbortIfSo
+                val retrievedData = RetrievedAccountData(parameter.account, successful, balance, emptyList(), emptyList(), statementOfHoldings, Instant.nowExt(), null, null, balanceResponse?.internalError)
+
+                return GetAccountTransactionsResponse(context, balanceResponse, retrievedData)
+            }
+        }
+
+
         val bookedTransactions = mutableSetOf<AccountTransaction>()
         val unbookedTransactions = mutableSetOf<Any>()
 
@@ -235,11 +258,12 @@ open class FinTsJobExecutor(
         closeDialog(context)
 
         val successful = response.tanRequiredButWeWereToldToAbortIfSo
-          || (response.successful && (parameter.alsoRetrieveBalance == false || balance != null))
+            || (response.successful && (parameter.alsoRetrieveBalance == false || balance != null))
+            || (parameter.account.supportsRetrievingAccountTransactions == false && balance != null)
         val fromDate = parameter.fromDate
             ?: parameter.account.serverTransactionsRetentionDays?.let { LocalDate.todayAtSystemDefaultTimeZone().minusDays(it) }
             ?: bookedTransactions.minByOrNull { it.valueDate }?.valueDate
-        val retrievedData = RetrievedAccountData(parameter.account, successful, balance, bookedTransactions, unbookedTransactions, startTime, fromDate, parameter.toDate ?: LocalDate.todayAtEuropeBerlin(), response.internalError)
+        val retrievedData = RetrievedAccountData(parameter.account, successful, balance, bookedTransactions, unbookedTransactions, statementOfHoldings, startTime, fromDate, parameter.toDate ?: LocalDate.todayAtEuropeBerlin(), response.internalError)
 
         return GetAccountTransactionsResponse(context, response, retrievedData,
             if (parameter.maxCountEntries != null) parameter.isSettingMaxCountEntriesAllowedByBank else null)

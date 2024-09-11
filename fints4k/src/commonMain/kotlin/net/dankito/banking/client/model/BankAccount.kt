@@ -5,6 +5,7 @@ import kotlinx.datetime.LocalDate
 import kotlinx.serialization.Serializable
 import net.codinux.banking.fints.model.Currency
 import net.codinux.banking.fints.model.Money
+import net.codinux.banking.fints.transactions.swift.model.StatementOfHoldings
 
 
 @Serializable
@@ -39,6 +40,8 @@ open class BankAccount(
     open var lastTransactionsRetrievalTime: Instant? = null
 
     open var bookedTransactions: List<AccountTransaction> = listOf()
+
+    open var statementOfHoldings: List<StatementOfHoldings> = emptyList()
 
 
     override fun toString(): String {

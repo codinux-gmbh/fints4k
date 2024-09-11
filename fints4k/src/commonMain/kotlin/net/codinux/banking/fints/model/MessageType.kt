@@ -25,6 +25,8 @@ enum class MessageType {
 
     GetCreditCardTransactions,
 
+    GetSecuritiesAccountBalance,
+
     TransferMoney
 
 }

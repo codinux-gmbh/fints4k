@@ -103,6 +103,8 @@ open class FinTsModelMapper {
             addAll(map(accountTransactionsResponse))
           }
         }
+
+        bankAccount.statementOfHoldings = accountTransactionsResponse.statementOfHoldings
       }
     }
 

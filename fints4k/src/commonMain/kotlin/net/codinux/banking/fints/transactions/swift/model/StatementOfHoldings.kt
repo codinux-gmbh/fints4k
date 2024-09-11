@@ -1,6 +1,7 @@
 package net.codinux.banking.fints.transactions.swift.model
 
 import kotlinx.datetime.LocalDate
+import kotlinx.serialization.Serializable
 import net.codinux.banking.fints.model.Amount
 
 /**
@@ -8,6 +9,7 @@ import net.codinux.banking.fints.model.Amount
  * „Statement of Holdings“; basiert auf SWIFT „Standards Release Guide“
  * (letzte berücksichtigte Änderung SRG 1998)
  */
+@Serializable
 data class StatementOfHoldings(
     val bankCode: String,
     val accountIdentifier: String,
@@ -15,7 +17,7 @@ data class StatementOfHoldings(
     val holdings: List<Holding>,
 
     val totalBalance: Amount? = null,
-    val totalBalanceCurrency: String? = null,
+    val currency: String? = null,
 
     /**
      * The page number is actually mandatory, but to be prepared for surprises like for [statementDate] i added error

@@ -13,6 +13,7 @@ import net.codinux.banking.fints.messages.segmente.Synchronisierung
 import net.codinux.banking.fints.messages.segmente.id.CustomerSegmentId
 import net.codinux.banking.fints.messages.segmente.id.ISegmentId
 import net.codinux.banking.fints.messages.segmente.implementierte.*
+import net.codinux.banking.fints.messages.segmente.implementierte.depot.Depotaufstellung
 import net.codinux.banking.fints.messages.segmente.implementierte.sepa.SepaBankTransferBase
 import net.codinux.banking.fints.messages.segmente.implementierte.tan.TanGeneratorListeAnzeigen
 import net.codinux.banking.fints.messages.segmente.implementierte.tan.TanGeneratorTanMediumAnOderUmmelden
@@ -242,15 +243,36 @@ open class MessageBuilder(protected val utils: FinTsUtils = FinTsUtils()) {
             return createSignedMessageBuilderResult(context, MessageType.GetBalance, segments)
         }
 
+        val securitiesAccountResult = supportsGetSecuritiesAccountBalance(account)
+
+        if (securitiesAccountResult.isJobVersionSupported) {
+            return createGetSecuritiesAccountBalanceMessage(context, result, account)
+        }
+
         return result
+    }
+
+    protected open fun createGetSecuritiesAccountBalanceMessage(context: JobContext, result: MessageBuilderResult,
+                                                                account: AccountData): MessageBuilderResult {
+
+        val segments = mutableListOf<Segment>(Depotaufstellung(SignedMessagePayloadFirstSegmentNumber, account))
+
+        addTanSegmentIfRequired(context, CustomerSegmentId.SecuritiesAccountBalance, segments, SignedMessagePayloadFirstSegmentNumber + 1)
+
+        return createSignedMessageBuilderResult(context, MessageType.GetSecuritiesAccountBalance, segments)
     }
 
     open fun supportsGetBalance(account: AccountData): Boolean {
         return supportsGetBalanceMessage(account).isJobVersionSupported
+                || supportsGetSecuritiesAccountBalance(account).isJobVersionSupported
     }
 
     protected open fun supportsGetBalanceMessage(account: AccountData): MessageBuilderResult {
         return getSupportedVersionsOfJobForAccount(CustomerSegmentId.Balance, account, listOf(5, 6, 7, 8))
+    }
+
+    protected open fun supportsGetSecuritiesAccountBalance(account: AccountData): MessageBuilderResult {
+        return getSupportedVersionsOfJobForAccount(CustomerSegmentId.SecuritiesAccountBalance, account, listOf(6))
     }
 
 

@@ -27,6 +27,11 @@ enum class CustomerSegmentId(override val id: String) : ISegmentId {
 
     SepaRealTimeTransfer("HKIPZ"),
 
-    SepaAccountInfoParameters("HKSPA") // not implemented, retrieved automatically with UPD
+    SepaAccountInfoParameters("HKSPA"), // not implemented, retrieved automatically with UPD
+
+
+    /*      Wertpapierdepot     */
+
+    SecuritiesAccountBalance("HKWPD")
 
 }

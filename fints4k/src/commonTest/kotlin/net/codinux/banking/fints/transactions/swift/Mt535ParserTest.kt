@@ -8,7 +8,6 @@ import net.codinux.banking.fints.transactions.swift.model.ContinuationIndicator
 import net.codinux.banking.fints.transactions.swift.model.Holding
 import net.codinux.banking.fints.transactions.swift.model.StatementOfHoldings
 import kotlin.test.Test
-import kotlin.test.assertNotNull
 
 class Mt535ParserTest {
 
@@ -37,7 +36,7 @@ class Mt535ParserTest {
         assertEquals("1234567", statement.accountIdentifier)
 
         assertEquals("17026,37", statement.totalBalance?.string)
-        assertEquals("EUR", statement.totalBalanceCurrency)
+        assertEquals("EUR", statement.currency)
 
         assertEquals(1, statement.pageNumber)
         assertEquals(ContinuationIndicator.SinglePage, statement.continuationIndicator)
@@ -61,7 +60,7 @@ class Mt535ParserTest {
         assertEquals(accountId, statement.accountIdentifier)
 
         assertEquals(totalBalance, statement.totalBalance?.string)
-        assertEquals(totalBalanceCurrency, statement.totalBalanceCurrency)
+        assertEquals(totalBalanceCurrency, statement.currency)
 
         assertEquals(pageNumber, statement.pageNumber)
         assertEquals(continuationIndicator, statement.continuationIndicator)

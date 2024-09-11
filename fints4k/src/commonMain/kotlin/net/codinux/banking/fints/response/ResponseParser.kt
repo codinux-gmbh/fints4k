@@ -24,11 +24,13 @@ import net.codinux.banking.fints.model.Money
 import net.codinux.banking.fints.response.segments.*
 import net.codinux.banking.fints.util.MessageUtils
 import net.codinux.banking.fints.extensions.getAllExceptionMessagesJoined
+import net.codinux.banking.fints.transactions.swift.Mt535Parser
 
 
 open class ResponseParser(
     protected open val messageUtils: MessageUtils = MessageUtils(),
-    open var logAppender: IMessageLogAppender? = null
+    open var logAppender: IMessageLogAppender? = null,
+    open var mt535Parser: Mt535Parser = Mt535Parser(logAppender)
 ) {
 
     companion object {
@@ -116,6 +118,7 @@ open class ResponseParser(
             InstituteSegmentId.ChangeTanMediaParameters.id -> parseChangeTanMediaParameters(segment, segmentId, dataElementGroups)
 
             InstituteSegmentId.Balance.id -> parseBalanceSegment(segment, dataElementGroups)
+            InstituteSegmentId.SecuritiesAccountBalance.id -> parseSecuritiesAccountBalanceSegment(segment, dataElementGroups)
 
             InstituteSegmentId.AccountTransactionsMt940.id -> parseMt940AccountTransactions(segment, dataElementGroups)
             InstituteSegmentId.AccountTransactionsMt940Parameters.id -> parseMt940AccountTransactionsParameters(segment, segmentId, dataElementGroups)
@@ -688,6 +691,17 @@ open class ResponseParser(
             balanceOfPreBookedTransactions = balanceOfPreBookedTransactions?.amount,
             segment
         )
+    }
+
+    protected open fun parseSecuritiesAccountBalanceSegment(segment: String, dataElementGroups: List<String>): SecuritiesAccountBalanceSegment {
+        // 1 Segmentkopf        1 DEG        M 1
+        // 2 Depotaufstellung   1 DE  bin .. M 1
+
+        val balancesMt535String = extractBinaryData(dataElementGroups[1])
+        // TODO: for larger portfolios there can be a Aufsetzpunkt, but for balances we currently do not support sending multiple messages
+        val statementOfHoldings = mt535Parser.parseMt535String(balancesMt535String)
+
+        return SecuritiesAccountBalanceSegment(statementOfHoldings, segment)
     }
 
     protected open fun parseBalanceToNullIfZeroOrNotSet(dataElementGroup: String): Balance? {
