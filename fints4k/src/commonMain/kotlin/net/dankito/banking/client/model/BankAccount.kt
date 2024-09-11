@@ -37,6 +37,10 @@ open class BankAccount(
 
     open var retrievedTransactionsFrom: LocalDate? = null
 
+    /**
+     * Gibt wider, wann zuletzt aktuelle Kontoumsätze, d.h. [net.dankito.banking.client.model.parameter.GetAccountDataParameter.retrieveTransactionsTo]
+     * war nicht gesetzt, oder aktuelle [StatementOfHoldings] empfangen wurden.
+     */
     open var lastAccountUpdateTime: Instant? = null
 
     open var bookedTransactions: List<AccountTransaction> = listOf()

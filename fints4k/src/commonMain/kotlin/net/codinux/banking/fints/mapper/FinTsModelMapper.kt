@@ -92,9 +92,9 @@ open class FinTsModelMapper {
           bankAccount.retrievedTransactionsFrom = accountTransactionsResponse.retrievedTransactionsFrom
         }
 
-        val retrievalTime = if (retrieveTransactionsTo == null) accountTransactionsResponse.retrievalTime
-                            else retrieveTransactionsTo.atTime(0, 0).toInstant(TimeZone.EuropeBerlin)
-        if (bankAccount.lastAccountUpdateTime == null || bankAccount.lastAccountUpdateTime!! <= retrievalTime) { // if retrieveTransactionsTo is set it may is older than current account's lastTransactionsRetrievalTime
+        val retrievalTime = accountTransactionsResponse.retrievalTime
+        if (retrieveTransactionsTo == null && (bankAccount.lastAccountUpdateTime == null || bankAccount.lastAccountUpdateTime!! <= retrievalTime || // if retrieveTransactionsTo is set, then we don't retrieve all current transactions -> don't set lastAccountUpdateTime
+                  (bankAccount.supportsRetrievingTransactions == false && accountTransactionsResponse.statementOfHoldings.isNotEmpty()))) { // TODO: really check for supportsRetrievingTransactions == false if statementOfHoldings are set? Are there really accounts that support HKWPD and HKKAZ?
           bankAccount.lastAccountUpdateTime = retrievalTime
         }
 
