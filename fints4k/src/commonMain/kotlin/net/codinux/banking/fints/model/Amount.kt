@@ -3,7 +3,9 @@ package net.codinux.banking.fints.model
 import kotlinx.serialization.Serializable
 import net.dankito.banking.client.model.serializer.AmountSerializer
 
-
+/**
+ * Be aware: The decimal separator is as specified by FinTS standard ',', not '.'.
+ */
 @Serializable(with = AmountSerializer::class)
 open class Amount(
     val string: String
