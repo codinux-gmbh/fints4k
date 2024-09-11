@@ -245,14 +245,14 @@ class Mt940ParserTest : MtParserTestBase() {
     fun parseDate_FixSparkasse29thOFFebruaryInNonLeapYearBug() {
         val result = underTest.parseDate("230229")
 
-        assertEquals(LocalDate(2023, 3, 1), result)
+        assertEquals(LocalDate(2023, 2, 28), result)
     }
 
     @Test
     fun parseDate_FixSparkasse30thOfFebruaryBug() {
         val result = underTest.parseDate("230229")
 
-        assertEquals(LocalDate(2023, 3, 1), result)
+        assertEquals(LocalDate(2023, 2, 28), result)
     }
 
 }
