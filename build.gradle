@@ -1,16 +1,16 @@
 // TODO: move to versions.gradle
 ext {
-    appVersionName = '1.0.0-Alpha-13'
+    appVersionName = "1.0.0-Alpha-14-SNAPSHOT"
 
 
     /*      Test        */
 
-    assertJVersion = '3.12.2'
+    assertJVersion = "3.12.2"
 
-    mockitoVersion = '2.22.0'
-    mockitoKotlinVersion = '1.6.0'
+    mockitoVersion = "2.22.0"
+    mockitoKotlinVersion = "1.6.0"
 
-    logbackVersion = '1.2.3'
+    logbackVersion = "1.2.3"
 }
 
 buildscript {
