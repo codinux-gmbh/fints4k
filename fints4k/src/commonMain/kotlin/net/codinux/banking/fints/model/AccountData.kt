@@ -30,6 +30,7 @@ open class AccountData(
         get() = FinTsClient.SupportedAccountTypes.contains(accountType)
                 || allowedJobNames.contains(CustomerSegmentId.Balance.id)
                 || allowedJobNames.contains(CustomerSegmentId.AccountTransactionsMt940.id)
+                || allowedJobNames.contains(CustomerSegmentId.SecuritiesAccountBalance.id)
 
 
 
