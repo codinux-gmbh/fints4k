@@ -26,7 +26,7 @@ repositories {
 
 
 dependencies {
-    implementation("net.codinux.banking:fints4k:1.0.0-Alpha-11")
+    implementation("net.codinux.banking:fints4k:1.0.0-Alpha-13")
 }
 ```
 
