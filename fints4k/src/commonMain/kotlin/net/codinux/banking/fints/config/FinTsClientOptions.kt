@@ -27,10 +27,12 @@ data class FinTsClientOptions(
      */
     val removeSensitiveDataFromMessageLog: Boolean = true,
 
+    val appendFinTsMessagesToLog: Boolean = false,
+
     val closeDialogs: Boolean = true,
 
     val version: String = "1.0.0", // TODO: get version dynamically
-    val productName: String = "15E53C26816138699C7B6A3E8"
+    val productName: String = "15E53C26816138699C7B6A3E8" // TODO: extract constant // TODO: get product number for fints4k and Bankmeister (if we stick with that name)
 ) {
 
     val product: ProductData by lazy { ProductData(productName, version) }

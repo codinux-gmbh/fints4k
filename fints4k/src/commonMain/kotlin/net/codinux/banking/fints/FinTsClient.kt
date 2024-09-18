@@ -17,6 +17,8 @@ import net.codinux.banking.fints.response.client.GetAccountTransactionsResponse
 import net.codinux.banking.fints.response.segments.AccountType
 import net.codinux.banking.fints.response.segments.BankParameters
 import net.codinux.banking.fints.util.BicFinder
+import net.codinux.log.LogLevel
+import net.codinux.log.LoggerFactory
 
 
 open class FinTsClient(
@@ -35,6 +37,15 @@ open class FinTsClient(
   protected open val mapper = FinTsModelMapper()
 
   protected open val bicFinder = BicFinder()
+
+
+  init {
+    LoggerFactory.getLogger("net.codinux.banking.fints.log.MessageLogCollector").level = if (config.options.appendFinTsMessagesToLog) {
+      LogLevel.Debug
+    } else {
+      null
+    }
+  }
 
 
   open suspend fun getAccountDataAsync(bankCode: String, loginName: String, password: String): GetAccountDataResponse {
