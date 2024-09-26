@@ -45,7 +45,7 @@ open class FlickerCodeDecoder {
         } catch (e: Exception) {
             log.error(e) { "Could not decode challenge $challengeHHD_UC" }
 
-            return FlickerCode(challengeHHD_UC, "", e)
+            return FlickerCode(challengeHHD_UC, null, e)
         }
     }
 

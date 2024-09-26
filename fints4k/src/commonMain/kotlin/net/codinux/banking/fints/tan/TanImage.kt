@@ -2,13 +2,13 @@ package net.codinux.banking.fints.tan
 
 
 open class TanImage(
-    val mimeType: String,
-    val imageBytes: ByteArray,
+    val mimeType: String? = null,
+    val imageBytes: ByteArray? = null,
     val decodingError: Exception? = null
 ) {
 
     val decodingSuccessful: Boolean
-        get() = decodingError == null
+        get() = mimeType != null && imageBytes != null
 
 
     override fun toString(): String {
@@ -16,7 +16,7 @@ open class TanImage(
             return "Decoding error: $decodingError"
         }
 
-        return "$mimeType ${imageBytes.size} bytes"
+        return "$mimeType ${imageBytes?.size} bytes"
     }
 
 }

@@ -29,7 +29,7 @@ open class TanImageDecoder {
         } catch (e: Exception) {
             log.error(e) { "Could not decode challenge HHD_UC to TanImage: $challengeHHD_UC" }
 
-            return TanImage("", ByteArray(0), e)
+            return TanImage(null, null, e)
         }
     }
 
