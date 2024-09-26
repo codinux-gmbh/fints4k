@@ -444,7 +444,7 @@ Log.info { "Terminating waiting for TAN input" } // TODO: remove again
         return when (tanMethod.type) {
             TanMethodType.ChipTanFlickercode ->
                 FlickerCodeTanChallenge(
-                    FlickerCodeDecoder().decodeChallenge(challenge, tanMethod.hhdVersion ?: HHDVersion.HHD_1_4), // HHD 1.4 is currently the most used version
+                    FlickerCodeDecoder().decodeChallenge(challenge, tanMethod.hhdVersion ?: getFallbackHhdVersion(challenge)),
                     forAction, messageToShowToUser, challenge, tanMethod, tanResponse.tanMediaIdentifier, bank, account, tanResponse.tanExpirationTime)
 
             TanMethodType.ChipTanQrCode, TanMethodType.ChipTanPhotoTanMatrixCode,
@@ -453,6 +453,14 @@ Log.info { "Terminating waiting for TAN input" } // TODO: remove again
 
             else -> TanChallenge(forAction, messageToShowToUser, challenge, tanMethod, tanResponse.tanMediaIdentifier, bank, account, tanResponse.tanExpirationTime)
         }
+    }
+
+    protected open fun getFallbackHhdVersion(challenge: String): HHDVersion {
+        if (challenge.length <= 35) { // is this true in all circumstances?
+            return HHDVersion.HHD_1_3
+        }
+
+        return HHDVersion.HHD_1_4 // HHD 1.4 is currently the most used version
     }
 
     protected open suspend fun mayRetrieveAutomaticallyIfUserEnteredDecoupledTan(context: JobContext, tanChallenge: TanChallenge, tanResponse: TanResponse) {
