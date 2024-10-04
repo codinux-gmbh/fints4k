@@ -8,7 +8,7 @@ import net.codinux.banking.fints.model.JobContextType
 
 class MessageContext(
     val jobType: JobContextType,
-    val dialogType: MessageType,
+    val messageType: MessageType,
     val jobNumber: Int,
     val dialogNumber: Int,
     val messageNumber: Int,
