@@ -25,7 +25,7 @@ open class MessageLogEntry(
         get() = messageTrace + "\n" + message
 
     override fun toString(): String {
-        return "$type $message"
+        return "$context $type $message"
     }
 
 }

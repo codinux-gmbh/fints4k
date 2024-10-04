@@ -14,4 +14,6 @@ class MessageContext(
     val messageNumber: Int,
     val bank: BankData,
     val account: AccountData?
-)
+) {
+    override fun toString() = "${jobNumber}_${dialogNumber}_$messageNumber ${bank.bankCode} $jobType $messageType"
+}
