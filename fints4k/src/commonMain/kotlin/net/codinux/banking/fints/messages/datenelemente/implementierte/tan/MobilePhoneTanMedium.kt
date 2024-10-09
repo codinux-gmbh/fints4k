@@ -18,7 +18,6 @@ open class MobilePhoneTanMedium(
         if (other !is MobilePhoneTanMedium) return false
         if (!super.equals(other)) return false
 
-        if (mediumName != other.mediumName) return false
         if (concealedPhoneNumber != other.concealedPhoneNumber) return false
         if (phoneNumber != other.phoneNumber) return false
         if (smsDebitAccount != other.smsDebitAccount) return false
@@ -28,7 +27,6 @@ open class MobilePhoneTanMedium(
 
     override fun hashCode(): Int {
         var result = super.hashCode()
-        result = 31 * result + (mediumName.hashCode())
         result = 31 * result + (concealedPhoneNumber?.hashCode() ?: 0)
         result = 31 * result + (phoneNumber?.hashCode() ?: 0)
         result = 31 * result + (smsDebitAccount?.hashCode() ?: 0)

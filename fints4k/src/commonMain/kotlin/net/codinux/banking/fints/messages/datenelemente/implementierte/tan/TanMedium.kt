@@ -29,6 +29,7 @@ open class TanMedium(
 
         if (mediumClass != other.mediumClass) return false
         if (status != other.status) return false
+        if (mediumName != other.mediumName) return false
 
         return true
     }
@@ -36,6 +37,7 @@ open class TanMedium(
     override fun hashCode(): Int {
         var result = mediumClass.hashCode()
         result = 31 * result + status.hashCode()
+        result = 31 * result + mediumName.hashCode()
         return result
     }
 
