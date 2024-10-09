@@ -27,9 +27,9 @@ open class MobilePhoneTanMedium(
 
     override fun hashCode(): Int {
         var result = super.hashCode()
-        result = 31 * result + (concealedPhoneNumber?.hashCode() ?: 0)
-        result = 31 * result + (phoneNumber?.hashCode() ?: 0)
-        result = 31 * result + (smsDebitAccount?.hashCode() ?: 0)
+        result = 31 * result + concealedPhoneNumber.hashCode()
+        result = 31 * result + phoneNumber.hashCode()
+        result = 31 * result + smsDebitAccount.hashCode()
         return result
     }
 

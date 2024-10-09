@@ -35,9 +35,9 @@ open class TanGeneratorTanMedium(
         var result = super.hashCode()
         result = 31 * result + cardNumber.hashCode()
         result = 31 * result + cardSequenceNumber.hashCode()
-        result = 31 * result + (cardType?.hashCode() ?: 0)
-        result = 31 * result + (validFrom?.hashCode() ?: 0)
-        result = 31 * result + (validTo?.hashCode() ?: 0)
+        result = 31 * result + cardType.hashCode()
+        result = 31 * result + validFrom.hashCode()
+        result = 31 * result + validTo.hashCode()
         return result
     }
 

@@ -85,10 +85,10 @@ open class AccountTransaction(
         var result = amount.hashCode()
         result = 31 * result + reference.hashCode()
         result = 31 * result + bookingDate.hashCode()
-        result = 31 * result + (otherPartyName?.hashCode() ?: 0)
-        result = 31 * result + (otherPartyBankId?.hashCode() ?: 0)
-        result = 31 * result + (otherPartyAccountId?.hashCode() ?: 0)
-        result = 31 * result + (postingText?.hashCode() ?: 0)
+        result = 31 * result + otherPartyName.hashCode()
+        result = 31 * result + otherPartyBankId.hashCode()
+        result = 31 * result + otherPartyAccountId.hashCode()
+        result = 31 * result + postingText.hashCode()
         result = 31 * result + valueDate.hashCode()
         return result
     }
