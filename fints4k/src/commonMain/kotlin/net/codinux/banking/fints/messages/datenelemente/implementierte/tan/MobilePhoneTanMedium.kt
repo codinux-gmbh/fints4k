@@ -1,22 +1,18 @@
 package net.codinux.banking.fints.messages.datenelemente.implementierte.tan
 
-import net.codinux.banking.fints.messages.datenelementgruppen.implementierte.account.KontoverbindungInternational
+import kotlinx.serialization.Serializable
+import net.dankito.banking.client.model.BankAccountIdentifier
 
-
+@Serializable
 open class MobilePhoneTanMedium(
-    mediumClass: TanMediumKlasse,
-    status: TanMediumStatus,
-    override val mediumName: String,
     val concealedPhoneNumber: String?,
     val phoneNumber: String?,
-    val smsDebitAccount: KontoverbindungInternational? = null
-) : TanMedium(mediumClass, status, mediumName) {
-
+    val smsDebitAccount: BankAccountIdentifier? = null
+) {
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is MobilePhoneTanMedium) return false
-        if (!super.equals(other)) return false
 
         if (concealedPhoneNumber != other.concealedPhoneNumber) return false
         if (phoneNumber != other.phoneNumber) return false
@@ -26,8 +22,7 @@ open class MobilePhoneTanMedium(
     }
 
     override fun hashCode(): Int {
-        var result = super.hashCode()
-        result = 31 * result + concealedPhoneNumber.hashCode()
+        var result = concealedPhoneNumber.hashCode()
         result = 31 * result + phoneNumber.hashCode()
         result = 31 * result + smsDebitAccount.hashCode()
         return result
@@ -35,7 +30,7 @@ open class MobilePhoneTanMedium(
 
 
     override fun toString(): String {
-        return super.toString() + " $mediumName ${phoneNumber ?: concealedPhoneNumber ?: ""}"
+        return phoneNumber ?: concealedPhoneNumber ?: ""
     }
 
 }

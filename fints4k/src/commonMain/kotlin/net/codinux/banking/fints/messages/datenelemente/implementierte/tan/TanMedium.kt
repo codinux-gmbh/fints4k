@@ -14,7 +14,9 @@ import kotlinx.serialization.Serializable
 open class TanMedium(
     open val mediumClass: TanMediumKlasse,
     open val status: TanMediumStatus,
-    open val mediumName: String?
+    open val mediumName: String?,
+    open val tanGenerator: TanGeneratorTanMedium? = null,
+    open val mobilePhone: MobilePhoneTanMedium? = null
 ) {
 
 
@@ -30,6 +32,8 @@ open class TanMedium(
         if (mediumClass != other.mediumClass) return false
         if (status != other.status) return false
         if (mediumName != other.mediumName) return false
+        if (tanGenerator != other.tanGenerator) return false
+        if (mobilePhone != other.mobilePhone) return false
 
         return true
     }
@@ -38,6 +42,8 @@ open class TanMedium(
         var result = mediumClass.hashCode()
         result = 31 * result + status.hashCode()
         result = 31 * result + mediumName.hashCode()
+        result = 31 * result + tanGenerator.hashCode()
+        result = 31 * result + mobilePhone.hashCode()
         return result
     }
 

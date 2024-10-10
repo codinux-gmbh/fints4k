@@ -1,13 +1,13 @@
 package net.codinux.banking.fints.callback
 
-import net.codinux.banking.fints.messages.datenelemente.implementierte.tan.TanGeneratorTanMedium
+import net.codinux.banking.fints.messages.datenelemente.implementierte.tan.TanMedium
 import net.codinux.banking.fints.model.*
 
 
 open class SimpleFinTsClientCallback(
     protected open val askUserForTanMethod: ((supportedTanMethods: List<TanMethod>, suggestedTanMethod: TanMethod?) -> TanMethod?)? = null,
     protected open val messageLogAdded: ((MessageLogEntry) -> Unit)? = null,
-    protected open val enterTanGeneratorAtc: ((bank: BankData, tanMedium: TanGeneratorTanMedium) -> EnterTanGeneratorAtcResult)? = null,
+    protected open val enterTanGeneratorAtc: ((bank: BankData, tanMedium: TanMedium) -> EnterTanGeneratorAtcResult)? = null,
     protected open val enterTan: ((tanChallenge: TanChallenge) -> Unit)? = null
 ) : FinTsClientCallback {
 
@@ -25,7 +25,7 @@ open class SimpleFinTsClientCallback(
         enterTan?.invoke(tanChallenge) ?: run { tanChallenge.userDidNotEnterTan() }
     }
 
-    override suspend fun enterTanGeneratorAtc(bank: BankData, tanMedium: TanGeneratorTanMedium): EnterTanGeneratorAtcResult {
+    override suspend fun enterTanGeneratorAtc(bank: BankData, tanMedium: TanMedium): EnterTanGeneratorAtcResult {
         return enterTanGeneratorAtc?.invoke(bank, tanMedium) ?: EnterTanGeneratorAtcResult.userDidNotEnterAtc()
     }
 

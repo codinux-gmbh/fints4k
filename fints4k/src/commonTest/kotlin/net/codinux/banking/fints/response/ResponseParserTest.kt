@@ -1021,8 +1021,8 @@ class ResponseParserTest : FinTsTestBase() {
         result.getFirstSegmentById<TanMediaList>(InstituteSegmentId.TanMediaList)?.let { segment ->
             assertEquals(TanEinsatzOption.KundeKannGenauEinMediumZuEinerZeitNutzen, segment.usageOption)
             assertContainsExactly(segment.tanMedia,
-                TanGeneratorTanMedium(TanMediumKlasse.TanGenerator, TanMediumStatus.AktivFolgekarte, oldCardNumber, cardSequenceNumber, null, null, null, mediaName),
-                TanGeneratorTanMedium(TanMediumKlasse.TanGenerator, TanMediumStatus.Verfuegbar, cardSequenceNumber, null, null, null, null, mediaName)
+                TanMedium(TanMediumKlasse.TanGenerator, TanMediumStatus.AktivFolgekarte, mediaName, TanGeneratorTanMedium(oldCardNumber, cardSequenceNumber, null, null, null)),
+                TanMedium(TanMediumKlasse.TanGenerator, TanMediumStatus.Verfuegbar, mediaName, TanGeneratorTanMedium(cardSequenceNumber, null, null, null, null))
             )
         }
         ?: run { fail("No segment of type TanMediaList found in ${result.receivedSegments}") }

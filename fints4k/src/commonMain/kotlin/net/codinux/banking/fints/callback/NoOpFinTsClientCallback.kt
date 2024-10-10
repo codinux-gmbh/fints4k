@@ -1,6 +1,6 @@
 package net.codinux.banking.fints.callback
 
-import net.codinux.banking.fints.messages.datenelemente.implementierte.tan.TanGeneratorTanMedium
+import net.codinux.banking.fints.messages.datenelemente.implementierte.tan.TanMedium
 import net.codinux.banking.fints.model.*
 
 
@@ -14,7 +14,7 @@ open class NoOpFinTsClientCallback : FinTsClientCallback {
         return tanChallenge.userDidNotEnterTan()
     }
 
-    override suspend fun enterTanGeneratorAtc(bank: BankData, tanMedium: TanGeneratorTanMedium): EnterTanGeneratorAtcResult {
+    override suspend fun enterTanGeneratorAtc(bank: BankData, tanMedium: TanMedium): EnterTanGeneratorAtcResult {
         return EnterTanGeneratorAtcResult.userDidNotEnterAtc()
     }
 

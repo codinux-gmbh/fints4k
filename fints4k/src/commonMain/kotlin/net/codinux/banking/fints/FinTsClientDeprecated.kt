@@ -135,7 +135,7 @@ open class FinTsClientDeprecated(
     }
 
 
-    open suspend fun changeTanMedium(newActiveTanMedium: TanGeneratorTanMedium, bank: BankData): FinTsClientResponse {
+    open suspend fun changeTanMedium(newActiveTanMedium: TanMedium, bank: BankData): FinTsClientResponse {
         val context = JobContext(JobContextType.ChangeTanMedium, this.callback, config, bank)
 
         val response = config.jobExecutor.changeTanMedium(context, newActiveTanMedium)

@@ -4,10 +4,7 @@ import net.codinux.banking.fints.extensions.randomWithSeed
 import net.codinux.banking.fints.messages.datenelemente.implementierte.Aufsetzpunkt
 import net.codinux.banking.fints.messages.datenelemente.implementierte.KundensystemID
 import net.codinux.banking.fints.messages.datenelemente.implementierte.Synchronisierungsmodus
-import net.codinux.banking.fints.messages.datenelemente.implementierte.tan.TanGeneratorTanMedium
-import net.codinux.banking.fints.messages.datenelemente.implementierte.tan.TanMedienArtVersion
-import net.codinux.banking.fints.messages.datenelemente.implementierte.tan.TanMediumKlasse
-import net.codinux.banking.fints.messages.datenelemente.implementierte.tan.TanProcess
+import net.codinux.banking.fints.messages.datenelemente.implementierte.tan.*
 import net.codinux.banking.fints.messages.segmente.Segment
 import net.codinux.banking.fints.messages.segmente.Synchronisierung
 import net.codinux.banking.fints.messages.segmente.id.CustomerSegmentId
@@ -294,7 +291,7 @@ open class MessageBuilder(protected val utils: FinTsUtils = FinTsUtils()) {
     }
 
     // TODO: no HKTAN needed?
-    open fun createChangeTanMediumMessage(context: JobContext, newActiveTanMedium: TanGeneratorTanMedium,
+    open fun createChangeTanMediumMessage(context: JobContext, newActiveTanMedium: TanMedium,
                                           tan: String? = null, atc: Int? = null): MessageBuilderResult {
 
         val result = getSupportedVersionsOfJobForBank(CustomerSegmentId.ChangeTanMedium, context.bank, listOf(1, 2, 3))

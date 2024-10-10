@@ -149,7 +149,7 @@ abstract class FinTsTestBase {
         3 -> messageBuilder.createInitDialogMessageWithoutStrongCustomerAuthentication(context, null)
         4 -> messageBuilder.createSynchronizeCustomerSystemIdMessage(context)
         5 -> messageBuilder.createGetTanMediaListMessage(context)
-        6 -> messageBuilder.createChangeTanMediumMessage(context, TanGeneratorTanMedium(TanMediumKlasse.TanGenerator, TanMediumStatus.Aktiv, "", null, null, null, null, null), null, null)
+        6 -> messageBuilder.createChangeTanMediumMessage(context, TanMedium(TanMediumKlasse.TanGenerator, TanMediumStatus.Aktiv, null, TanGeneratorTanMedium("", null, null, null, null)), null, null)
         7 -> messageBuilder.createGetBalanceMessage(context, account)
         8 -> messageBuilder.createGetTransactionsMessage(context, GetAccountTransactionsParameter(bank, account, true))
         9 -> messageBuilder.createGetTransactionsMessage(context, GetAccountTransactionsParameter(bank, bank.accounts[1], true))

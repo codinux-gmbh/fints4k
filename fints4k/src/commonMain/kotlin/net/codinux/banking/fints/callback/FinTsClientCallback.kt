@@ -1,6 +1,6 @@
 package net.codinux.banking.fints.callback
 
-import net.codinux.banking.fints.messages.datenelemente.implementierte.tan.TanGeneratorTanMedium
+import net.codinux.banking.fints.messages.datenelemente.implementierte.tan.TanMedium
 import net.codinux.banking.fints.model.*
 
 
@@ -25,7 +25,7 @@ interface FinTsClientCallback {
      *
      * If you do not support entering TAN generator ATC, return [EnterTanGeneratorAtcResult.userDidNotEnterAtc]
      */
-    suspend fun enterTanGeneratorAtc(bank: BankData, tanMedium: TanGeneratorTanMedium): EnterTanGeneratorAtcResult
+    suspend fun enterTanGeneratorAtc(bank: BankData, tanMedium: TanMedium): EnterTanGeneratorAtcResult
 
     /**
      * Gets fired when a FinTS message get sent to bank server, a FinTS message is received from bank server or an error occurred.

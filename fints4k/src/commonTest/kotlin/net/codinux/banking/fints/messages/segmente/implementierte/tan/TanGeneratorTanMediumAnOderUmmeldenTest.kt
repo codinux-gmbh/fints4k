@@ -2,6 +2,7 @@ package net.codinux.banking.fints.messages.segmente.implementierte.tan
 
 import net.codinux.banking.fints.FinTsTestBase
 import net.codinux.banking.fints.messages.datenelemente.implementierte.tan.TanGeneratorTanMedium
+import net.codinux.banking.fints.messages.datenelemente.implementierte.tan.TanMedium
 import net.codinux.banking.fints.messages.datenelemente.implementierte.tan.TanMediumKlasse
 import net.codinux.banking.fints.messages.datenelemente.implementierte.tan.TanMediumStatus
 import net.codinux.banking.fints.response.segments.ChangeTanMediaParameters
@@ -25,7 +26,7 @@ class TanGeneratorTanMediumAnOderUmmeldenTest: FinTsTestBase() {
 
         private const val SegmentNumber = 3
 
-        private val NewActiveTanMedium = TanGeneratorTanMedium(TanMediumKlasse.TanGenerator, TanMediumStatus.Verfuegbar, CardNumber, CardSequenceNumber, CardType, null, null, "EC-Card")
+        private val NewActiveTanMedium = TanMedium(TanMediumKlasse.TanGenerator, TanMediumStatus.Verfuegbar, "EC-Card", TanGeneratorTanMedium(CardNumber, CardSequenceNumber, CardType, null, null))
 
     }
 

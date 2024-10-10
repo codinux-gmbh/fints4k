@@ -25,6 +25,7 @@ import net.codinux.banking.fints.response.segments.*
 import net.codinux.banking.fints.util.MessageUtils
 import net.codinux.banking.fints.extensions.getAllExceptionMessagesJoined
 import net.codinux.banking.fints.transactions.swift.Mt535Parser
+import net.dankito.banking.client.model.BankAccountIdentifier
 
 
 open class ResponseParser(
@@ -613,34 +614,32 @@ open class ResponseParser(
 
         val mediumName = if (hitabVersion < 2) null else parseStringToNullIfEmpty(remainingDataElements[10])
 
-        return when (mediumClass) {
-            TanMediumKlasse.TanGenerator -> parseTanGeneratorTanMedium(mediumClass, status, mediumName, hitabVersion, remainingDataElements)
-            TanMediumKlasse.MobiltelefonMitMobileTan -> parseMobilePhoneTanMedium(mediumClass, status, mediumName, hitabVersion, remainingDataElements)
-            else -> TanMedium(mediumClass, status, mediumName) // Sparkasse sends for pushTan now class 'AlleMedien' -> set medium name and everything just works fine
-        }
+        val tanGenerator = if (mediumClass == TanMediumKlasse.TanGenerator) parseTanGeneratorTanMedium(hitabVersion, remainingDataElements)
+                            else null
+        val mobilePhone = if (mediumClass == TanMediumKlasse.MobiltelefonMitMobileTan) parseMobilePhoneTanMedium(hitabVersion, remainingDataElements)
+                            else null
+
+        return TanMedium(mediumClass, status, mediumName, tanGenerator, mobilePhone) // Sparkasse sends for pushTan now class 'AlleMedien' -> set medium name and everything just works fine
     }
 
-    protected open fun parseTanGeneratorTanMedium(mediumClass: TanMediumKlasse, status: TanMediumStatus, mediumName: String?,
-                                                  hitabVersion: Int, dataElements: List<String>): TanGeneratorTanMedium {
+    protected open fun parseTanGeneratorTanMedium(hitabVersion: Int, dataElements: List<String>): TanGeneratorTanMedium {
 
         val cardType = if (hitabVersion < 2) null else parseNullableInt(dataElements[2])
         // TODO: may also parse account info
         val validFrom = if (hitabVersion < 2) null else parseNullableDate(dataElements[8])
         val validTo = if (hitabVersion < 2) null else parseNullableDate(dataElements[9])
 
-        return TanGeneratorTanMedium(mediumClass, status, parseString(dataElements[0]), parseStringToNullIfEmpty(dataElements[1]),
-            cardType, validFrom, validTo, mediumName)
+        return TanGeneratorTanMedium(parseString(dataElements[0]), parseStringToNullIfEmpty(dataElements[1]),
+            cardType, validFrom, validTo)
     }
 
-    protected open fun parseMobilePhoneTanMedium(mediumClass: TanMediumKlasse, status: TanMediumStatus, mediumName: String?,
-                                                  hitabVersion: Int, dataElements: List<String>): MobilePhoneTanMedium {
+    protected open fun parseMobilePhoneTanMedium(hitabVersion: Int, dataElements: List<String>): MobilePhoneTanMedium {
 
         val concealedPhoneNumber = if (hitabVersion < 2) null else parseStringToNullIfEmpty(dataElements[11])
         val phoneNumber = if (hitabVersion < 2) null else parseStringToNullIfEmpty(dataElements[12])
-        val smsDebitAccount: KontoverbindungInternational? = null // TODO: may parse 13th data element to KontoverbindungInternational
+        val smsDebitAccount: BankAccountIdentifier? = null // TODO: may parse 13th data element to KontoverbindungInternational and map to BankAccountIdentifier
 
-        // mediumName should actually never be unset according to spec
-        return MobilePhoneTanMedium(mediumClass, status, mediumName ?: "", concealedPhoneNumber, phoneNumber, smsDebitAccount)
+        return MobilePhoneTanMedium(concealedPhoneNumber, phoneNumber, smsDebitAccount)
     }
 
 

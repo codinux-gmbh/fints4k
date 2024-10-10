@@ -8,7 +8,7 @@ import net.codinux.banking.fints.messages.datenelemente.basisformate.Numerisches
 import net.codinux.banking.fints.messages.datenelemente.implementierte.DoNotPrintDatenelement
 import net.codinux.banking.fints.messages.datenelemente.implementierte.NotAllowedDatenelement
 import net.codinux.banking.fints.messages.datenelemente.implementierte.allCodes
-import net.codinux.banking.fints.messages.datenelemente.implementierte.tan.TanGeneratorTanMedium
+import net.codinux.banking.fints.messages.datenelemente.implementierte.tan.TanMedium
 import net.codinux.banking.fints.messages.datenelemente.implementierte.tan.TanMediumKlasse
 import net.codinux.banking.fints.messages.datenelementgruppen.implementierte.Segmentkopf
 import net.codinux.banking.fints.messages.datenelementgruppen.implementierte.account.Kontoverbindung
@@ -34,13 +34,13 @@ import net.codinux.banking.fints.response.segments.ChangeTanMediaParameters
  * chipTAN-Verfahren:
  * Steht beim chipTAN-Verfahren ein Kartenwechsel an, so kann der Kunde mit diesem Geschäftsvorfall seine Karte bzw.
  * Folgekarte aktivieren. Kann der Kunde mehrere Karten verwenden, dann kann mit diesem GV die Ummeldung auf eine
- * andere Karte erfolgen. Das Kreditinstitut entscheidet selbst, ob dieser GV TAN-pflichtig istoder nicht.
+ * andere Karte erfolgen. Das Kreditinstitut entscheidet selbst, ob dieser GV TAN-pflichtig ist oder nicht.
  */
 open class TanGeneratorTanMediumAnOderUmmelden(
     segmentVersion: Int,
     segmentNumber: Int,
     bank: BankData,
-    newActiveTanMedium: TanGeneratorTanMedium,
+    newActiveTanMedium: TanMedium,
     /**
      * Has to be set if „Eingabe von ATC und TAN erforderlich“ (BPD)=“J“
      */
@@ -57,17 +57,17 @@ open class TanGeneratorTanMediumAnOderUmmelden(
 )
     : Segment(listOf(
     Segmentkopf(CustomerSegmentId.ChangeTanMedium, segmentVersion, segmentNumber),
-    Code(TanMediumKlasse.TanGenerator, allCodes<TanMediumKlasse>(), Existenzstatus.Mandatory),
-    AlphanumerischesDatenelement(newActiveTanMedium.cardNumber, Existenzstatus.Mandatory),
-    AlphanumerischesDatenelement(newActiveTanMedium.cardSequenceNumber, if (parameters.enteringCardSequenceNumberRequired) Existenzstatus.Mandatory else Existenzstatus.NotAllowed),
-    if (segmentVersion > 1) NumerischesDatenelement(newActiveTanMedium.cardType, 2, if (parameters.enteringCardTypeAllowed) Existenzstatus.Optional else Existenzstatus.NotAllowed) else DoNotPrintDatenelement(),
+    Code(newActiveTanMedium.mediumClass, allCodes<TanMediumKlasse>(), Existenzstatus.Mandatory),
+    AlphanumerischesDatenelement(newActiveTanMedium.tanGenerator?.cardNumber, if (newActiveTanMedium.mediumClass == TanMediumKlasse.TanGenerator) Existenzstatus.Mandatory else Existenzstatus.NotAllowed),
+    AlphanumerischesDatenelement(newActiveTanMedium.tanGenerator?.cardSequenceNumber, if (newActiveTanMedium.mediumClass == TanMediumKlasse.TanGenerator && parameters.enteringCardSequenceNumberRequired) Existenzstatus.Mandatory else Existenzstatus.NotAllowed),
+    if (segmentVersion > 1) NumerischesDatenelement(newActiveTanMedium.tanGenerator?.cardType, 2, if (newActiveTanMedium.mediumClass == TanMediumKlasse.TanGenerator && parameters.enteringCardTypeAllowed) Existenzstatus.Optional else Existenzstatus.NotAllowed) else DoNotPrintDatenelement(),
     if (segmentVersion == 2) Kontoverbindung(bank.accounts.first()) else DoNotPrintDatenelement(),
     if (segmentVersion >= 3 && parameters.accountInfoRequired) KontoverbindungInternational(bank.accounts.first(), bank) else DoNotPrintDatenelement(),
-    if (segmentVersion >= 2) Datum(newActiveTanMedium.validFrom, Existenzstatus.Optional) else DoNotPrintDatenelement(),
-    if (segmentVersion >= 2) Datum(newActiveTanMedium.validTo, Existenzstatus.Optional) else DoNotPrintDatenelement(),
-    if (segmentVersion >= 3) AlphanumerischesDatenelement(iccsn, Existenzstatus.Optional, 19) else DoNotPrintDatenelement(),
+    if (segmentVersion >= 2 && newActiveTanMedium.mediumClass == TanMediumKlasse.TanGenerator) Datum(newActiveTanMedium.tanGenerator?.validFrom, Existenzstatus.Optional) else DoNotPrintDatenelement(),
+    if (segmentVersion >= 2 && newActiveTanMedium.mediumClass == TanMediumKlasse.TanGenerator) Datum(newActiveTanMedium.tanGenerator?.validTo, Existenzstatus.Optional) else DoNotPrintDatenelement(),
+    if (segmentVersion >= 3 && newActiveTanMedium.mediumClass == TanMediumKlasse.TanGenerator) AlphanumerischesDatenelement(iccsn, Existenzstatus.Optional, 19) else DoNotPrintDatenelement(),
     NotAllowedDatenelement(), // TAN-Listennummer not supported anymore
-    NumerischesDatenelement(atc, 5, if (parameters.enteringAtcAndTanRequired) Existenzstatus.Mandatory else Existenzstatus.NotAllowed),
+    NumerischesDatenelement(atc, 5, if (newActiveTanMedium.mediumClass == TanMediumKlasse.TanGenerator && parameters.enteringAtcAndTanRequired) Existenzstatus.Mandatory else Existenzstatus.NotAllowed),
     AlphanumerischesDatenelement(tan, if (parameters.enteringAtcAndTanRequired) Existenzstatus.Mandatory else Existenzstatus.NotAllowed, 99)
 )) {
 

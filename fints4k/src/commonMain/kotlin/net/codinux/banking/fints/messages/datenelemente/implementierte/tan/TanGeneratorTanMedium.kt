@@ -1,24 +1,21 @@
 package net.codinux.banking.fints.messages.datenelemente.implementierte.tan
 
 import kotlinx.datetime.LocalDate
+import kotlinx.serialization.Serializable
 
-
+@Serializable
 open class TanGeneratorTanMedium(
-    mediumClass: TanMediumKlasse,
-    status: TanMediumStatus,
     val cardNumber: String,
     val cardSequenceNumber: String?,
     val cardType: Int?,
     val validFrom: LocalDate?,
-    val validTo: LocalDate?,
-    mediumName: String?
-) : TanMedium(mediumClass, status, mediumName) {
+    val validTo: LocalDate?
+) {
 
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other == null || this::class != other::class) return false
-        if (!super.equals(other)) return false
 
         other as TanGeneratorTanMedium
 
@@ -32,8 +29,7 @@ open class TanGeneratorTanMedium(
     }
 
     override fun hashCode(): Int {
-        var result = super.hashCode()
-        result = 31 * result + cardNumber.hashCode()
+        var result = cardNumber.hashCode()
         result = 31 * result + cardSequenceNumber.hashCode()
         result = 31 * result + cardType.hashCode()
         result = 31 * result + validFrom.hashCode()
@@ -43,7 +39,7 @@ open class TanGeneratorTanMedium(
 
 
     override fun toString(): String {
-        return super.toString() + " $mediumName $cardNumber (card sequence number: ${cardSequenceNumber ?: "-"})"
+        return "$cardNumber (card sequence number: ${cardSequenceNumber ?: "-"})"
     }
 
 }

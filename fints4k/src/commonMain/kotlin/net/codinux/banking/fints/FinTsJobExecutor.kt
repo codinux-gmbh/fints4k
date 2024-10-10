@@ -341,7 +341,7 @@ open class FinTsJobExecutor(
     }
 
 
-    open suspend fun changeTanMedium(context: JobContext, newActiveTanMedium: TanGeneratorTanMedium): BankResponse {
+    open suspend fun changeTanMedium(context: JobContext, newActiveTanMedium: TanMedium): BankResponse {
         val bank = context.bank
 
         if (bank.changeTanMediumParameters?.enteringAtcAndTanRequired == true) {
@@ -358,7 +358,7 @@ open class FinTsJobExecutor(
         }
     }
 
-    protected open suspend fun sendChangeTanMediumMessage(context: JobContext, newActiveTanMedium: TanGeneratorTanMedium, enteredAtc: EnterTanGeneratorAtcResult?): BankResponse {
+    protected open suspend fun sendChangeTanMediumMessage(context: JobContext, newActiveTanMedium: TanMedium, enteredAtc: EnterTanGeneratorAtcResult?): BankResponse {
 
         return sendMessageInNewDialogAndHandleResponse(context, null, true) {
             messageBuilder.createChangeTanMediumMessage(context, newActiveTanMedium, enteredAtc?.tan, enteredAtc?.atc)
@@ -527,7 +527,7 @@ Log.info { "Terminating waiting for TAN input" } // TODO: remove again
 
         if (enteredTanResult.changeTanMethodTo != null) {
             return handleUserAsksToChangeTanMethodAndResendLastMessage(context, enteredTanResult.changeTanMethodTo)
-        } else if (enteredTanResult.changeTanMediumTo is TanGeneratorTanMedium) {
+        } else if (enteredTanResult.changeTanMediumTo != null) {
             return handleUserAsksToChangeTanMediumAndResendLastMessage(context, enteredTanResult.changeTanMediumTo,
                 enteredTanResult.changeTanMediumResultCallback)
         } else if (enteredTanResult.userApprovedDecoupledTan == true && enteredTanResult.responseAfterApprovingDecoupledTan != null) {
@@ -562,7 +562,7 @@ Log.info { "Terminating waiting for TAN input" } // TODO: remove again
         return resendMessageInNewDialog(context, lastCreatedMessage)
     }
 
-    protected open suspend fun handleUserAsksToChangeTanMediumAndResendLastMessage(context: JobContext, changeTanMediumTo: TanGeneratorTanMedium,
+    protected open suspend fun handleUserAsksToChangeTanMediumAndResendLastMessage(context: JobContext, changeTanMediumTo: TanMedium,
                                                                            changeTanMediumResultCallback: ((FinTsClientResponse) -> Unit)?): BankResponse {
 
         val lastCreatedMessage = context.dialog.currentMessage
