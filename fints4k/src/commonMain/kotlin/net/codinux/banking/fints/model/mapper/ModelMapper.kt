@@ -152,7 +152,7 @@ open class ModelMapper(
         }
     }
 
-    protected open fun findTanMethod(securityFunction: Sicherheitsfunktion, bank: BankData): TanMethod? {
+    open fun findTanMethod(securityFunction: Sicherheitsfunktion, bank: BankData): TanMethod? {
         return bank.tanMethodsSupportedByBank.firstOrNull { it.securityFunction == securityFunction }
     }
 
@@ -173,7 +173,7 @@ open class ModelMapper(
         account.setSupportsFeature(AccountFeature.RealTimeTransfer, messageBuilder.supportsSepaRealTimeTransfer(bank, account))
     }
 
-    protected open fun mapToTanMethods(tanInfo: TanInfo): List<TanMethod> {
+    open fun mapToTanMethods(tanInfo: TanInfo): List<TanMethod> {
         return tanInfo.tanProcedureParameters.methodParameters.mapNotNull {
             mapToTanMethod(it, tanInfo.segmentVersion)
         }

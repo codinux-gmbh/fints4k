@@ -9,7 +9,8 @@ open class FinTsClientResponse(
     open val error: ErrorCode?,
     open val errorMessage: String?,
     open val messageLogWithoutSensitiveData: List<MessageLogEntry>,
-    open val finTsModel: BankData? = null
+    open val finTsModel: BankData? = null,
+    open val serializedFinTsModel: String? = null
 ) {
 
   internal constructor() : this(null, null, listOf()) // for object deserializers

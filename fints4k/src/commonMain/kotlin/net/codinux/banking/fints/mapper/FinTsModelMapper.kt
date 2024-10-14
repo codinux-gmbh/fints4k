@@ -1,10 +1,6 @@
 package net.codinux.banking.fints.mapper
 
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.atTime
-import kotlinx.datetime.toInstant
-import net.codinux.banking.fints.extensions.EuropeBerlin
 import net.dankito.banking.client.model.*
 import net.dankito.banking.client.model.AccountTransaction
 import net.dankito.banking.client.model.parameter.FinTsClientParameter
@@ -19,9 +15,12 @@ import net.codinux.banking.fints.response.segments.AccountType
 import net.codinux.banking.fints.util.BicFinder
 import net.codinux.banking.fints.extensions.minusDays
 import net.codinux.banking.fints.extensions.todayAtEuropeBerlin
+import net.codinux.banking.fints.serialization.FinTsModelSerializer
 
 
-open class FinTsModelMapper {
+open class FinTsModelMapper(
+  private val serializer: FinTsModelSerializer = FinTsModelSerializer()
+) {
 
   protected open val bicFinder = BicFinder()
 
@@ -203,5 +202,8 @@ open class FinTsModelMapper {
   open fun mergeMessageLog(vararg responses: FinTsClientResponse?): List<MessageLogEntry> {
     return responses.filterNotNull().flatMap { it.messageLog }
   }
+
+  open fun serialize(finTsModel: BankData?): String? =
+    finTsModel?.let { serializer.serializeToJson(finTsModel) }
 
 }

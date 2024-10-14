@@ -1,12 +1,15 @@
 package net.codinux.banking.fints.model
 
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 import net.codinux.banking.fints.FinTsClient
 import net.codinux.banking.fints.messages.datenelemente.abgeleiteteformate.Laenderkennzeichen
 import net.codinux.banking.fints.messages.segmente.id.CustomerSegmentId
 import net.codinux.banking.fints.response.segments.AccountType
 import net.codinux.banking.fints.response.segments.JobParameters
 
-
+@Serializable
 open class AccountData(
     open val accountIdentifier: String,
     open val subAccountAttribute: String?,
@@ -20,6 +23,7 @@ open class AccountData(
     open val productName: String?,
     open val accountLimit: String?,
     open val allowedJobNames: List<String>,
+    @Transient // can be restored from bank.supportedJobs and this.allowedJobNames
     open var allowedJobs: List<JobParameters> = listOf()
 ) {
 
@@ -40,6 +44,7 @@ open class AccountData(
     open var serverTransactionsRetentionDays: Int? = null
 
 
+    @SerialName("supportedFeatures")
     protected open val _supportedFeatures = mutableSetOf<AccountFeature>()
 
     open val supportedFeatures: Collection<AccountFeature>

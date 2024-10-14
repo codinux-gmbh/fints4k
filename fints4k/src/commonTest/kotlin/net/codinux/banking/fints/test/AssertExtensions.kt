@@ -61,6 +61,12 @@ fun <T : Any?> assertContains(collection: Collection<T>, vararg items: T) {
   }
 }
 
+fun <T : Any?> assertContains(collection: Collection<T>, items: Collection<T>) {
+  items.forEach { item ->
+    kotlin.test.assertContains(collection, item)
+  }
+}
+
 
 inline fun <reified T : Throwable> assertThrows(action: () -> Unit) {
   try {

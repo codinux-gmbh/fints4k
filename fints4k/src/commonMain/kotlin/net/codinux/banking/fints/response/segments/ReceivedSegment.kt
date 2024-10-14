@@ -1,17 +1,13 @@
 package net.codinux.banking.fints.response.segments
 
 import net.codinux.banking.fints.messages.Separators
-import kotlin.jvm.Transient
 
 
 open class ReceivedSegment(
     open val segmentId: String,
-    @Transient
     open val segmentNumber: Int,
     open val segmentVersion: Int,
-    @Transient
     open val referenceSegmentNumber: Int? = null,
-    @Transient
     open val segmentString: String
 ) {
 

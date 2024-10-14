@@ -23,6 +23,11 @@ open class TanMedium(
     internal constructor() : this(TanMediumKlasse.AlleMedien, TanMediumStatus.Verfuegbar, null) // for object deserializers
 
 
+    val identifier: String by lazy {
+        "$mediumClass $mediumName $status ${tanGenerator?.cardNumber} ${mobilePhone?.concealedPhoneNumber ?: mobilePhone?.concealedPhoneNumber}"
+    }
+
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other == null || this::class != other::class) return false

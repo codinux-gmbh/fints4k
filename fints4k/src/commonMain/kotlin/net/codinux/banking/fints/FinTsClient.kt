@@ -19,6 +19,8 @@ import net.codinux.banking.fints.response.segments.BankParameters
 import net.codinux.banking.fints.util.BicFinder
 import net.codinux.log.LogLevel
 import net.codinux.log.LoggerFactory
+import kotlin.js.JsName
+import kotlin.jvm.JvmName
 
 
 open class FinTsClient(
@@ -57,7 +59,7 @@ open class FinTsClient(
 
     if (basicAccountDataResponse.successful == false || param.retrieveOnlyAccountInfo || basicAccountDataResponse.finTsModel == null) {
       return GetAccountDataResponse(basicAccountDataResponse.error, basicAccountDataResponse.errorMessage, null,
-        basicAccountDataResponse.messageLogWithoutSensitiveData, basicAccountDataResponse.finTsModel)
+        basicAccountDataResponse.messageLogWithoutSensitiveData, basicAccountDataResponse.finTsModel, basicAccountDataResponse.serializedFinTsModel)
     } else {
       val bank = basicAccountDataResponse.finTsModel!!
       return getAccountData(param, bank, bank.accounts, basicAccountDataResponse.messageLogWithoutSensitiveData)
@@ -71,7 +73,7 @@ open class FinTsClient(
 
     if (accountsSupportingRetrievingTransactions.isEmpty()) {
       val errorMessage = "None of the accounts ${accounts.map { it.productName }} supports retrieving balance or transactions" // TODO: translate
-      return GetAccountDataResponse(ErrorCode.NoneOfTheAccountsSupportsRetrievingData, errorMessage, mapper.map(bank), previousJobMessageLog ?: listOf(), bank)
+      return GetAccountDataResponse(ErrorCode.NoneOfTheAccountsSupportsRetrievingData, errorMessage, mapper.map(bank), previousJobMessageLog ?: listOf(), bank, serialize(bank))
     }
 
     for (account in accountsSupportingRetrievingTransactions) {
@@ -87,7 +89,7 @@ open class FinTsClient(
     val errorCode = unsuccessfulJob?.let { mapper.mapErrorCode(it) }
       ?: if (retrievedTransactionsResponses.size < accountsSupportingRetrievingTransactions.size) ErrorCode.DidNotRetrieveAllAccountData else null
     return GetAccountDataResponse(errorCode, mapper.mapErrorMessages(unsuccessfulJob), mapper.map(bank, retrievedTransactionsResponses, param.retrieveTransactionsTo),
-      mapper.mergeMessageLog(previousJobMessageLog, *retrievedTransactionsResponses.map { it.messageLog }.toTypedArray()), bank)
+      mapper.mergeMessageLog(previousJobMessageLog, *retrievedTransactionsResponses.map { it.messageLog }.toTypedArray()), bank, serialize(bank))
   }
 
   protected open suspend fun getAccountTransactions(param: GetAccountDataParameter, bank: BankData, account: AccountData): GetAccountTransactionsResponse {
@@ -122,7 +124,7 @@ open class FinTsClient(
 
       if (getAccountInfoResponse.successful == false) {
         return TransferMoneyResponse(mapper.mapErrorCode(getAccountInfoResponse), mapper.mapErrorMessages(getAccountInfoResponse),
-          getAccountInfoResponse.messageLog, bank)
+          getAccountInfoResponse.messageLog, bank, serialize(bank))
       } else {
         return transferMoneyAsync(param, recipientBankIdentifier, getAccountInfoResponse.bank, getAccountInfoResponse.bank.accounts, getAccountInfoResponse)
       }
@@ -136,14 +138,14 @@ open class FinTsClient(
     val accountToUse: AccountData
 
     if (accountsSupportingTransfer.isEmpty()) {
-      return TransferMoneyResponse(ErrorCode.NoAccountSupportsMoneyTransfer, "None of the accounts $accounts supports money transfer", previousJobResponse?.messageLog ?: listOf(), bank)
+      return TransferMoneyResponse(ErrorCode.NoAccountSupportsMoneyTransfer, "None of the accounts $accounts supports money transfer", previousJobResponse?.messageLog ?: listOf(), bank, serialize(bank))
     } else if (accountsSupportingTransfer.size == 1) {
       accountToUse = accountsSupportingTransfer.first()
     } else {
       val selectedAccount = param.selectAccountToUseForTransfer?.invoke(accountsSupportingTransfer)
 
       if (selectedAccount == null) {
-        return TransferMoneyResponse(ErrorCode.MoreThanOneAccountSupportsMoneyTransfer, "More than one of the accounts $accountsSupportingTransfer supports money transfer, so we cannot clearly determine which one to use for this transfer", previousJobResponse?.messageLog ?: listOf(), bank)
+        return TransferMoneyResponse(ErrorCode.MoreThanOneAccountSupportsMoneyTransfer, "More than one of the accounts $accountsSupportingTransfer supports money transfer, so we cannot clearly determine which one to use for this transfer", previousJobResponse?.messageLog ?: listOf(), bank, serialize(bank))
       }
 
       accountToUse = selectedAccount
@@ -154,7 +156,7 @@ open class FinTsClient(
     val response = config.jobExecutor.transferMoneyAsync(context, BankTransferData(param.recipientName, param.recipientAccountIdentifier, recipientBankIdentifier,
       param.amount, param.reference, param.instantPayment))
 
-    return TransferMoneyResponse(mapper.mapErrorCode(response), mapper.mapErrorMessages(response), mapper.mergeMessageLog(previousJobResponse, response), bank)
+    return TransferMoneyResponse(mapper.mapErrorCode(response), mapper.mapErrorMessages(response), mapper.mergeMessageLog(previousJobResponse, response), bank, serialize(bank))
   }
 
   private fun getRecipientBankCode(param: TransferMoneyParameter): String? {
@@ -192,7 +194,7 @@ open class FinTsClient(
    */
   open suspend fun getRequiredDataToSendUserJobs(param: FinTsClientParameter): net.dankito.banking.client.model.response.FinTsClientResponse {
     if (param.finTsModel != null) {
-      return net.dankito.banking.client.model.response.FinTsClientResponse(null, null, emptyList(), param.finTsModel)
+      return net.dankito.banking.client.model.response.FinTsClientResponse(null, null, emptyList(), param.finTsModel, serialize(param.finTsModel))
     }
 
     val defaultValues = (param as? GetAccountDataParameter)?.defaultBankValues
@@ -207,7 +209,7 @@ open class FinTsClient(
     val getAccountInfoResponse = getAccountInfo(param, bank)
 
     return net.dankito.banking.client.model.response.FinTsClientResponse(mapper.mapErrorCode(getAccountInfoResponse), mapper.mapErrorMessages(getAccountInfoResponse),
-      getAccountInfoResponse.messageLog, bank)
+      getAccountInfoResponse.messageLog, bank, serialize(bank))
   }
 
   protected open suspend fun getAccountInfo(param: FinTsClientParameter, bank: BankData): GetAccountInfoResponse {
@@ -233,5 +235,13 @@ open class FinTsClient(
 
     return GetAccountInfoResponse(context, getAccountsResponse)
   }
+
+
+  @JvmName("serializeNullable")
+  @JsName("serializeNullable")
+  private fun serialize(bank: BankData?) =
+    bank?.let { serialize(bank) }
+
+  private fun serialize(bank: BankData): String? = mapper.serialize(bank)
 
 }
