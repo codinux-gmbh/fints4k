@@ -43,7 +43,8 @@ open class BankData(
     open var countMaxJobsPerMessage: Int = 0,
 
     open var supportedHbciVersions: List<HbciVersion> = listOf(),
-    open var supportedJobs: List<JobParameters> = listOf()
+    open var supportedJobs: List<JobParameters> = listOf(),
+    open var jobsRequiringTan: Set<String> = emptySet()
 ) {
 
     companion object {
@@ -60,6 +61,8 @@ open class BankData(
 
     internal constructor() : this("", "", "", "", "") // for object deserializers
 
+
+    open var pinInfo: PinInfo? = null
 
 
     protected open val _accounts = mutableListOf<AccountData>()
@@ -80,10 +83,6 @@ open class BankData(
         _accounts.remove(account)
     }
 
-
-    open var jobsRequiringTan: Set<String> = emptySet()
-
-//    open var pinInfo: PinInfo? = null
 
     open fun doesJobRequireTan(segmentId: ISegmentId): Boolean = doesJobRequireTan(segmentId.id)
 

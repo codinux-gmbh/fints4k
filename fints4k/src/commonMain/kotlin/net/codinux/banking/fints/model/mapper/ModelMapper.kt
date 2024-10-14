@@ -11,6 +11,7 @@ import net.codinux.banking.fints.model.*
 import net.codinux.banking.fints.response.BankResponse
 import net.codinux.banking.fints.response.InstituteSegmentId
 import net.codinux.banking.fints.response.segments.*
+import net.codinux.banking.fints.response.segments.PinInfo
 
 
 open class ModelMapper(
@@ -34,7 +35,7 @@ open class ModelMapper(
         }
 
         response.getFirstSegmentById<PinInfo>(InstituteSegmentId.PinInfo)?.let { pinInfo ->
-            // TODO: save min/maxPinLength, minTanLength, user/customerIdHint on BankData (or in BankFinderResult object?)
+            bank.pinInfo = net.codinux.banking.fints.model.PinInfo(pinInfo.minPinLength, pinInfo.maxPinLength, pinInfo.minTanLength, pinInfo.userIdHint, pinInfo.customerIdHint)
             bank.jobsRequiringTan = pinInfo.jobTanConfiguration.filter { it.tanRequired }.map { it.segmentId }.toHashSet()
         }
 
