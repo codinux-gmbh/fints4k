@@ -31,7 +31,7 @@ class ResponseParserTestJvm : FinTsTestBaseJvm() {
 
         val decodedChallengeHhdUc = TanImageDecoder().decodeChallenge(result.tanResponse?.challengeHHD_UC ?: "")
         assertThat(decodedChallengeHhdUc.decodingSuccessful).isTrue()
-        assertThat(decodedChallengeHhdUc.imageBytes.size).isEqualTo(3664)
+        assertThat(decodedChallengeHhdUc.imageBytes?.size).isEqualTo(3664)
     }
 
 }
