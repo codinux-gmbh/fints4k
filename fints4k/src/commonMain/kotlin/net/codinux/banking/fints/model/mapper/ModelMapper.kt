@@ -34,7 +34,8 @@ open class ModelMapper(
         }
 
         response.getFirstSegmentById<PinInfo>(InstituteSegmentId.PinInfo)?.let { pinInfo ->
-            bank.pinInfo = pinInfo
+            // TODO: save min/maxPinLength, minTanLength, user/customerIdHint on BankData (or in BankFinderResult object?)
+            bank.jobsRequiringTan = pinInfo.jobTanConfiguration.filter { it.tanRequired }.map { it.segmentId }.toHashSet()
         }
 
         val tanInfos = response.getSegmentsById<TanInfo>(InstituteSegmentId.TanInfo)

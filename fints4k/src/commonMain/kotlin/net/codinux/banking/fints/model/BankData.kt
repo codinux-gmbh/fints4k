@@ -7,7 +7,6 @@ import net.codinux.banking.fints.messages.datenelemente.implementierte.tan.TanMe
 import net.codinux.banking.fints.messages.segmente.id.ISegmentId
 import net.codinux.banking.fints.response.segments.ChangeTanMediaParameters
 import net.codinux.banking.fints.response.segments.JobParameters
-import net.codinux.banking.fints.response.segments.PinInfo
 
 
 open class BankData(
@@ -83,14 +82,8 @@ open class BankData(
 
 
     open var jobsRequiringTan: Set<String> = emptySet()
-        protected set
 
-    open var pinInfo: PinInfo? = null
-        set(value) {
-            field = value
-            // TODO: in case of null: actually in this case it's not allowed to execute job via PIN/TAN at all
-            jobsRequiringTan = value?.jobTanConfiguration.orEmpty().filter { it.tanRequired }.map { it.segmentId }.toSet()
-        }
+//    open var pinInfo: PinInfo? = null
 
     open fun doesJobRequireTan(segmentId: ISegmentId): Boolean = doesJobRequireTan(segmentId.id)
 

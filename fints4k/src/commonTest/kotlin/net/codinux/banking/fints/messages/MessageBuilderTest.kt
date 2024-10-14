@@ -164,7 +164,7 @@ class MessageBuilderTest : FinTsTestBase() {
         // given
         val getTransactionsJob = RetrieveAccountTransactionsParameters(JobParameters(CustomerSegmentId.AccountTransactionsMt940.id, 1, 1, null, "HIKAZS:73:5"), 180, true, false)
         bank.supportedJobs = listOf(getTransactionsJob)
-        bank.pinInfo = PinInfo(getTransactionsJob, null, null, null, null, null, listOf(JobTanConfiguration(CustomerSegmentId.AccountTransactionsMt940.id, true)))
+        bank.jobsRequiringTan = setOf(CustomerSegmentId.AccountTransactionsMt940.id)
         val account = AccountData(CustomerId, null, BankCountryCode, BankCode, null, CustomerId, AccountType.Girokonto, "EUR", "", null, null, listOf(getTransactionsJob.jobName), listOf(getTransactionsJob))
         bank.addAccount(account)
 
@@ -198,7 +198,7 @@ class MessageBuilderTest : FinTsTestBase() {
         // given
         val getTransactionsJob = RetrieveAccountTransactionsParameters(JobParameters(CustomerSegmentId.AccountTransactionsMt940.id, 1, 1, null, "HIKAZS:73:5"), 180, true, false)
         bank.supportedJobs = listOf(getTransactionsJob)
-        bank.pinInfo = PinInfo(getTransactionsJob, null, null, null, null, null, listOf(JobTanConfiguration(CustomerSegmentId.AccountTransactionsMt940.id, true)))
+        bank.jobsRequiringTan = setOf(CustomerSegmentId.AccountTransactionsMt940.id)
         val account = AccountData(CustomerId, null, BankCountryCode, BankCode, null, CustomerId, AccountType.Girokonto, "EUR", "", null, null, listOf(getTransactionsJob.jobName), listOf(getTransactionsJob))
         bank.addAccount(account)
 

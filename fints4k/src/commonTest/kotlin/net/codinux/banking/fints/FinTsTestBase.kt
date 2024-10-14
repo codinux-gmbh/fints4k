@@ -123,13 +123,13 @@ abstract class FinTsTestBase {
             SepaAccountInfoParameters(createAllowedJob(CustomerSegmentId.SepaBankTransfer, 1), true, true, true, true, 35, listOf("pain.001.001.03")),
             SepaAccountInfoParameters(createAllowedJob(CustomerSegmentId.SepaRealTimeTransfer, 1), true, true, true, true, 35, listOf("pain.001.001.03")),
         )
-        bank.pinInfo = PinInfo(getTransactionsJob, null, null, null, null, null, listOf(
-            JobTanConfiguration(CustomerSegmentId.Balance.id, true),
-            JobTanConfiguration(CustomerSegmentId.AccountTransactionsMt940.id, true),
-            JobTanConfiguration(CustomerSegmentId.CreditCardTransactions.id, true),
-            JobTanConfiguration(CustomerSegmentId.SepaBankTransfer.id, true),
-            JobTanConfiguration(CustomerSegmentId.SepaRealTimeTransfer.id, true)
-        ))
+        bank.jobsRequiringTan = setOf(
+            CustomerSegmentId.Balance.id,
+            CustomerSegmentId.AccountTransactionsMt940.id,
+            CustomerSegmentId.CreditCardTransactions.id,
+            CustomerSegmentId.SepaBankTransfer.id,
+            CustomerSegmentId.SepaRealTimeTransfer.id
+        )
         bank.changeTanMediumParameters = ChangeTanMediaParameters(changeTanMediumJob, false, false, false, false, false, listOf())
 
         val checkingAccount = AccountData(CustomerId, null, BankCountryCode, BankCode, "ABCDDEBBXXX", CustomerId, AccountType.Girokonto, "EUR", "", null, null, bank.supportedJobs.map { it.jobName }, bank.supportedJobs)
