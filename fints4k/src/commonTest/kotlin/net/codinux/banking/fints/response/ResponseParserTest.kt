@@ -1227,6 +1227,24 @@ class ResponseParserTest : FinTsTestBase() {
 
 
     @Test
+    fun parseAccountTransactionsCamtParameters() {
+        val result = underTest.parse("HICAZS:56:1:3+1+1+1+740:N:N:urn?:iso?:std?:iso?:20022?:tech?:xsd?:camt.052.001.02:urn?:iso?:std?:iso?:20022?:tech?:xsd?:camt.052.001.08'")
+
+        // then
+        assertSuccessfullyParsedSegment(result, InstituteSegmentId.AccountTransactionsCamtParameters, 56, 1, 3)
+
+        result.getFirstSegmentById<RetrieveAccountTransactionsParameters>(InstituteSegmentId.AccountTransactionsCamtParameters)?.let { segment ->
+            assertEquals(740, segment.serverTransactionsRetentionDays)
+            assertFalse(segment.settingCountEntriesAllowed)
+            assertFalse(segment.settingAllAccountAllowed)
+
+            assertContainsExactly(segment.supportedCamtDataFormats, "urn:iso:std:iso:20022:tech:xsd:camt.052.001.02", "urn:iso:std:iso:20022:tech:xsd:camt.052.001.08")
+        }
+        ?: run { fail("No segment of type AccountTransactionsCamtParameters found in ${result.receivedSegments}") }
+    }
+
+
+    @Test
     fun parseCreditCardAccountTransactions() {
 
         // given

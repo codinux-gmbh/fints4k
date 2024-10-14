@@ -124,6 +124,9 @@ open class ResponseParser(
             InstituteSegmentId.AccountTransactionsMt940.id -> parseMt940AccountTransactions(segment, dataElementGroups)
             InstituteSegmentId.AccountTransactionsMt940Parameters.id -> parseMt940AccountTransactionsParameters(segment, segmentId, dataElementGroups)
 
+//            InstituteSegmentId.AccountTransactionsCamt.id -> parseCamtAccountTransactions(segment, dataElementGroups)
+            InstituteSegmentId.AccountTransactionsCamtParameters.id -> parseCamtAccountTransactionsParameters(segment, segmentId, dataElementGroups)
+
             InstituteSegmentId.CreditCardTransactions.id -> parseCreditCardTransactions(segment, dataElementGroups)
             InstituteSegmentId.CreditCardTransactionsParameters.id -> parseCreditCardTransactionsParameters(segment, segmentId, dataElementGroups)
 
@@ -764,6 +767,20 @@ open class ResponseParser(
         val settingAllAccountAllowed = if (dataElements.size > 2) parseBoolean(dataElements[2]) else false
 
         return RetrieveAccountTransactionsParameters(jobParameters, serverTransactionsRetentionDays, settingCountEntriesAllowed, settingAllAccountAllowed)
+    }
+
+    protected open fun parseCamtAccountTransactionsParameters(segment: String, segmentId: String, dataElementGroups: List<String>): RetrieveAccountTransactionsParameters {
+        val jobParameters = parseJobParameters(segment, segmentId, dataElementGroups)
+
+        val dataElements = getDataElements(dataElementGroups[4])
+
+        val serverTransactionsRetentionDays = parseInt(dataElements[0])
+        val settingCountEntriesAllowed = parseBoolean(dataElements[1])
+        val settingAllAccountAllowed = parseBoolean(dataElements[2])
+
+        val supportedCamtDataFormats = dataElements.subList(3, dataElements.size)
+
+        return RetrieveAccountTransactionsParameters(jobParameters, serverTransactionsRetentionDays, settingCountEntriesAllowed, settingAllAccountAllowed, supportedCamtDataFormats)
     }
 
 

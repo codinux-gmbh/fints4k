@@ -41,6 +41,10 @@ enum class InstituteSegmentId(override val id: String) : ISegmentId {
 
     AccountTransactionsMt940Parameters(AccountTransactionsMt940.id + "S"),
 
+    AccountTransactionsCamt("HICAZ"),
+
+    AccountTransactionsCamtParameters(AccountTransactionsCamt.id + "S"),
+
     CreditCardTransactions("DIKKU"),
 
     CreditCardTransactionsParameters(CreditCardTransactions.id + "S"),
