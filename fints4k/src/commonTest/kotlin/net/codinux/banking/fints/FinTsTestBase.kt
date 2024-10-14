@@ -62,13 +62,10 @@ abstract class FinTsTestBase {
         val ClientConfig = FinTsClientConfiguration(FinTsClientOptions(version = ProductVersion, productName = ProductName))
 
 
-        init {
-            Bank.changeTanMediumParameters = ChangeTanMediaParameters(JobParameters("", 1, 1, 1, ":0:0"), false, false, false, false, false, listOf())
-        }
-
-
         fun createTestBank(): BankData {
-            return BankData(BankCode, CustomerId, Pin, BankFinTsServerAddress, Bic, "", BankCountryCode, selectedTanMethod = TanMethod("chipTAN-optisch", SecurityFunction, TanMethodType.ChipTanFlickercode), selectedLanguage = Language)
+            return BankData(BankCode, CustomerId, Pin, BankFinTsServerAddress, Bic, "", BankCountryCode, selectedTanMethod = TanMethod("chipTAN-optisch", SecurityFunction, TanMethodType.ChipTanFlickercode), selectedLanguage = Language, supportedJobs = listOf(
+                ChangeTanMediaParameters(JobParameters("", 1, 1, 1, ":0:0"), false, false, false, false, false, listOf())
+            ))
         }
 
         fun createTestAccount(): AccountData {
@@ -122,6 +119,7 @@ abstract class FinTsTestBase {
             createAllowedJob(CustomerSegmentId.CreditCardTransactions, 2),
             SepaAccountInfoParameters(createAllowedJob(CustomerSegmentId.SepaBankTransfer, 1), true, true, true, true, 35, listOf("pain.001.001.03")),
             SepaAccountInfoParameters(createAllowedJob(CustomerSegmentId.SepaRealTimeTransfer, 1), true, true, true, true, 35, listOf("pain.001.001.03")),
+            ChangeTanMediaParameters(changeTanMediumJob, false, false, false, false, false, listOf())
         )
         bank.jobsRequiringTan = setOf(
             CustomerSegmentId.Balance.id,
@@ -130,7 +128,6 @@ abstract class FinTsTestBase {
             CustomerSegmentId.SepaBankTransfer.id,
             CustomerSegmentId.SepaRealTimeTransfer.id
         )
-        bank.changeTanMediumParameters = ChangeTanMediaParameters(changeTanMediumJob, false, false, false, false, false, listOf())
 
         val checkingAccount = AccountData(CustomerId, null, BankCountryCode, BankCode, "ABCDDEBBXXX", CustomerId, AccountType.Girokonto, "EUR", "", null, null, bank.supportedJobs.map { it.jobName }, bank.supportedJobs)
         bank.addAccount(checkingAccount)

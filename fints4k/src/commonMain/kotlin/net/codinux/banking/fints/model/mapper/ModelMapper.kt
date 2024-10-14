@@ -56,10 +56,6 @@ open class ModelMapper(
             }
         }
 
-        response.getFirstSegmentById<ChangeTanMediaParameters>(InstituteSegmentId.ChangeTanMediaParameters)?.let { parameters ->
-            bank.changeTanMediumParameters = parameters
-        }
-
         if (response.supportedJobs.isNotEmpty()) {
             bank.supportedJobs = response.supportedJobs
         }

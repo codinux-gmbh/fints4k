@@ -29,7 +29,6 @@ open class BankData(
     open var selectedTanMethod: TanMethod = TanMethodNotSelected,
     open var tanMedia: List<TanMedium> = listOf(),
     open var selectedTanMedium: TanMedium? = null,
-    open var changeTanMediumParameters: ChangeTanMediaParameters? = null,
 
     open var supportedLanguages: List<Dialogsprache> = listOf(),
     open var selectedLanguage: Dialogsprache = Dialogsprache.Default,
@@ -63,6 +62,9 @@ open class BankData(
 
 
     open var pinInfo: PinInfo? = null
+
+    open val changeTanMediumParameters: ChangeTanMediaParameters?
+        get() = supportedJobs.filterIsInstance<ChangeTanMediaParameters>().firstOrNull()
 
 
     protected open val _accounts = mutableListOf<AccountData>()
