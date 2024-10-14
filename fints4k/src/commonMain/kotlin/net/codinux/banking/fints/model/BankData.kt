@@ -1,5 +1,6 @@
 package net.codinux.banking.fints.model
 
+import kotlinx.serialization.Serializable
 import net.codinux.banking.fints.messages.datenelemente.abgeleiteteformate.Laenderkennzeichen
 import net.codinux.banking.fints.messages.datenelemente.implementierte.*
 import net.codinux.banking.fints.messages.datenelemente.implementierte.signatur.Sicherheitsfunktion
@@ -7,8 +8,9 @@ import net.codinux.banking.fints.messages.datenelemente.implementierte.tan.TanMe
 import net.codinux.banking.fints.messages.segmente.id.ISegmentId
 import net.codinux.banking.fints.response.segments.ChangeTanMediaParameters
 import net.codinux.banking.fints.response.segments.JobParameters
+import net.codinux.banking.fints.serialization.BankDataSerializer
 
-
+@Serializable(with = BankDataSerializer::class)
 open class BankData(
     open var bankCode: String,
     open var customerId: String,

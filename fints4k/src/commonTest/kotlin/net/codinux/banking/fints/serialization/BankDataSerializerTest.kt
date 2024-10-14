@@ -1,5 +1,8 @@
 package net.codinux.banking.fints.serialization
 
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+import net.codinux.banking.fints.model.BankData
 import net.codinux.banking.fints.test.TestDataGenerator
 import net.codinux.banking.fints.test.assertContains
 import net.codinux.banking.fints.test.assertSize
@@ -8,25 +11,27 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
-class FinTsModelSerializerTest {
+class BankDataSerializerTest {
 
     private val serializedBankData = TestDataGenerator.serializedBankData
 
-    private val underTest = FinTsModelSerializer()
+    private val json = Json {
+        prettyPrint = true
+    }
 
 
     @Test
     fun serializeToJson() {
         val bank = TestDataGenerator.generateBankDataForSerialization()
 
-        val result = underTest.serializeToJson(bank, true)
+        val result = json.encodeToString(bank)
 
         assertEquals(serializedBankData, result)
     }
 
     @Test
     fun deserializeFromJson() {
-        val result = underTest.deserializeFromJson(serializedBankData)
+        val result = json.decodeFromString<BankData>(serializedBankData)
 
         assertNotNull(result)
 
@@ -48,7 +53,7 @@ class FinTsModelSerializerTest {
             assertContains(result.supportedJobs, account.allowedJobs) // check that it contains exactly the same object instances
         }
 
-        assertEquals(serializedBankData, underTest.serializeToJson(result, true))
+        assertEquals(serializedBankData, json.encodeToString(result))
     }
 
 }
