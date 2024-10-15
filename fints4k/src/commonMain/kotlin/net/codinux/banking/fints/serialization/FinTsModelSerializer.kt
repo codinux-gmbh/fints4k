@@ -5,7 +5,7 @@ import kotlinx.serialization.json.Json
 import net.codinux.banking.fints.model.BankData
 import net.codinux.log.logger
 
-open class FinTsModelSerializer {
+object FinTsModelSerializer {
 
     private val json: Json by lazy {
         Json { this.ignoreUnknownKeys = true }
@@ -23,7 +23,7 @@ open class FinTsModelSerializer {
     private val log by logger()
 
 
-    open fun serializeToJson(bank: BankData, prettyPrint: Boolean = false): String? {
+    fun serializeToJson(bank: BankData, prettyPrint: Boolean = false): String? {
         return try {
             val serializableData = mapper.map(bank)
 
@@ -36,7 +36,7 @@ open class FinTsModelSerializer {
         }
     }
 
-    open fun deserializeFromJson(serializedFinTsData: String): BankData? = try {
+    fun deserializeFromJson(serializedFinTsData: String): BankData? = try {
         val serializedData = json.decodeFromString<SerializedFinTsData>(serializedFinTsData)
 
         mapper.map(serializedData)

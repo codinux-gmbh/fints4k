@@ -15,12 +15,9 @@ import net.codinux.banking.fints.response.segments.AccountType
 import net.codinux.banking.fints.util.BicFinder
 import net.codinux.banking.fints.extensions.minusDays
 import net.codinux.banking.fints.extensions.todayAtEuropeBerlin
-import net.codinux.banking.fints.serialization.FinTsModelSerializer
 
 
-open class FinTsModelMapper(
-  private val serializer: FinTsModelSerializer = FinTsModelSerializer()
-) {
+open class FinTsModelMapper {
 
   protected open val bicFinder = BicFinder()
 
@@ -202,8 +199,5 @@ open class FinTsModelMapper(
   open fun mergeMessageLog(vararg responses: FinTsClientResponse?): List<MessageLogEntry> {
     return responses.filterNotNull().flatMap { it.messageLog }
   }
-
-  open fun serialize(finTsModel: BankData?): String? =
-    finTsModel?.let { serializer.serializeToJson(finTsModel) }
 
 }

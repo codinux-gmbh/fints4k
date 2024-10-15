@@ -12,21 +12,19 @@ class FinTsModelSerializerTest {
 
     private val serializedBankData = TestDataGenerator.serializedBankData
 
-    private val underTest = FinTsModelSerializer()
-
 
     @Test
     fun serializeToJson() {
         val bank = TestDataGenerator.generateBankDataForSerialization()
 
-        val result = underTest.serializeToJson(bank, true)
+        val result = FinTsModelSerializer.serializeToJson(bank, true)
 
         assertEquals(serializedBankData, result)
     }
 
     @Test
     fun deserializeFromJson() {
-        val result = underTest.deserializeFromJson(serializedBankData)
+        val result = FinTsModelSerializer.deserializeFromJson(serializedBankData)
 
         assertNotNull(result)
 
@@ -48,7 +46,7 @@ class FinTsModelSerializerTest {
             assertContains(result.supportedJobs, account.allowedJobs) // check that it contains exactly the same object instances
         }
 
-        assertEquals(serializedBankData, underTest.serializeToJson(result, true))
+        assertEquals(serializedBankData, FinTsModelSerializer.serializeToJson(result, true))
     }
 
 }

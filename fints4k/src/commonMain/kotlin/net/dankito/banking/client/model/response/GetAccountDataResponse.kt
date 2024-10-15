@@ -10,9 +10,8 @@ open class GetAccountDataResponse(
     errorMessage: String?,
     open val customerAccount: CustomerAccount?,
     messageLog: List<MessageLogEntry>,
-    finTsModel: BankData? = null,
-    serializedFinTsModel: String? = null
-) : FinTsClientResponse(error, errorMessage, messageLog, finTsModel, serializedFinTsModel) {
+    finTsModel: BankData? = null
+) : FinTsClientResponse(error, errorMessage, messageLog, finTsModel) {
 
     internal constructor() : this(null, null, null, listOf()) // for object deserializers
 

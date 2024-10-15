@@ -8,6 +8,5 @@ open class TransferMoneyResponse(
     error: ErrorCode?,
     errorMessage: String?,
     messageLog: List<MessageLogEntry>,
-    finTsModel: BankData? = null,
-    serializedFinTsModel: String? = null
-) : FinTsClientResponse(error, errorMessage, messageLog, finTsModel, serializedFinTsModel)
+    finTsModel: BankData? = null
+) : FinTsClientResponse(error, errorMessage, messageLog, finTsModel)
