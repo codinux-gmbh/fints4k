@@ -8,7 +8,7 @@ import net.codinux.banking.fints.model.MessageLogEntry
 open class FinTsClientResponse(
     open val error: ErrorCode?,
     open val errorMessage: String?,
-    open val messageLogWithoutSensitiveData: List<MessageLogEntry>,
+    open val messageLog: List<MessageLogEntry>,
     open val finTsModel: BankData? = null,
     open val serializedFinTsModel: String? = null
 ) {
