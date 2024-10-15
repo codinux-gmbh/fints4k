@@ -59,10 +59,10 @@ open class FinTsClient(
 
     if (basicAccountDataResponse.successful == false || param.retrieveOnlyAccountInfo || basicAccountDataResponse.finTsModel == null) {
       return GetAccountDataResponse(basicAccountDataResponse.error, basicAccountDataResponse.errorMessage, null,
-        basicAccountDataResponse.messageLogWithoutSensitiveData, basicAccountDataResponse.finTsModel, basicAccountDataResponse.serializedFinTsModel)
+        basicAccountDataResponse.messageLog, basicAccountDataResponse.finTsModel)
     } else {
       val bank = basicAccountDataResponse.finTsModel!!
-      return getAccountData(param, bank, bank.accounts, basicAccountDataResponse.messageLogWithoutSensitiveData)
+      return getAccountData(param, bank, bank.accounts, basicAccountDataResponse.messageLog)
     }
   }
 
