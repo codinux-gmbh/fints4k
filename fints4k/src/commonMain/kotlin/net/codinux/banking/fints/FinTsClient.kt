@@ -193,8 +193,8 @@ open class FinTsClient(
    * 04 FinTS_3.0_Messages_Geschaeftsvorfaelle.pdf
    */
   open suspend fun getRequiredDataToSendUserJobs(param: FinTsClientParameter): net.dankito.banking.client.model.response.FinTsClientResponse {
-    if (param.finTsModel != null) {
-      return net.dankito.banking.client.model.response.FinTsClientResponse(null, null, emptyList(), param.finTsModel)
+    param.finTsModelOrDeserialized?.let { finTsModel ->
+      return net.dankito.banking.client.model.response.FinTsClientResponse(null, null, emptyList(), finTsModel)
     }
 
     val defaultValues = (param as? GetAccountDataParameter)?.defaultBankValues
@@ -213,7 +213,7 @@ open class FinTsClient(
   }
 
   protected open suspend fun getAccountInfo(param: FinTsClientParameter, bank: BankData): GetAccountInfoResponse {
-    param.finTsModel?.let {
+    param.finTsModelOrDeserialized?.let {
       // TODO: implement
 //      return GetAccountInfoResponse(it)
     }

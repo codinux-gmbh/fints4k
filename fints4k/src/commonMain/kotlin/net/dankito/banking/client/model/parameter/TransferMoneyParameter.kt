@@ -38,7 +38,8 @@ open class TransferMoneyParameter(
   preferredTanMedium: String? = null,
   abortIfTanIsRequired: Boolean = false,
   finTsModel: BankData? = null,
+  serializedFinTsModel: String? = null,
 
   open val selectAccountToUseForTransfer: ((List<AccountData>) -> AccountData?)? = null // TODO: use BankAccount instead of AccountData
 
-) : FinTsClientParameter(bankCode, loginName, password, preferredTanMethods, tanMethodsNotSupportedByApplication, preferredTanMedium, abortIfTanIsRequired, finTsModel)
+) : FinTsClientParameter(bankCode, loginName, password, preferredTanMethods, tanMethodsNotSupportedByApplication, preferredTanMedium, abortIfTanIsRequired, finTsModel, serializedFinTsModel)
