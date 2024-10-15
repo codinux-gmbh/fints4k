@@ -11,7 +11,7 @@ data class Holding(
     val isin: String?,
     val wkn: String?,
     val buyingDate: LocalDate?,
-    val quantity: Int?,
+    val quantity: Double?,
     /**
      * (Durchschnittlicher) Einstandspreis/-kurs einer Einheit des Wertpapiers
      */

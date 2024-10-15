@@ -22,8 +22,19 @@ class Mt535ParserTest {
 
         assertSize(2, statement.holdings)
 
-        assertHolding(statement.holdings.first(), "MUL AMUN MSCI WLD ETF ACC MUL Amundi MSCI World V", "LU1781541179", null, LocalDate(2024, 6, 3), 1693, "16,828250257", "18531,08")
-        assertHolding(statement.holdings[1], "NVIDIA CORP. DL-,001 NVIDIA Corp.", "US67066G1040", null, LocalDate(2024, 8, 5), 214, "92,86", "22846,64")
+        assertHolding(statement.holdings.first(), "MUL AMUN MSCI WLD ETF ACC MUL Amundi MSCI World V", "LU1781541179", null, LocalDate(2024, 6, 3), 1693.0, "16,828250257", "18531,08")
+        assertHolding(statement.holdings[1], "NVIDIA CORP. DL-,001 NVIDIA Corp.", "US67066G1040", null, LocalDate(2024, 8, 5), 214.0, "92,86", "22846,64")
+    }
+
+    @Test
+    fun quantityIsFloatingPointNumber() {
+        val result = underTest.parseMt535String(QuantityIsFloatingPointNumber)
+
+        val statement = assertStatement(result, "70033100", "0123456789", "21480,38", LocalDate(2024, 10, 15), LocalDate(2024, 10, 15))
+
+        assertSize(1, statement.holdings)
+
+        assertHolding(statement.holdings.first(), "SAP SE O.N. SAP SE", "DE0007164600", null, LocalDate(2024, 10, 4), 100.446, "199,090257451", "21480,38")
     }
 
     @Test
@@ -46,8 +57,8 @@ class Mt535ParserTest {
 
         assertSize(3, statement.holdings)
 
-        assertHolding(statement.holdings.first(), "/DE/123456 Mustermann AG, Stammaktien", "DE0123456789", null, LocalDate(1999, 8, 15), 100, "68,5", "5270,")
-        assertHolding(statement.holdings[1], "/DE/123457 Mustermann AG, Vorzugsaktien", "DE0123456790", null, LocalDate(1998, 10, 13), 100, "42,75", "5460,")
+        assertHolding(statement.holdings.first(), "/DE/123456 Mustermann AG, Stammaktien", "DE0123456789", null, LocalDate(1999, 8, 15), 100.0, "68,5", "5270,")
+        assertHolding(statement.holdings[1], "/DE/123457 Mustermann AG, Vorzugsaktien", "DE0123456790", null, LocalDate(1998, 10, 13), 100.0, "42,75", "5460,")
         // TODO: these values are not correct. Implement taking foreign currencies into account to fix this
         assertHolding(statement.holdings[2], "Australian Domestic Bonds 1993 (2003) Ser. 10", "AU9876543210", null, LocalDate(1999, 3, 15), null, "31", "6294,65")
     }
@@ -71,7 +82,7 @@ class Mt535ParserTest {
         return statement
     }
 
-    private fun assertHolding(holding: Holding, name: String, isin: String?, wkn: String?, buyingDate: LocalDate?, quantity: Int?, averagePrice: String?, balance: String?, currency: String? = "EUR") {
+    private fun assertHolding(holding: Holding, name: String, isin: String?, wkn: String?, buyingDate: LocalDate?, quantity: Double?, averagePrice: String?, balance: String?, currency: String? = "EUR") {
         assertEquals(name, holding.name)
 
         assertEquals(isin, holding.isin)
@@ -138,6 +149,41 @@ class Mt535ParserTest {
         :19A::HOLP//EUR41377,72
         :16S:ADDINFO
         -
+    """.trimIndent()
+
+    private val QuantityIsFloatingPointNumber = """
+        :16R:GENL
+        :28E:1/ONLY
+        :20C::SEME//NONREF
+        :23G:NEWM
+        :98A::PREP//20241015
+        :98A::STAT//20241015
+        :22F::STTY//CUST
+        :97A::SAFE//70033100/0123456789
+        :17B::ACTI//Y
+        :16S:GENL
+        
+        :16R:FIN
+        :35B:ISIN DE0007164600
+        SAP SE O.N.
+        SAP SE
+        :93B::AGGR//UNIT/100,446
+        :16R:SUBBAL
+        :93C::TAVI//UNIT/AVAI/100,446
+        :70C::SUBB//1 SAP SE O.N.
+        2
+        3 EDE 213.850000000EUR 2024-10-15T09:03:25.4
+        4 19997.82EUR DE0007164600, 1/SHS
+        :16S:SUBBAL
+        :19A::HOLD//EUR21480,38
+        :70E::HOLD//1STK++++20241004+
+        2199,090257451+EUR
+        :16S:FIN
+        
+        :16R:ADDINFO
+        :19A::HOLP//EUR21480,38
+        :16S:ADDINFO
+        -'
     """.trimIndent()
 
     /**

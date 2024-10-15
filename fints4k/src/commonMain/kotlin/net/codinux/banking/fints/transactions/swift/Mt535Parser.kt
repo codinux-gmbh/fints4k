@@ -145,7 +145,7 @@ open class Mt535Parser(
             val (marketValue, pricingTime, totalCostPrice) = parseMarketValue(holdingBlock)
 
             val balance = portfolioValue?.first ?: (if (balanceIsQuantity == false) Amount(totalBalance) else null)
-            val quantity = if (balanceIsQuantity) totalBalance.replace(",", "").toIntOrNull() else null
+            val quantity = if (balanceIsQuantity) totalBalance.replace(",", ".").toDoubleOrNull() else null
 
             Holding(name, isin, wkn, buyingDate, quantity, averageCostPrice, balance, portfolioValue?.second ?: averageCostPriceCurrency, marketValue, pricingTime, totalCostPrice)
         } catch (e: Throwable) {
