@@ -11,6 +11,7 @@ open class MessageLogEntry(
     open val context: MessageContext,
     open val messageTrace: String,
     open val message: String,
+    open val messageWithoutSensitiveData: String? = null,
     open val error: Throwable? = null,
     /**
      * Parsed received segments.

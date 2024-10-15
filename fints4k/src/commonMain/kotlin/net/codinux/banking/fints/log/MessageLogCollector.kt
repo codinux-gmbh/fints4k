@@ -37,22 +37,24 @@ open class MessageLogCollector(
 
     // in either case remove sensitive data after response is parsed as otherwise some information like account holder name and accounts may is not set yet on BankData
     open val messageLog: List<MessageLogEntry>
-        // safe CPU cycles by only formatting and removing sensitive data if messageLog is really requested
-        get() = _messageLog.map { MessageLogEntry(it.type, it.context, it.messageTrace, createMessageForLog(it), it.error, it.parsedSegments, it.time) }
+        // safe CPU cycles by only removing sensitive data if messageLog is really requested
+        get() = _messageLog.map {
+            val message = createMessageForLog(it)
+            val messageWithoutSensitiveData = if (options.removeSensitiveDataFromMessageLog) {
+                safelyRemoveSensitiveDataFromMessage(message, it.context.bank)
+            } else {
+                message
+            }
 
-    private fun createMessageForLog(logEntry: MessageLogEntry): String {
-        val message = if (logEntry.type == MessageLogEntryType.Error) {
+            MessageLogEntry(it.type, it.context, it.messageTrace, message, messageWithoutSensitiveData, it.error, it.parsedSegments, it.time)
+        }
+
+    private fun createMessageForLog(logEntry: MessageLogEntry): String =
+        if (logEntry.type == MessageLogEntryType.Error) {
             logEntry.message + (if (logEntry.error != null) NewLine + getStackTrace(logEntry.error!!) else "")
         } else {
             logEntry.message
         }
-
-        return if (options.removeSensitiveDataFromMessageLog) {
-            safelyRemoveSensitiveDataFromMessage(message, logEntry.context.bank)
-        } else {
-            message
-        }
-    }
 
 
     open fun addMessageLog(type: MessageLogEntryType, message: String, context: MessageContext, parsedSegments: List<ReceivedSegment> = emptyList()) {
@@ -76,7 +78,7 @@ open class MessageLogCollector(
 
     protected open fun addMessageLogEntry(type: MessageLogEntryType, context: MessageContext, messageTrace: String, message: String, error: Throwable? = null, parsedSegments: List<ReceivedSegment> = emptyList()) {
         if (options.collectMessageLog || options.fireCallbackOnMessageLogs) {
-            val newEntry = MessageLogEntry(type, context, messageTrace, message, error, parsedSegments)
+            val newEntry = MessageLogEntry(type, context, messageTrace, message, null, error, parsedSegments)
 
             if (options.collectMessageLog) {
                 _messageLog.add(newEntry)
