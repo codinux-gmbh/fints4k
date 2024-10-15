@@ -57,12 +57,7 @@ open class MessageLogCollector(
 
     open fun addMessageLog(type: MessageLogEntryType, message: String, context: MessageContext, parsedSegments: List<ReceivedSegment> = emptyList()) {
         val messageTrace = createMessageTraceString(type, context)
-
-        val prettyPrintMessage = if (options.collectMessageLog || options.fireCallbackOnMessageLogs || log.isDebugEnabled) { // only use CPU cycles if message will ever be used / displayed
-            prettyPrintFinTsMessage(message)
-        } else {
-            message
-        }
+        val prettyPrintMessage = prettyPrintMessageIfRequired(message)
 
         log.debug { "$messageTrace\n$prettyPrintMessage" }
 
@@ -72,10 +67,11 @@ open class MessageLogCollector(
     open fun logError(loggingClass: KClass<*>, message: String, context: MessageContext, e: Throwable? = null) {
         val type = MessageLogEntryType.Error
         val messageTrace = createMessageTraceString(type, context)
+        val prettyPrintMessage = prettyPrintFinTsMessage(message) // error messages almost always get logged / displayed -> pretty print
 
-        LoggerFactory.getLogger(loggingClass).error(e) { messageTrace + message }
+        LoggerFactory.getLogger(loggingClass).error(e) { "$messageTrace\n$prettyPrintMessage" }
 
-        addMessageLogEntry(type, context, messageTrace, message, e)
+        addMessageLogEntry(type, context, messageTrace, prettyPrintMessage, e)
     }
 
     protected open fun addMessageLogEntry(type: MessageLogEntryType, context: MessageContext, messageTrace: String, message: String, error: Throwable? = null, parsedSegments: List<ReceivedSegment> = emptyList()) {
@@ -112,6 +108,13 @@ open class MessageLogCollector(
             MessageLogEntryType.Error -> "03 Error"
         }
     }
+
+    protected open fun prettyPrintMessageIfRequired(message: String): String =
+        if (options.collectMessageLog || options.fireCallbackOnMessageLogs || log.isDebugEnabled) { // only use CPU cycles if message will ever be used / displayed
+            prettyPrintFinTsMessage(message)
+        } else {
+            message
+        }
 
     protected open fun prettyPrintFinTsMessage(message: String): String =
         finTsUtils.prettyPrintFinTsMessage(message)
