@@ -56,12 +56,12 @@ open class FinTsClient(
 
   open suspend fun getAccountDataAsync(param: GetAccountDataParameter): GetAccountDataResponse {
     val basicAccountDataResponse = getRequiredDataToSendUserJobs(param)
+    val bank = basicAccountDataResponse.finTsModel
 
-    if (basicAccountDataResponse.successful == false || param.retrieveOnlyAccountInfo || basicAccountDataResponse.finTsModel == null) {
+    if (basicAccountDataResponse.successful == false || param.retrieveOnlyAccountInfo || bank == null) {
       return GetAccountDataResponse(basicAccountDataResponse.error, basicAccountDataResponse.errorMessage, null,
-        basicAccountDataResponse.messageLog, basicAccountDataResponse.finTsModel)
+        basicAccountDataResponse.messageLog, bank)
     } else {
-      val bank = basicAccountDataResponse.finTsModel!!
       return getAccountData(param, bank, bank.accounts, basicAccountDataResponse.messageLog)
     }
   }
