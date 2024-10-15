@@ -1,6 +1,6 @@
 // TODO: move to versions.gradle
 ext {
-    appVersionName = "1.0.0-Alpha-15"
+    appVersionName = "1.0.0-Alpha-16-SNAPSHOT"
 
 
     /*      Test        */
