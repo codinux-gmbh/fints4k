@@ -590,7 +590,8 @@ Log.info { "Terminating waiting for TAN input" } // TODO: remove again
 
             val initDialogResponse = initDialogWithStrongCustomerAuthentication(context)
 
-            if (initDialogResponse.successful == false) {
+            // if lastCreatedMessage was a dialog init message, there's no need to send this message again, we just initialized a new dialog in initDialogWithStrongCustomerAuthentication()
+            if (initDialogResponse.successful == false || lastCreatedMessage.isDialogInitMessage()) {
                 return initDialogResponse
             } else {
                 val newMessage = messageBuilder.rebuildMessage(context, lastCreatedMessage)

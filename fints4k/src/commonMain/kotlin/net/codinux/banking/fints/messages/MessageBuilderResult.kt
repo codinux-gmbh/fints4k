@@ -1,6 +1,8 @@
 package net.codinux.banking.fints.messages
 
+import net.codinux.banking.fints.messages.datenelementgruppen.implementierte.Segmentkopf
 import net.codinux.banking.fints.messages.segmente.Segment
+import net.codinux.banking.fints.messages.segmente.implementierte.Verarbeitungsvorbereitung
 import net.codinux.banking.fints.messages.segmente.implementierte.ZweiSchrittTanEinreichung
 
 
@@ -31,5 +33,11 @@ open class MessageBuilderResult(
         return messageBodySegments.size == 1
                 && messageBodySegments.first() is ZweiSchrittTanEinreichung
     }
+
+    open fun isDialogInitMessage(): Boolean =
+        messageBodySegments.any { it is Verarbeitungsvorbereitung }
+
+
+    override fun toString() = "${messageBodySegments.joinToString { (it.dataElementsAndGroups.firstOrNull() as? Segmentkopf)?.let { "${it.identifier}:${it.segmentVersion}" } ?: "<No Segment header>" } }}"
 
 }
