@@ -26,7 +26,7 @@ repositories {
 
 
 dependencies {
-    implementation("net.codinux.banking:fints4k:1.0.0-Alpha-13")
+    implementation("net.codinux.banking:fints4k:1.0.0-Alpha-16")
 }
 ```
 
@@ -38,7 +38,7 @@ Maven:
 <dependency>
    <groupId>net.dankito.banking</groupId>
    <artifactId>fints4k-jvm</artifactId>
-   <version>1.0.0-Alpha-11</version>
+   <version>1.0.0-Alpha-16</version>
 </dependency>
 ```
 
