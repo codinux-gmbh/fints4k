@@ -116,7 +116,7 @@ open class FinTsClient(
     }
 
 
-    val bank = mapper.mapToBankData(param, finTsServerAddress)
+    val bank = param.finTsModel ?: mapper.mapToBankData(param, finTsServerAddress)
     val remittanceAccount = param.remittanceAccount
 
     if (remittanceAccount == null) { // then first retrieve customer's bank accounts
