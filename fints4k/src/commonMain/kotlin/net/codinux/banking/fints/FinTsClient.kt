@@ -60,12 +60,14 @@ open class FinTsClient(
       return GetAccountDataResponse(basicAccountDataResponse.error, basicAccountDataResponse.errorMessage, null,
         basicAccountDataResponse.messageLog, bank)
     } else {
-      return getAccountData(param, bank, bank.accounts, basicAccountDataResponse.messageLog)
+      return getAccountData(param, bank, basicAccountDataResponse.messageLog)
     }
   }
 
-  protected open suspend fun getAccountData(param: GetAccountDataParameter, bank: BankData, accounts: List<AccountData>, previousJobMessageLog: List<MessageLogEntry>?): GetAccountDataResponse {
+  protected open suspend fun getAccountData(param: GetAccountDataParameter, bank: BankData, previousJobMessageLog: List<MessageLogEntry>?): GetAccountDataResponse {
     val retrievedTransactionsResponses = mutableListOf<GetAccountTransactionsResponse>()
+    val accounts = param.accounts?.mapNotNull { identifier -> bank.accounts.firstOrNull { it.accountIdentifier == identifier.identifier } }
+          ?: bank.accounts
 
     val accountsSupportingRetrievingTransactions = accounts.filter { it.supportsRetrievingBalance || it.supportsRetrievingAccountTransactions }
 
