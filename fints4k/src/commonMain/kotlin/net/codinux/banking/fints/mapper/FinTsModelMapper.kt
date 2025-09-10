@@ -26,7 +26,11 @@ open class FinTsModelMapper {
     return BankData(
       param.bankCode, param.loginName, param.password, finTsServerAddress,
       defaultValues?.bic ?: bicFinder.findBic(param.bankCode) ?: "", defaultValues?.bankName ?: ""
-    )
+    ).apply {
+        (param.finTsModel ?: defaultValues)?.accounts.orEmpty().forEach { account ->
+            this.addAccount(account)
+        }
+    }
   }
 
   open fun mapToAccountData(credentials: BankAccountIdentifier, param: FinTsClientParameter): AccountData {
