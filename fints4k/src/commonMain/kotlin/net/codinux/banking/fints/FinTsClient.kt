@@ -128,7 +128,7 @@ open class FinTsClient(
         return transferMoneyAsync(param, recipientBankIdentifier, bank, bank.accounts, basicAccountDataResponse)
       }
     } else {
-      return transferMoneyAsync(param, recipientBankIdentifier, bank, listOf(mapper.mapToAccountData(remittanceAccount, param)), null)
+      return transferMoneyAsync(param, recipientBankIdentifier, bank, listOf(mapper.getExistingOrMapToAccountData(remittanceAccount, bank, param)), null)
     }
   }
 

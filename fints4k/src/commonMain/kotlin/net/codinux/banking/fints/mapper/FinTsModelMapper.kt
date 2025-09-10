@@ -33,6 +33,10 @@ open class FinTsModelMapper {
     }
   }
 
+open fun getExistingOrMapToAccountData(credentials: BankAccountIdentifier, bank: BankData, param: FinTsClientParameter): AccountData =
+    bank.accounts.firstOrNull { it.accountIdentifier == credentials.identifier }
+        ?: mapToAccountData(credentials, param)
+
   open fun mapToAccountData(credentials: BankAccountIdentifier, param: FinTsClientParameter): AccountData {
     val accountData = AccountData(credentials.identifier, credentials.subAccountNumber, Laenderkennzeichen.Germany, param.bankCode,
       credentials.iban, param.loginName, null, null, "", null, null, listOf(), listOf())
