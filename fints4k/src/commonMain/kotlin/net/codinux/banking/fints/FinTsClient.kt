@@ -19,8 +19,6 @@ import net.codinux.banking.fints.response.segments.BankParameters
 import net.codinux.banking.fints.util.BicFinder
 import net.codinux.log.LogLevel
 import net.codinux.log.LoggerFactory
-import kotlin.js.JsName
-import kotlin.jvm.JvmName
 
 
 open class FinTsClient(
