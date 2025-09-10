@@ -120,20 +120,22 @@ open class FinTsClient(
     val remittanceAccount = param.remittanceAccount
 
     if (remittanceAccount == null) { // then first retrieve customer's bank accounts
-      val getAccountInfoResponse = getAccountInfo(param, bank)
+      val basicAccountDataResponse = getRequiredDataToSendUserJobs(param)
+      val bank = basicAccountDataResponse.finTsModel
 
-      if (getAccountInfoResponse.successful == false) {
-        return TransferMoneyResponse(mapper.mapErrorCode(getAccountInfoResponse), mapper.mapErrorMessages(getAccountInfoResponse),
-          getAccountInfoResponse.messageLog, bank)
+      if (basicAccountDataResponse.successful == false || bank == null) {
+        return TransferMoneyResponse(basicAccountDataResponse.error, basicAccountDataResponse.errorMessage,
+            basicAccountDataResponse.messageLog, bank)
       } else {
-        return transferMoneyAsync(param, recipientBankIdentifier, getAccountInfoResponse.bank, getAccountInfoResponse.bank.accounts, getAccountInfoResponse)
+        return transferMoneyAsync(param, recipientBankIdentifier, bank, bank.accounts, basicAccountDataResponse)
       }
     } else {
       return transferMoneyAsync(param, recipientBankIdentifier, bank, listOf(mapper.mapToAccountData(remittanceAccount, param)), null)
     }
   }
 
-  protected open suspend fun transferMoneyAsync(param: TransferMoneyParameter, recipientBankIdentifier: String, bank: BankData, accounts: List<AccountData>, previousJobResponse: FinTsClientResponse?): TransferMoneyResponse {
+  protected open suspend fun transferMoneyAsync(param: TransferMoneyParameter, recipientBankIdentifier: String, bank: BankData, accounts: List<AccountData>,
+                                                previousJobResponse: net.dankito.banking.client.model.response.FinTsClientResponse?): TransferMoneyResponse {
     val accountsSupportingTransfer = accounts.filter { it.supportsTransferringMoney }
     val accountToUse: AccountData
 
@@ -156,7 +158,7 @@ open class FinTsClient(
     val response = config.jobExecutor.transferMoneyAsync(context, BankTransferData(param.recipientName, param.recipientAccountIdentifier, recipientBankIdentifier,
       param.amount, param.reference, param.instantPayment))
 
-    return TransferMoneyResponse(mapper.mapErrorCode(response), mapper.mapErrorMessages(response), mapper.mergeMessageLog(previousJobResponse, response), bank)
+    return TransferMoneyResponse(mapper.mapErrorCode(response), mapper.mapErrorMessages(response), mapper.mergeMessageLog(previousJobResponse?.messageLog ?: emptyList(), response.messageLog), bank)
   }
 
   private fun getRecipientBankCode(param: TransferMoneyParameter): String? {
